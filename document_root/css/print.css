@@ -1,0 +1,9 @@
+body {
+	font-family: "Trebuchet MS", "Geneva CE", lucida, sans-serif;
+	color: black;
+	background-color: white;
+}
+
+#spinner {
+	display: none;
+}

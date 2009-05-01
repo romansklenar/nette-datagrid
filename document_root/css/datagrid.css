@@ -1,0 +1,148 @@
+/********************** DataGrid *********************/
+table.grid {
+	padding: 0;
+	margin: 0;
+	border-collapse:collapse;
+}
+table.grid tr {
+	background: #FFFFFF;
+}
+table.grid tr.alt {
+	background: #F6F7FA;
+}
+table.grid tr:hover {
+	background: #E1E7F3 !important;
+}
+table.grid tr.selected {
+	background: #B3F76F !important;
+}
+table.grid tr.filters, table.grid tr.filters td {
+	background: #C6DBFF url('../images/th-bg-mid.gif') no-repeat;
+	padding: 3px 6px !important;
+}
+table.grid tr.filters input[type="text"], table.grid tr.filters select {
+	width: 100%;
+	color: #525B37;
+	font-family: Arial,sans-serif;
+	border: 1px #CCCCCC solid;
+	padding: 2px 0px;
+	margin: 0 auto;
+}
+table.grid tr.filters select {
+	padding: 1px 0px;
+}
+table.grid tr.filters input[type="text"]:hover, table.grid tr.filters input[type="text"]:focus {
+	background-color: #F6F7FA;
+}
+table.grid tr.filters input[type="checkbox"], table.grid tr.filters input[type="checkbox"]:hover {
+	border: none;
+	*background-color: #C6DBFF;
+	display: block;
+	margin: 0 auto;
+}
+table.grid td, table.grid th {
+	color: #525b37;
+	border: 1px solid #BBCBF4;
+	padding: 6px;
+}
+table.grid th {
+	color: #505767;
+	background: #C6DBFF url('../images/th-bg.gif') no-repeat;
+	text-align: left;
+	padding: 0 10px;
+}
+table.grid th.checker, table.grid td.checker,
+table.grid td.actions {
+	text-align: center;
+}
+table.grid th span {
+	color: #7D9DC9;
+	font-size: 90%;
+}
+table.grid th span.link {
+	color: #165CA3;
+}
+table.grid th a, table.grid tr.filters a.filter {
+	color: #165CA3;
+	text-decoration: none;
+	padding-right: 20px; /* padding: 6px 20px 6px 12px; */
+	line-height: 30px;
+}
+table.grid th .asc, table.grid th a:hover {
+	background: url('../images/asc.gif') no-repeat right center;
+}
+table.grid th .desc, table.grid th .asc:hover {
+	background: url('../images/desc.gif') no-repeat right center;
+}
+table.grid th .desc:hover {
+	background: none;
+}
+table.grid tr.filters a.filter {
+	background: url('../images/icons/find.png') no-repeat right center;
+	padding-right: 25px;
+	padding-left: 5px;
+	font-weight: bold;
+	text-align: left !important;
+	line-height: 10px !important;
+}
+table.grid tr.filters td.actions {
+	text-align: left;
+	*padding: 6px !important;
+}
+table.grid td span.positioner {
+	width: 22px;
+	height: 16px;
+	display: block;
+	float: left;
+}
+table.grid td span.positioner a span {
+	border: none;
+	display: block;
+	float: left;
+	margin: 2px;
+	width: 21px;
+	height: 4px;
+}
+table.grid td span.positioner a span.up {
+	background: url('../images/asc-n.gif') no-repeat right center;
+}
+table.grid td span.positioner a span.up:hover {
+	background: url('../images/asc.gif') no-repeat right center;
+}
+table.grid td span.positioner a span.down {
+	background: url('../images/desc-n.gif') no-repeat right center;
+}
+table.grid td span.positioner a span.down:hover {
+	background: url('../images/desc.gif') no-repeat right center;
+}
+table.grid td span.positioner a.inactive span, table.grid td span.positioner a.inactive span:hover {
+	background: none !important;
+	cursor: default;
+}
+
+
+.paginator {
+	margin: 2em 0;
+	font-size: 90%;
+}
+.paginator a, .paginator span {
+	margin-right: 0.1em;
+	padding: 0.2em 0.5em !important;
+	color: #999999;
+	background-color: whitesmoke;
+}
+.paginator a {
+	border: 1px solid #9AAFE5;
+	text-decoration: none;
+	color: #105CB6;
+	background-color: #FFFFFF
+}
+.paginator span.button {
+	border: 1px solid #DDDDDD;
+}
+.paginator .current {
+	background: #2E6AB1;
+	border: 1px solid #2E6AB1;
+	color: white;
+	font-weight: bold;
+}

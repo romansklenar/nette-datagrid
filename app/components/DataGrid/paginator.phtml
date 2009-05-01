@@ -1,0 +1,27 @@
+{*snippet paginator*}
+
+<span class="paginator">
+	{if $paginator->isFirst()}
+	<span class="button">« Previous</span>
+	{else}
+	<a href="{link page $paginator->page - 1}" class="ajaxlink">« Previous</a>
+	{/if}
+
+	{foreach $steps as $step}
+	{if isset($prevStep) && $step - $prevStep > 1}<span>…</span>{/if}
+	{if $step == $paginator->page}
+		<span class="current">{$step}</span>
+	{else}
+		<a href="{link page $step}" class="ajaxlink">{$step}</a>
+	{/if}
+	{? $prevStep = $step}
+	{/foreach}
+
+	{if $paginator->isLast()}
+	<span class="button">Next »</span>
+	{else}
+	<a href="{link page, $paginator->page + 1}" class="ajaxlink">Next »</a>
+	{/if}
+</span>
+
+{*/snippet*}
