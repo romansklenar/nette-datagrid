@@ -57,7 +57,7 @@ class DateColumn extends TextColumn
 	{
 		if (!$this->hasFilter()) return;
 		
-		$datagrid = $this->getDataGrid(TRUE);		
+		$datagrid = $this->getDataGrid(TRUE);
 		$column = $this->getName();
 		$cond = array();
 		$cond[] = array("[$column] = %t", $value);

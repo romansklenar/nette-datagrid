@@ -33,13 +33,13 @@ class CheckboxColumn extends NumericColumn
 	 * @return string
 	 */
 	public function formatContent($value)
-	{		
+	{
 		$checkbox = Html::el('input')->type('checkbox')->disabled('disabled');
 		if ($value) $checkbox->checked = TRUE;
 		return (string) $checkbox;
 	}
 	
-		
+	
 	/**
 	 * Filters data source.
 	 * @param  mixed
@@ -53,7 +53,7 @@ class CheckboxColumn extends NumericColumn
 		$column = $this->getName();
 		$value = (int)(bool)$value;
 		$cond = array();
-		$cond[] = array("[$column] " . ($value ? ">" : "=") . " %b", FALSE);		
+		$cond[] = array("[$column] " . ($value ? ">" : "=") . " %b", FALSE);
 		$datagrid->dataSource->where('%and', $cond);
 	}
 }

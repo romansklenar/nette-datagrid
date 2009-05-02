@@ -17,7 +17,7 @@ require_once dirname(__FILE__) . '/IDataGridAction.php';
  */
 class DataGridAction extends Component implements IDataGridAction
 {
-	/**#@+ special action key */	
+	/**#@+ special action key */
 	const WITH_KEY		= TRUE;
 	const WITHOUT_KEY	= FALSE;
 	/**#@-*/
@@ -50,10 +50,10 @@ class DataGridAction extends Component implements IDataGridAction
 	public function __construct($title, $destination, Html $icon = NULL, $useAjax = FALSE, $type = self::WITH_KEY)
 	{
 		parent::__construct();
-
+		
 		$this->type = $type;
 		$this->destination = $destination;
-
+		
 		$a = Html::el('a')->title($title);
 		if ($useAjax) $a->class(self::$ajaxClass);
 		if ($icon !== NULL && $icon instanceof Html) {
@@ -78,11 +78,11 @@ class DataGridAction extends Component implements IDataGridAction
 			case self::WITH_KEY: $link = $presenter->link($this->destination, $args); break;
 			default: throw new InvalidArgumentException("Invalid type of action.");
 		}
-
+		
 		$this->html->href($link);
 	}
-	
-	
+
+
 	/**
 	 * Returns data grid.
 	 * @param  bool   throw exception if form doesn't exist?
@@ -92,11 +92,11 @@ class DataGridAction extends Component implements IDataGridAction
 	{
 		return $this->lookup('DataGrid', $need);
 	}
-	
-	
-	
+
+
+
 	/********************* interface \IDataGridAction *********************/
-	
+
 
 
 	/**

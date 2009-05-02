@@ -19,20 +19,20 @@ abstract class DataGridColumnFilter extends Component implements IDataGridColumn
 {
 	/** @var FormControl  form element */
 	protected $element;
-	
+
 	/** @var string  value of filter (if was filtered) */
-	public $value;	
+	public $value;
 
 	
 	public function __construct()
 	{
 		parent::__construct();
 	}
-	
-	
-	
+
+
+
 	/********************* interface \IDataGridColumnFilter *********************/
-	
+
 
 
 	/**
@@ -42,8 +42,8 @@ abstract class DataGridColumnFilter extends Component implements IDataGridColumn
 	public function getFormControl()
 	{
 	}
-	
-	
+
+
 	/**
 	 * Gets filter's value, if was filtered.
 	 * @return string
@@ -58,7 +58,7 @@ abstract class DataGridColumnFilter extends Component implements IDataGridColumn
 			if ($key == $this->getName()) {
 				return $this->value = $value;
 			}
-		}		
+		}
 		return $this->value;
 	}
 

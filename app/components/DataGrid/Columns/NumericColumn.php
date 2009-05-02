@@ -43,16 +43,16 @@ class NumericColumn extends DataGridColumn
 			if (in_array($value, array_keys($this->replacement))) {
 				$value = $this->replacement[$value];
 			}
-		}		
+		}
 		$value = round($value, $this->precision);
-	
+		
 		foreach ($this->formatCallback as $callback) {
 			if (is_callable($callback)) {
-        		$value = call_user_func($callback, $value);
+				$value = call_user_func($callback, $value);
 			}
 		}
 		return $value;
-	}	
+	}
 	
 	/**
 	 * Filters data source.
@@ -75,7 +75,7 @@ class NumericColumn extends DataGridColumn
 			$value = $matches['value'];
 		}
 		$cond[] = array("[$column] $operator %s", $value);
-
+		
 		$datagrid = $this->getDataGrid(TRUE);
 		$datagrid->dataSource->where('%and', $cond);
 	}

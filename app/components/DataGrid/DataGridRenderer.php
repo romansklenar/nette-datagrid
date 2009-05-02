@@ -23,12 +23,12 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			'container' => 'class=gridform',
 			'errors' => TRUE,
 		),
-
+		
 		'error' => array(
 			'container' => 'ul class=error',
 			'item' => 'li',
 		),
-
+		
 		'grid' => array(
 			'container' => 'table class=grid',
 		),
@@ -51,7 +51,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			'container' => 'tr', // .alt, .selected
 			'cell' => array(
 				'container' => 'td', // .checker, .action
-			),	
+			),
 		),
 		
 		'row.footer' => array(
@@ -65,8 +65,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 	/** @var DataGrid */
 	protected $dataGrid;	
-	
-	
+
+
 	/**
 	 * Provides complete datagrid rendering.
 	 * @param  DataGrid
@@ -86,10 +86,10 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		if (!$dataGrid->hasColumns()) {
 			// auto-generate columns
 			$row = $dataGrid->dataSource->select('*')->fetch();
-			$keys = array_keys((array)$row);			
+			$keys = array_keys((array)$row);
 			foreach ($keys as $key) $dataGrid->addColumn($key);
 		}
-
+		
 		$s = '';
 		if  ($this->dataGrid->hasFilters() || $this->dataGrid->hasOperations()) {
 			if (!$mode || $mode === 'begin') {
@@ -107,8 +107,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		}
 		return $s;
 	}
-	
-	
+
+
 	/**
 	 * Renders datagrid form begin.
 	 * @return string
@@ -116,15 +116,15 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	public function renderBegin()
 	{
 		$form = $this->dataGrid->getForm(TRUE);
-
+		
 		foreach ($form->getControls() as $control) {
 			$control->setOption('rendered', FALSE);
 		}
-
+		
 		return $form->getElementPrototype()->startTag();
 	}
-	
-	
+
+
 	/**
 	 * Renders datagrid form end.
 	 * @return string
@@ -148,7 +148,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		if (count($errors)) {
 			$ul = $this->getWrapper('error container');
 			$li = $this->getWrapper('error item');
-
+			
 			foreach ($errors as $error) {
 				$item = clone $li;
 				if ($error instanceof Html) {
@@ -161,14 +161,14 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			return "\n" . $ul->render(0);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Renders form body.
 	 * @return string
 	 */
 	public function renderBody()
-	{		
+	{
 		$table = $this->getWrapper('grid container');
 		
 		// headers
@@ -191,8 +191,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		
 		return $table->render(0);
 	}
-	
-	
+
+
 	/**
 	 * Renders datagrid headrer.
 	 * @return Html
@@ -236,7 +236,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			}
 			
 			$cell = $this->getWrapper('row.header cell container')->setHtml($value);
-			$cell->attrs = $column->getHeaderPrototype()->attrs;			
+			$cell->attrs = $column->getHeaderPrototype()->attrs;
 			if ($column instanceof ActionColumn) $cell->class[] = 'actions';
 			
 			$row->add($cell);
@@ -244,8 +244,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		
 		return $row;
 	}
-	
-	
+
+
 	/**
 	 * Renders datagrid filter.
 	 * @return Html
@@ -278,8 +278,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		}		
 		return $row;
 	}
-	
-	
+
+
 	/**
 	 * Renders datagrid row content.
 	 * @param  DibiRow data
@@ -290,7 +290,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$form = $this->dataGrid->getForm(TRUE);
 		$row = $this->getWrapper('row.content container');
 		
-		if ($this->dataGrid->hasChecker() || $this->dataGrid->hasActions()) {			
+		if ($this->dataGrid->hasChecker() || $this->dataGrid->hasActions()) {
 			$primary = $this->dataGrid->getKeyName();
 			if (!array_key_exists($primary, $data)) {
 				throw new InvalidArgumentException("Invalid name of key for group operations or actions. Column '" . $primary . "' does not exist in data source.");
@@ -325,9 +325,10 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$row->add($cell);
 		}
 		
-		return $row;	
+		return $row;
 	}
-	
+
+
 	/**
 	 * Renders datagrid footer.
 	 * @return Html

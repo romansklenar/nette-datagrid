@@ -14,7 +14,7 @@ require_once dirname(__FILE__) . '/TextFilter.php';
  * @version    $Id$
  */
 class DateFilter extends TextFilter
-{	
+{
 	/**
 	 * Returns filter's form element.
 	 * @return FormControl
@@ -22,7 +22,7 @@ class DateFilter extends TextFilter
 	public function getFormControl()
 	{
 		parent::getFormControl();
-		$this->element->getControlPrototype()->class('datepicker');		
+		$this->element->getControlPrototype()->class('datepicker');
 		return $this->element;
 	}
 }

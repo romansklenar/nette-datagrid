@@ -14,7 +14,7 @@ require_once dirname(__FILE__) . '/../DataGridColumnFilter.php';
  * @version    $Id$
  */
 class SelectboxFilter extends DataGridColumnFilter
-{	
+{
 	/** @var array  asociative array of items in selectbox */
 	protected $generatedItems;
 	
@@ -23,7 +23,7 @@ class SelectboxFilter extends DataGridColumnFilter
 	
 	/** @var bool */
 	protected $skipFirst;	
-
+	
 	
 	/**
 	 * Selectbox filter constructor.
@@ -52,10 +52,10 @@ class SelectboxFilter extends DataGridColumnFilter
 		$columnName = $this->getName();
 		$dataSource = clone $dataGrid->dataSource;
 		$dataSource->release();
-
+		
 		$cond = array();
 		$cond[] = array("[$columnName] NOT LIKE %s", '');
-			
+		
 		$dataSource->where('%and', $cond)->orderBy($columnName)->applyLimit(NULL);
 		$items = $dataSource->fetchPairs($columnName, $columnName);
 		ksort($items);
@@ -79,13 +79,13 @@ class SelectboxFilter extends DataGridColumnFilter
 	public function getFormControl()
 	{
 		if ($this->element instanceof FormControl) return $this->element;
-		$this->element = new SelectBox($this->getName(), $this->items);		
+		$this->element = new SelectBox($this->getName(), $this->items);
 		
 		// prepare items
 		if ($this->items === NULL) {
 			$this->generateItems();
 		}
-
+		
 		// skip first item?
 		if ($this->skipFirst) {
 			$this->element->skipFirst();

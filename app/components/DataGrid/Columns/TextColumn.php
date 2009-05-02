@@ -28,15 +28,15 @@ class TextColumn extends DataGridColumn
 				$value = $this->replacement[$value];
 			}
 		}
-		$value = String::truncate((string) $value, $this->maxLength);		
-	
+		$value = String::truncate((string) $value, $this->maxLength);
+		
 		foreach ($this->formatCallback as $callback) {
 			if (is_callable($callback)) {
-        		$value = call_user_func($callback, $value);
+				$value = call_user_func($callback, $value);
 			}
 		}
 		return $value;
-	}	
+	}
 	
 	
 	/**

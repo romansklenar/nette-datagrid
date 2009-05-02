@@ -52,5 +52,5 @@ class ActionColumn extends DataGridColumn
 		// TODO: or throw exception?
 		//throw new InvalidStateException("ActionColumn cannot be filtered.");
 		return;
-	}	
+	}
 }

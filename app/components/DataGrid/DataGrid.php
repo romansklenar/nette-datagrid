@@ -64,7 +64,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	protected $paginator;
 
 	/** @var bool  multi column order */
-	public $multiOrder = TRUE;	
+	public $multiOrder = TRUE;
 
 	/** @var array */
 	public $operations = array();
@@ -73,20 +73,20 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	protected $rowsChecker = FALSE;
 
 	/** @var array  of valid callback(s) */
-	protected $onOperationSubmit;	
+	protected $onOperationSubmit;
 
 	/** @var IDataGridRenderer */
 	protected $renderer;
-	
+
 	/** @var string */
 	protected $keyName;
-	
+
 	/** @var bool */
 	protected $isPaging;
-	
+
 	/** @var bool */
 	protected $isSorting;
-	
+
 	/** @var bool */
 	protected $isFiltering;
 
@@ -100,7 +100,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		parent::__construct();
 		$this->paginator = new Paginator;
 		$this->paginator->itemsPerPage = $this->rowsPerPage;
-
+		
 		$this->addComponent(new ComponentContainer(), 'columns');
 		$this->addComponent(new ComponentContainer(), 'filters');
 		$this->addComponent(new ComponentContainer(), 'actions');
@@ -138,11 +138,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		if ($this->keyName != NULL) {
 			return $this->keyName;
-		}		
+		}
 		throw new InvalidStateException("Name of key for group operations or actions was not set for DataGrid '" . $this->getName() . "'.");
 	}
-	
-	
+
+
 	/**
 	 * Setter / property method.
 	 * Key name must be set if you want to use group operations or actions.
@@ -155,10 +155,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	}
 
 
-	
+
 	/********************* public getters and setters *********************/
 
-	
+
 
 	/**
 	 * Setter / property method.
@@ -204,8 +204,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 		return array_values(array_unique($arr));
 	}
-	
-	
+
+
 	/**
 	 * Setter / property method.
 	 * @param  mixed  callback(s) to handler(s) which is called after data grid form operation is submited.
@@ -218,8 +218,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 		$this->onOperationSubmit[] = $callback;
 	}
-	
-	
+
+
 	/**
 	 * Getter / property method.
 	 * @return array
@@ -230,10 +230,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	}
 
 
-	
+
 	/********************* Iterators getters *********************/
 
-	
+
 
 	/**
 	 * Iterates over all datagrid rows.
@@ -280,13 +280,13 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		return $this->getComponent('actions', TRUE)->getComponents(FALSE, 'IDataGridAction');
 	}
-	
-	
-	
+
+
+
 	/********************* General data grid behavior *********************/
 
-	
-	
+
+
 	/**
 	 * Does data grid has any column?
 	 * @return bool
@@ -295,7 +295,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		return count($this->getColumns()->getInnerIterator()) > 0;
 	}
-	
+
 
 	/**
 	 * Does any of datagrid columns has a filter?
@@ -315,8 +315,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		return count($this->getActions()->getInnerIterator()) > 0;
 	}
-	
-	
+
+
 	/**
 	 * Does datagrid has any group operation?
 	 * @return bool
@@ -325,8 +325,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		return count($this->operations) > 0;
 	}
-	
-	
+
+
 	/**
 	 * Does datagrid has a checker?
 	 * @return bool
@@ -365,31 +365,30 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		$this->isPaging = TRUE;
 		parse_str($this->order, $list);
-
+		
 		if (!isset($list[$by])) {
 			if (!$this->multiOrder) {
 				$list = array();
 			}
 			$list[$by] = 'a';
-
+		
 		} elseif ($list[$by] === 'd') {
 			if ($this->multiOrder) {
 				unset($list[$by]);
 			} else {
 				$list[$by] = 'a';
 			}
-
+		
 		} else {
 			$list[$by] = 'd';
-
 		}
-
+		
 		$this->order = http_build_query($list, '', '&');
 		$this->invalidateControl('grid');
-
+		
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
-	
+
 
 	/**
 	 * Prepare filtering.
@@ -409,13 +408,13 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
-	
-	
-	
+
+
+
 	/********************* submit handlers *********************/
-	
-	
-	
+
+
+
 	/**
 	 * Data grid form submit handler.
 	 * @param  AppForm
@@ -426,19 +425,19 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		// was form submitted?
 		if ($form->isSubmitted() && $form->isValid()) {
 			$values = $form->getValues();
-
+			
 			if ($form['filterSubmit']->isSubmittedBy()) {
 				$this->handleFilter($values['filters']);
 					
 			} elseif ($form['operationSubmit']->isSubmittedBy()) {
 				trigger_error('No user defined handler for group operations; assign valid callback to your group operations handler into DataGrid::$operationsHandler variable.', E_USER_WARNING);
 				return;
-
+			
 			} else {
 				// unknown submit button
 				throw new InvalidStateException("Unknown submit button.");
 			}
-
+		
 		}
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
@@ -453,12 +452,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		$this->onSubmitHandler($button->getParent());
 	}
-	
-	
-	
+
+
+
 	/********************* Applycators (call before rendering only) *********************/
-	
-	
+
+
 
 	/**
 	 * Applies paging on data grid.
@@ -467,7 +466,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	protected function applyPaging()
 	{
 		if ($this->isFiltering && !$this->isPaging) {
-			$this->paginator->page = $this->page = 1;			
+			$this->paginator->page = $this->page = 1;
 		} else {
 			$this->paginator->page = $this->page;
 		}
@@ -510,11 +509,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	}
 
 
-	
-	/********************* renderers *********************/
-	
 
-	
+	/********************* renderers *********************/
+
+
+
 	/**
 	 * Sets data grid renderer.
 	 * @param  IDataGridRenderer
@@ -537,8 +536,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 		return $this->renderer;
 	}
-	
-	
+
+
 	/**
 	 * Renders data grid.
 	 * @return void
@@ -548,10 +547,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		$args = func_get_args();
 		array_unshift($args, $this);
 		$s = call_user_func_array(array($this->getRenderer(), 'render'), $args);
-
+		
 		echo mb_convert_encoding($s, 'HTML-ENTITIES', 'UTF-8');
 	}
-		
+
+
 	/**
 	 * Renders table grid.
 	 * @return void
@@ -564,8 +564,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		$template->registerFilter('Nette\Templates\CurlyBracketsFilter::invoke');
 		$template->render();
 	}
-	
-	
+
+
 	/**
 	 * Renders paginator.
 	 * @return void
@@ -574,7 +574,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		if ($this->paginator->pageCount < 2) return;
 		$this->paginator->page = $this->page;
-
+		
 		// render
 		$template = $this->createTemplate();
 		$template->paginator = $this->paginator;
@@ -583,13 +583,13 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		$template->steps = $this->getSteps();
 		$template->render();
 	}
-	
-	
+
+
 
 	/********************* components handling *********************/
-	
-	
-	
+
+
+
 	/**
 	 * Component factory
 	 * @see Nette/ComponentContainer#createComponent()
@@ -601,10 +601,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				$form = new AppForm($this, $name);
 				$form->getElementPrototype()->class = 'gridform';
 				FormControl::$idMask = 'frm-grid' . String::capitalize($this->getName()) . '-%s-%s';
-
+				
 				$form->addSubmit('filterSubmit', 'Apply filters')
 					->onClick[] = array($this, 'onClickFilterHandler');
-
+				
 				$form->addSelect('operations', 'Selected:', $this->operations);
 				$form->addSubmit('operationSubmit', 'Send')
 					->onClick= $this->onOperationSubmit;
@@ -627,21 +627,21 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 						$sub->addCheckbox($row[$primary], $row[$primary]);
 					}
 				}
-
+				
 				$renderer = $form->getRenderer();
 				$renderer->wrappers['controls']['container'] = NULL;
 				$renderer->wrappers['label']['container'] = NULL;
 				$renderer->wrappers['control']['container'] = NULL;
 				$form->setRenderer($renderer);
 				return;
-
+				
 			default:
 				parent::createComponent($name);
 				return;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Returns data grid's form component.
 	 * @param  bool   throw exception if form doesn't exist?
@@ -651,8 +651,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		return $this->_getComponent('form', $need);
 	}
-	
-	
+
+
 	/**
 	 * Returns component specified by name or path.
 	 * @param  string
@@ -680,10 +680,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		// TODO: regenerate if is datagrid signal receiver only
 		if ($name == 'form' && $regenerate == TRUE) {
 			$this->regenerateFormControls($component);
-		}		
+		}
 		return $component;
 	}
-	
+
 
 	/**
 	 * Generates filter controls and checker's checkbox controls
@@ -718,8 +718,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		
 		return;
 	}
-	
-	
+
+
 	/**
 	 * Allows group operations and adds checker (column filled by checkboxes).
 	 * @param  array  list of group operations (selectbox items)
@@ -740,11 +740,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 	}
 
-	
-	
+
+
 	/********************* control factories *********************/
-	
-	
+
+
 
 	/**
 	 * Adds column of textual values.
@@ -757,8 +757,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		return $this[$name] = new TextColumn($caption, $maxLength);
 	}
-	
-	
+
+
 	/**
 	 * Adds column of numeric values.
 	 * @param  string  control name
@@ -770,8 +770,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		return $this[$name] = new NumericColumn($caption, $precision);
 	}
-	
-	
+
+
 	/**
 	 * Adds column of date-represented values.
 	 * @param  string  control name
@@ -783,8 +783,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		return $this[$name] = new DateColumn($caption, $format);
 	}
-	
-	
+
+
 	/**
 	 * Adds column of boolean values (represented by checkboxes).
 	 * @param  string  control name
@@ -807,8 +807,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		return $this[$name] = new ImageColumn($caption);
 	}
-	
-	
+
+
 	/**
 	 * Adds column which provides moving entries up or down.
 	 * @param  string  control name
@@ -822,8 +822,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		return $this[$name] = new PositionColumn($caption, $destination, $moves);
 	}
-	
-	
+
+
 	/**
 	 * Adds column which represents logic container for data grid actions.
 	 * @param  string  column label
@@ -908,8 +908,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			$this->getComponent('columns', TRUE)->removeComponent($component);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Renders table grid and return as string.
 	 * @return string

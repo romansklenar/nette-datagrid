@@ -16,28 +16,28 @@ require_once dirname(__FILE__) . '/IDataGridColumn.php';
  * @version    $Id$
  */
 abstract class DataGridColumn extends Component implements IDataGridColumn
-{	
+{
 	/** @var Html  table header element template */
 	protected $header;
-	
+
 	/** @var Html  table cell element template */
 	protected $cell;
 
 	/** @var string */
 	public $caption;
-	
+
 	/** @var int */
 	protected $maxLength = 100;
 
 	/** @var array  of arrays('pattern' => 'replacement') */
 	public $replacement;
-	
+
 	/** @var array  of callback functions */
 	public $formatCallback = array();
-	
+
 	/** @var bool */
 	public $orderable = TRUE;	
-	
+
 	/** @var string */
 	static public $ajaxClass = 'ajaxlink';
 
@@ -74,8 +74,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Returns DataGrid.
 	 * @param  bool   throw exception if form doesn't exist?
@@ -85,13 +85,13 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	{
 		return $this->lookup('DataGrid', $need);
 	}
-	
-	
-	
+
+
+
 	/********************* Html objects getters *********************/
-	
-	
-	
+
+
+
 	/**
 	 * Returns headers's HTML element template.
 	 * @return Html
@@ -100,7 +100,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	{
 		return $this->header;
 	}
-	
+
+
 	/**
 	 * Returns table's cell HTML element template.
 	 * @return Html
@@ -109,13 +110,13 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	{
 		return $this->cell;
 	}
-	
-	
-	
+
+
+
 	/********************* interface \IDataGridColumn *********************/
-	
-	
-	
+
+
+
 	/**
 	 * Is column orderable?
 	 * @return bool
@@ -124,8 +125,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	{
 		return $this->orderable;
 	}
-	
-	
+
+
 	/**
 	 * Gets header link (order signal)
 	 * @return string
@@ -134,8 +135,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	{
 		return $this->lookup('DataGrid', TRUE)->link('order', $this->getName());
 	}
-	
-	
+
+
 	/**
 	 * Has column filter box?
 	 * @return bool
@@ -144,8 +145,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	{
 		return $this->getDataGrid(TRUE)->getComponent('filters', TRUE)->getComponent($this->getName(), FALSE) instanceof IDataGridColumnFilter;
 	}
-	
-	
+
+
 	/**
 	 * Returns column's filter.
 	 * @param  bool   throw exception if component doesn't exist?
@@ -159,8 +160,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 			return NULL;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
@@ -171,8 +172,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 		trigger_error('DataGridColumn::formatContent should not be called; Overload this method by your implementation in descendant.', E_USER_WARNING);
 		return (string) $value;
 	}
-	
-		
+
+
 	/**
 	 * Filters data source.
 	 * @param  mixed
@@ -183,13 +184,13 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 		trigger_error('DataGridColumn::applyFilter should not be called; Overload this method by your implementation in descendant.', E_USER_WARNING);
 		return;
 	}
-	
-	
-	
+
+
+
 	/********************* filter factories *********************/
-	
-	
-	
+
+
+
 	/**
 	 * Alias for method addTextFilter().
 	 * @return IDataGridColumnFilter
@@ -211,8 +212,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 		$this->getDataGrid(TRUE)->getComponent('filters', TRUE)->addComponent($filter, $this->getName());
 		return $filter;
 	}
-	
-	
+
+
 	/**
 	 * Adds single-line text date filter input to data grid.
 	 * Optional dependency on DatePicker class (@link http://nettephp.com/extras/datepicker)
@@ -253,5 +254,4 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 		$this->getDataGrid(TRUE)->getComponent('filters', TRUE)->addComponent($filter, $this->getName());
 		return $filter;
 	}
-	
 }
