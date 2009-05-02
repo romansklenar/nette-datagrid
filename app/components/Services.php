@@ -1,6 +1,11 @@
 <?php
 
-
+/**
+ * Common services.
+ *
+ * @author     Roman Sklenář
+ * @package    DataGrid\Example
+ */
 class Services extends Object
 {
 	/**

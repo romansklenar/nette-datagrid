@@ -1,68 +1,51 @@
 <?php
 
-/**
- * Nette Framework
- *
- * Copyright (c) 2004, 2009 David Grudl (http://davidgrudl.com)
- *
- * This source file is subject to the "Nette license" that is bundled
- * with this package in the file license.txt.
- *
- * For more information please see http://nettephp.com
- *
- * @copyright  Copyright (c) 2004, 2009 David Grudl
- * @license    http://nettephp.com/license  Nette license
- * @link       http://nettephp.com
- * @category   Nette
- * @package    Nette\Forms
- * @version    $Id$
- */
-
-
-
 require_once LIBS_DIR . '/Nette/Component.php';
 
+require_once dirname(__FILE__) . '/IDataGridColumn.php';
+
 
 
 /**
- * Base class that implements the basic functionality common to form controls.
+ * Base class that implements the basic common functionality to data grid columns.
  *
- * @author     David Grudl
- * @copyright  Copyright (c) 2004, 2009 David Grudl
+ * @author     Roman Sklenář
+ * @copyright  Copyright (c) 2009 Roman Sklenář
+ * @example    http://nettephp.com/extras/datagrid
  * @package    Nette\Extras\DataGrid
+ * @version    $Id$
  */
 abstract class DataGridColumn extends Component implements IDataGridColumn
 {	
-	/** @var Html  control table header element template */
+	/** @var Html  table header element template */
 	protected $header;
 	
-	/** @var Html  control table cell element template */
+	/** @var Html  table cell element template */
 	protected $cell;
 
-	/** @var string textual caption or label */
+	/** @var string */
 	public $caption;
 	
-	/** @var int  maximum number of dislayed characters */
+	/** @var int */
 	protected $maxLength = 100;
 
-	/** @var array of arrays('pattern' => 'replacement') */
+	/** @var array  of arrays('pattern' => 'replacement') */
 	public $replacement;
 	
-	/** @var array  of callback function */
+	/** @var array  of callback functions */
 	public $formatCallback = array();
-
-	/** @var array user options */
-	private $options = array();
 	
 	/** @var bool */
-	public $orderable = TRUE;
-
+	public $orderable = TRUE;	
+	
+	/** @var string */
+	static public $ajaxClass = 'ajaxlink';
 
 
 	/**
-	 * @param  string  column caption
-	 * @param  int  width in pixels of the control (will be setted by css)
-	 * @param  int  maximum number of dislayed characters
+	 * Data grid column constructor.
+	 * @param  string  textual caption of column
+	 * @param  int     maximum number of dislayed characters
 	 */
 	public function __construct($caption = NULL, $maxLength = NULL)
 	{
@@ -73,7 +56,6 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 		if ($maxLength !== NULL) $this->maxLength = $maxLength;
 		$this->monitor('DataGrid');
 	}
-
 
 
 	/**
@@ -97,7 +79,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	/**
 	 * Returns DataGrid.
 	 * @param  bool   throw exception if form doesn't exist?
-	 * @return Form
+	 * @return DataGrid
 	 */
 	public function getDataGrid($need = TRUE)
 	{
@@ -130,7 +112,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	
 	
 	
-	/********************* interface IDataGridColumn *********************/
+	/********************* interface \IDataGridColumn *********************/
+	
 	
 	
 	/**
@@ -153,16 +136,25 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	}
 	
 	
+	/**
+	 * Has column filter box?
+	 * @return bool
+	 */
 	public function hasFilter()
 	{
-		return $this->getDataGrid(TRUE)->getComponent('filters')->getComponent($this->getName(), FALSE) instanceof IDataGridColumnFilter;
+		return $this->getDataGrid(TRUE)->getComponent('filters', TRUE)->getComponent($this->getName(), FALSE) instanceof IDataGridColumnFilter;
 	}
 	
 	
+	/**
+	 * Returns column's filter.
+	 * @param  bool   throw exception if component doesn't exist?
+	 * @return IDataGridColumnFilter|NULL
+	 */
 	public function getFilter()
 	{
 		if ($this->hasFilter()) {
-			return $this->getDataGrid(TRUE)->getComponent('filters', TRUE)->getComponent($this->getName());
+			return $this->getDataGrid(TRUE)->getComponent('filters', TRUE)->getComponent($this->getName(), TRUE);
 		} else {
 			return NULL;
 		}
@@ -170,17 +162,19 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	
 	
 	/**
-	 * @param string  value to be formated
+	 * Formats cell's content.
+	 * @param  mixed
+	 * @return string
 	 */
 	public function formatContent($value)
 	{
 		trigger_error('DataGridColumn::formatContent should not be called; Overload this method by your implementation in descendant.', E_USER_WARNING);
-		return $value;
+		return (string) $value;
 	}
 	
 		
 	/**
-	 * Applies filtering on dataset.
+	 * Filters data source.
 	 * @param  mixed
 	 * @return void
 	 */
@@ -207,7 +201,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 
 
 	/**
-	 * Adds single-line text input 
+	 * Adds single-line text filter input to data grid.
 	 * @return IDataGridColumnFilter
 	 * @throws InvalidArgumentException
 	 */
@@ -219,6 +213,12 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	}
 	
 	
+	/**
+	 * Adds single-line text date filter input to data grid.
+	 * Optional dependency on DatePicker class (@link http://nettephp.com/extras/datepicker)
+	 * @return IDataGridColumnFilter
+	 * @throws InvalidArgumentException
+	 */
 	public function addDateFilter()
 	{
 		$filter = new DateFilter();
@@ -227,13 +227,10 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	}
 
 
-
 	/**
-	 * Adds check box control to the form.
-	 * @param  string  control name
-	 * @param  string  column label
-	 * @param  string  caption
-	 * @return Checkbox
+	 * Adds check box filter input to data grid.
+	 * @return IDataGridColumnFilter
+	 * @throws InvalidArgumentException
 	 */
 	public function addCheckboxFilter()
 	{
@@ -243,14 +240,12 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	}
 
 
-
 	/**
-	 * Adds select box control that allows single item selection.
-	 * @param  string  control name
-	 * @param  string  column label
+	 * Adds select box filter input to data grid.
 	 * @param  array   items from which to choose
-	 * @param  int     number of rows that should be visible
-	 * @return SelectBox
+	 * @param  int     skip first items value from validation? 
+	 * @return IDataGridColumnFilter
+	 * @throws InvalidArgumentException
 	 */
 	public function addSelectboxFilter($items = NULL, $skipFirst = NULL)
 	{
@@ -258,300 +253,5 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 		$this->getDataGrid(TRUE)->getComponent('filters', TRUE)->addComponent($filter, $this->getName());
 		return $filter;
 	}
-}
-
-
-
-class TextColumn extends DataGridColumn
-{
 	
-	/**
-	 * @param string  value to be formated
-	 * @param string  primary key value of the first param
-	 */
-	public function formatContent($value)
-	{
-		$value = htmlSpecialChars($value);
-		if (is_array($this->replacement) && !empty($this->replacement)) {
-			if (in_array($value, array_keys($this->replacement))) {
-				$value = $this->replacement[$value];
-			}
-		}
-		$value = String::truncate((string) $value, $this->maxLength);		
-	
-		foreach ($this->formatCallback as $callback) {
-			if (is_callable($callback)) {
-        		$value = call_user_func($callback, $value);
-			}
-		}
-		return $value;
-	}	
-	
-	
-	/**
-	 * Applies filtering on dataset.
-	 * @param  mixed
-	 * @return void
-	 */
-	public function applyFilter($value)
-	{
-		if (!$this->hasFilter()) return;
-		
-		$datagrid = $this->getDataGrid(TRUE);
-		
-		$column = $this->getName();
-		$cond = array();		
-		$cond[] = array("[$column] LIKE '%$value%'");
-		$datagrid->dataSource->where('%and', $cond);
-	}
-
-}
-
-
-class NumericColumn extends DataGridColumn
-{
-	/** @var int  number of digits after the decimal point */
-	public $precision;
-	
-	
-	public function __construct($caption = NULL, $precision = 2)
-	{
-		parent::__construct($caption);
-		$this->precision = $precision;
-	}
-	
-	public function formatContent($value)
-	{
-		if (is_array($this->replacement) && !empty($this->replacement)) {
-			if (in_array($value, array_keys($this->replacement))) {
-				$value = $this->replacement[$value];
-			}
-		}		
-		$value = round($value, $this->precision);
-	
-		foreach ($this->formatCallback as $callback) {
-			if (is_callable($callback)) {
-        		$value = call_user_func($callback, $value);
-			}
-		}
-		return $value;
-	}	
-	
-	/**
-	 * Applies filtering on dataset.
-	 * @param  mixed
-	 * @return void
-	 */
-	public function applyFilter($value)
-	{
-		if (!$this->hasFilter()) return;
-		
-		$column = $this->getName();
-		$cond = array();
-		$operator = '=';
-		
-		$v = str_replace(',', '.', $value);
-		if (preg_match('/^(?<operator>\>|\>\=|\<|\<\=|\=|\<\>)?(?<value>[\.|\d]+)$/', $v, $matches)) {
-			if (isset($matches['operator']) && !empty($matches['operator'])) {
-				$operator = $matches['operator'];
-			}
-			$value = $matches['value'];
-		}
-		$cond[] = array("[$column] $operator %s", $value);
-
-		$datagrid = $this->getDataGrid(TRUE);
-		$datagrid->dataSource->where('%and', $cond);
-	}
-}
-
-
-class DateColumn extends TextColumn
-{
-	/** @var string  database date format */
-	public $format;
-	
-	
-	public function __construct($caption = NULL, $format = '%x')
-	{
-		parent::__construct($caption);
-		$this->format = $format;
-		$this->getHeaderPrototype()->style('width: 80px');
-	}
-	
-	public function formatContent($value)
-	{
-		if ($value == NULL || empty($value)) return 'N/A';
-		$value = parent::formatContent($value);
-		
-		$value = is_numeric($value) ? (int) $value : ($value instanceof DateTime ? $value->format('U') : strtotime($value));
-		return strftime($this->format, $value);
-	}
-	
-		
-	/**
-	 * Applies filtering on dataset.
-	 * @param  mixed
-	 * @return void
-	 */
-	public function applyFilter($value)
-	{
-		if (!$this->hasFilter()) return;
-		
-		$datagrid = $this->getDataGrid(TRUE);
-		
-		$column = $this->getName();
-		$cond = array();
-		$cond[] = array("[$column] = %t", $value);
-		$datagrid->dataSource->where('%and', $cond);
-	}
-}
-
-
-class CheckboxColumn extends NumericColumn
-{	
-	public function __construct($caption = NULL)
-	{
-		parent::__construct($caption, 0);
-		$this->getCellPrototype()->style('text-align: center');
-	}
-	
-	public function formatContent($value)
-	{		
-		$checkbox = Html::el('input')->type('checkbox')->disabled('disabled');
-		if ($value) $checkbox->checked = TRUE;
-		return (string) $checkbox;
-	}
-	
-		
-	/**
-	 * Applies filtering on dataset.
-	 * @param  mixed
-	 * @return void
-	 */
-	public function applyFilter($value)
-	{
-		if (!$this->hasFilter()) return;
-		$datagrid = $this->getDataGrid(TRUE);
-		$column = $this->getName();
-		$value = (int)(bool)$value;
-		$cond = array();
-		$cond[] = array("[$column] " . ($value ? ">" : "=") . " %b", FALSE);
-		
-		$datagrid->dataSource->where('%and', $cond);
-	}
-}
-
-
-class PositionColumn extends NumericColumn
-{
-	/** @var array */
-	public $moves = array();
-	
-	/** @var string  signal handler of move action */
-	public $destination;
-	
-	/** @var bool */
-	public $useAjax;
-	
-	/** @var string */
-	static public $ajaxClass = 'ajaxlink';
-	
-	public function __construct($caption = NULL, $destination = NULL, array $moves = NULL, $useAjax = FALSE)
-	{
-		parent::__construct($caption, 0);
-		
-		$this->useAjax = $useAjax;
-		
-		if ($moves === NULL) {
-			$this->moves['up'] = 'Move up';
-			$this->moves['down'] = 'Move down';
-		} else {
-			$this->moves = $moves;
-		}
-		
-		// try set handler if is not set
-		if ($destination === NULL) {
-			if ($presenter = $this->lookup('Nette\Aplication\Presenter') !== NULL) {
-				$this->destination = 'handle' . String::capitalize($this->getName) . 'Move!';
-			}
-		} else {
-			$this->destination = $destination;
-		}
-		
-	}
-	
-	public function formatContent($value)
-	{
-		$dataSource = clone $this->getDataGrid(TRUE)->dataSource;
-		$max = (int)$dataSource->select($this->getName())->orderBy($this->getName(), 'DESC')->fetchSingle();
-
-		$presenter = $this->lookup('Nette\Aplication\Presenter', TRUE);
-		$uplink = $presenter->link($this->destination, array('key' => $value, 'dir' => 'up'));
-		$downlink = $presenter->link($this->destination, array('key' => $value, 'dir' => 'down'));
-		
-		$up = Html::el('a')->title($this->moves['up'])->href($uplink)->add(Html::el('span')->class('up')->setHtml('&nbsp;'));
-		$down = Html::el('a')->title($this->moves['down'])->href($downlink)->add(Html::el('span')->class('down')->setHtml('&nbsp;'));
-		
-		// disable top up & top bottom links
-		if ($value == 1) {
-			$up->href(NULL);
-			$up->class('inactive');
-		}
-		if ($value == $max) {
-			$down->href(NULL);
-			$down->class('inactive');
-		}		
-		if ($this->useAjax) {
-			$up->class(self::$ajaxClass);
-			$down->class(self::$ajaxClass);
-		}
-		
-		$positioner = Html::el('span')->class('positioner')->add($up)->add($down);
-		return $positioner . '&nbsp;' . $value;
-	}
-}
-
-
-class ImageColumn extends TextColumn
-{
-	public function __construct($caption = NULL)
-	{
-		parent::__construct($caption);
-		throw new NotImplementedException("Class was not implemented yet.");
-	}
-}
-
-
-class ActionColumn extends DataGridColumn
-{
-	// TODO: move actions from datagrid here?
-	/** @var ComponentContainer */
-	//public $actions = array();
-	
-	/** @var int */
-	//public $count = 0;
-	
-	public function __construct($caption = 'Actions')
-	{
-		parent::__construct($caption);
-		$this->orderable = FALSE;
-	}
-	
-	
-	public function formatContent($value)
-	{
-		trigger_error('ActionColumn cannot be formated.', E_USER_WARNING);
-		// TODO: or throw exception?
-		//throw new InvalidStateException("ActionColumn cannot be formated.");
-		return $value;
-	}
-	
-	
-	public function applyFilter($value)
-	{
-		trigger_error('ActionColumn cannot be filtered.', E_USER_WARNING);
-		// TODO: or throw exception?
-		//throw new InvalidStateException("ActionColumn cannot be filtered.");
-		return;
-	}	
 }

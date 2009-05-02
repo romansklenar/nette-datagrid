@@ -1,6 +1,11 @@
 <?php
 
-
+/**
+ * Common helpers.
+ * 
+ * @author     David Grudl
+ * @package    Nette\Extras
+ */
 class Helpers
 {
 	/**

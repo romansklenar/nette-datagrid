@@ -1,8 +1,10 @@
 <?php
 
-
 /**
  * Base abstract model class.
+ *
+ * @author     Roman Sklenář
+ * @package    DataGrid\Example
  */
 abstract class BaseModel extends Object implements IModel
 {

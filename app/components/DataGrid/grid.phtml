@@ -9,9 +9,9 @@ TODO: spodni stranu tabulky (toolbar) udelat jako <a href="http://extjs.com/depl
 -->
 @{if count($component->operations) && $component->hasChecker() && is_array($component->onOperationSubmit)}
 <div class="toolbar">
-{$form['bottomAction']->label}
-{$form['bottomAction']->control}
-{$form['bottomSubmit']->control}&nbsp;|&nbsp;
+{$form['operations']->label}
+{$form['operations']->control}
+{$form['operationSubmit']->control}&nbsp;|&nbsp;
 {? $control->renderPaginator()}
 </div>
 @{/if}

@@ -43,7 +43,7 @@ jQuery.extend({
 		
 		// a na jeho místo vložím odesílací ikonku / odkaz nahrazující jeho úlohu (pro každý datagrid jen jednu)
 		$('<a href="#" class="filter" title="Filtrovat">Filtrovat</a>').click(function () {
-			$("form.gridform input:submit[name=filterSubmit]").netteAjaxSubmit();
+			$(this).parents("form.gridform").find("input:submit[name=filterSubmit]").netteAjaxSubmit();
 			return false;
 		}).appendTo("form.gridform table.grid tr.filters td.actions");
 		$('form.gridform table.grid').find('tr.filters td.actions a.filter:not(:first)').remove();

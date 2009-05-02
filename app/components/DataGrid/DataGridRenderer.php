@@ -1,11 +1,23 @@
 <?php
 
+require_once LIBS_DIR . '/Nette/Object.php';
+
+require_once dirname(__FILE__) . '/IDataGridRenderer.php';
 
 
+
+/**
+ * Converts a data grid into the HTML output.
+ *
+ * @author     Roman Sklenář
+ * @copyright  Copyright (c) 2009 Roman Sklenář
+ * @example    http://nettephp.com/extras/datagrid
+ * @package    Nette\Extras\DataGrid
+ * @version    $Id$
+ */
 class DataGridRenderer extends Object implements IDataGridRenderer
 {
-	// TODO: udelat vlastni vykreslovac begin, error a end? ANO!
-	/** @var array of HTML tags */
+	/** @var array  of HTML tags */
 	public $wrappers = array(
 		'form' => array(
 			'container' => 'class=gridform',
@@ -52,8 +64,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	);
 
 	/** @var DataGrid */
-	protected $dataGrid;
-	
+	protected $dataGrid;	
 	
 	
 	/**
@@ -66,6 +77,10 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	{
 		if ($this->dataGrid !== $dataGrid) {
 			$this->dataGrid = $dataGrid;
+		}
+		
+		if (!$dataGrid->dataSource instanceof DibiDataSource) {
+			throw new InvalidArgumentException("Data source was not setted. You must set data source to data grid before rendering.");
 		}
 		
 		if (!$dataGrid->hasColumns()) {
@@ -189,8 +204,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		// checker
 		if ($this->dataGrid->hasChecker()) {
 			$cell = $this->getWrapper('row.header cell container')->class('checker');
-			// TODO: remove and create by javascript
-			// $cell->setHtml('<span class="icon icon-invert" style="display: none" title="Invertovat výběr" />');
+			
 			if ($this->dataGrid->hasFilters()) {
 				$cell->rowspan(2);
 			}
@@ -208,9 +222,9 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 					$list[$field] = array($dir, $i++);
 				}
 				
-				$class = 'ajaxlink ';
+				$class = DataGridColumn::$ajaxClass;
 				if (isset($list[$column->getName()])) {
-					$class .= $list[$column->getName()][0] === 'a' ? 'asc' : 'desc';
+					$class .= ' ' . ($list[$column->getName()][0] === 'a' ? 'asc' : 'desc');
 				}
 				
 				if (count($list) > 1 && isset($list[$column->getName()])) {
@@ -223,7 +237,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			
 			$cell = $this->getWrapper('row.header cell container')->setHtml($value);
 			$cell->attrs = $column->getHeaderPrototype()->attrs;			
-			if ($column instanceof ActionColumn) $cell->class('actions');
+			if ($column instanceof ActionColumn) $cell->class[] = 'actions';
 			
 			$row->add($cell);
 		}
@@ -244,9 +258,12 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		foreach ($this->dataGrid->getColumns() as $column) {
 			$cell = $this->getWrapper('row.filter cell container');
 			
+			// TODO: set on filters too?
+			$cell->attrs = $column->getCellPrototype()->attrs;
+			
 			if ($column instanceof ActionColumn) {
 				$value = $form['filterSubmit']->getControl();
-				$cell->class('actions');
+				$cell->class[] = 'actions';
 				
 			} else {
 				if ($column->hasFilter()) {
@@ -257,9 +274,6 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			}
 			
 			$cell->setHtml((string)$value);
-			
-			// TODO: Nastavovat i na filtrech?
-			// $cell->attrs = $column->getCellPrototype()->attrs;
 			$row->add($cell);
 		}		
 		return $row;
@@ -299,9 +313,9 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				$value = '';
 				foreach ($this->dataGrid->getActions() as $action) {
 					$action->generateLink(array($primary => $data[$primary]));
-					$value .= $action->getHtml();
+					$value .= $action->getHtml() . ' ';
 				}
-				$cell->class('actions');
+				$cell->class[] = 'actions';
 				
 			} else {
 				$value = $column->formatContent($data[$column->getName()]);
@@ -325,7 +339,6 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	}
 	
 	
-	
 	/**
 	 * @param  string
 	 * @return Html
@@ -335,7 +348,6 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$data = $this->getValue($name);
 		return $data instanceof Html ? clone $data : Html::el($data);
 	}
-
 
 
 	/**

@@ -1,12 +1,13 @@
 <?php
 
-
 /**
  * Common model inteface.
+ *
+ * @author     Roman Sklenář
+ * @package    DataGrid\Example
  */
 interface IModel
 {
-
 	/**
 	 * Setups database connection
 	 * @return void
@@ -23,8 +24,7 @@ interface IModel
 	 * Gets table name
 	 * @return string
 	 */
-	public function getTable();
-	
+	public function getTable();	
 	
 	
 	/**
@@ -32,16 +32,14 @@ interface IModel
 	 * @param $table  table name
 	 * @return void
 	 */
-	public function setTable($table);
-	
+	public function setTable($table);	
 	
 	
 	/**
 	 * Gets primary key(s)
 	 * @return string|array
 	 */
-	public function getPrimary();
-	
+	public function getPrimary();	
 	
 	
 	/**
@@ -94,6 +92,5 @@ interface IModel
 	 * @param $id
 	 * @return DibiFluent
 	 */
-	public function delete($id);
-	
+	public function delete($id);	
 }
