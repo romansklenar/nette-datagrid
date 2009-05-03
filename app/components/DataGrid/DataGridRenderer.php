@@ -45,10 +45,16 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			'cell' => array(
 				'container' => 'td', // .action
 			),
+			'control' => array(
+				'.input' => 'text',
+				'.select' => 'select',
+				'.submit' => 'button',
+			),
 		),
 		
 		'row.content' => array(
-			'container' => 'tr', // .alt, .selected
+			'container' => 'tr', // .even, .selected
+			'.even' => 'even',
 			'cell' => array(
 				'container' => 'td', // .checker, .action
 			),
@@ -182,7 +188,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		// rows
 		$iterator = new SmartCachingIterator($this->dataGrid->getRows());
 		foreach ($iterator as $data) {
-			$row = $this->generateContentRow($data)->class($iterator->isEven() ? 'alt' : NULL);
+			$row = $this->generateContentRow($data);
+			$row->class[] = $iterator->isEven() ? $this->getValue('row.content .even') : '';
 			$table->add($row);
 		}
 		
@@ -229,8 +236,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				
 				if (count($list) > 1 && isset($list[$column->getName()])) {
 					$text .= '&nbsp;<span>' . $list[$column->getName()][1] . '</span>';
-				}
-				
+				}				
 				
 				$value = (string) Html::el('a')->href($column->getLink())->class($class)->setHtml($text);
 			}
@@ -262,18 +268,29 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$cell->attrs = $column->getCellPrototype()->attrs;
 			
 			if ($column instanceof ActionColumn) {
-				$value = $form['filterSubmit']->getControl();
+				$control = $form['filterSubmit']->control;
+				$control->class[] = $this->getValue('row.filter control .submit');
+				$value = (string) $control;
 				$cell->class[] = 'actions';
 				
 			} else {
 				if ($column->hasFilter()) {
-					$value = $form['filters'][$column->getName()]->getControl();
+					$filter = $column->getFilter()->getFormControl()->control;
+					// or: $filter = $form['filters'][$column->getName()]->control
+					
+					if ($column->getFilter() instanceof SelectboxFilter) {
+						$class = $this->getValue('row.filter control .select');
+					} else {
+						$class = $this->getValue('row.filter control .input');
+					}
+					$filter->class[] = $class;
+					$value = (string) $filter;
 				} else {
 					$value = '&nbsp;';
 				}
 			}
 			
-			$cell->setHtml((string)$value);
+			$cell->setHtml($value);
 			$row->add($cell);
 		}		
 		return $row;
@@ -324,7 +341,6 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$cell->setHtml((string)$value);
 			$row->add($cell);
 		}
-		
 		return $row;
 	}
 
@@ -336,7 +352,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	protected function generateFooterRow()
 	{
 		// TODO: implement!
-		return Html::el('');
+		return Html::el();
 	}
 	
 	

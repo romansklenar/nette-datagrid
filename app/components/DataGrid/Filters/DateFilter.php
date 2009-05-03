@@ -22,7 +22,7 @@ class DateFilter extends TextFilter
 	public function getFormControl()
 	{
 		parent::getFormControl();
-		$this->element->getControlPrototype()->class('datepicker');
+		$this->element->getControlPrototype()->class[] = 'datepicker';
 		return $this->element;
 	}
 }

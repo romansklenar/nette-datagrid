@@ -38,15 +38,16 @@ jQuery.extend({
 		$('table.grid').find('tr.header th.checker span.icon-invert:not(:first)').remove();
 		
 		// přesunu odesílací tlačítko tak, aby bylo první ve formuláři, aby se na formulář po odeslání ENTEREM aplikovaly filtry
-		// (je nutné, jen pokud filtrační tlačítko není první tlačítko formuláře)
-		$("form.gridform table.grid tr.filters td.actions input:submit[name=filterSubmit]").prependTo("form.gridform").hide();
-		
+		// (je nutné, jen pokud filtrační tlačítko není první tlačítko formuláře, např. při manuálním renderování)
+		//$("form.gridform table.grid tr.filters td.actions input:submit[name=filterSubmit]").prependTo("form.gridform").hide();
 		// a na jeho místo vložím odesílací ikonku / odkaz nahrazující jeho úlohu (pro každý datagrid jen jednu)
+		/*
 		$('<a href="#" class="filter" title="Filtrovat">Filtrovat</a>').click(function () {
 			$(this).parents("form.gridform").find("input:submit[name=filterSubmit]").netteAjaxSubmit();
 			return false;
 		}).appendTo("form.gridform table.grid tr.filters td.actions");
 		$('form.gridform table.grid').find('tr.filters td.actions a.filter:not(:first)').remove();
+		*/
 	}
 });
 

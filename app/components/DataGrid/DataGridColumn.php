@@ -50,8 +50,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	public function __construct($caption = NULL, $maxLength = NULL)
 	{
 		parent::__construct();
-		$this->header = Html::el('');
-		$this->cell = Html::el('');
+		$this->header = Html::el();
+		$this->cell = Html::el();
 		$this->caption = $caption;
 		if ($maxLength !== NULL) $this->maxLength = $maxLength;
 		$this->monitor('DataGrid');

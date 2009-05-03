@@ -40,7 +40,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->addColumn('country', 'Country');
 			$grid->addColumn('postalCode', 'Postal code');
 			$grid->addCheckboxColumn('orders', 'Has orders');
-			$grid->addDateColumn('orderDate', 'Date', '%d.%m.%Y');
+			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y');
 			$grid->addColumn('status', 'Status');
 			$grid->addNumericColumn('creditLimit', 'Size', 0);
 			
@@ -75,6 +75,7 @@ class ExamplePresenter extends BasePresenter
 		case 'customersGrid':			
 			$model = new DatagridModel('customers');			
 			$grid = new DataGrid;
+			$grid->setRenderer(new CustomDataGridRenderer);
 			
 			$grid->rowsPerPage = 10; // display 10 rows per page
 			$grid->bindDataTable($model->getCustomerAndOrderInfo(), $model->table);
@@ -97,7 +98,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->addColumn('postalCode', 'Postal code'); // ->addCheckboxFilter();
 			$caption = Html::el('span')->setText('O')->title('Has orders?')->class('link');
 			$grid->addCheckboxColumn('orders', $caption)->getHeaderPrototype()->style('text-align: center');
-			$grid->addDateColumn('orderDate', 'Date', '%d.%m.%Y'); // czech format: '%d.%m.%Y'
+			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y'); // czech format: '%d.%m.%Y'
 			$grid->addColumn('status', 'Status');
 			$grid->addNumericColumn('creditLimit', 'Size', 0);
 			
@@ -110,7 +111,7 @@ class ExamplePresenter extends BasePresenter
 			$grid['city']->addSelectboxFilter();
 			$grid['country']->addSelectboxFilter();
 			$grid['postalCode']->addFilter();
-			$grid['orders']->addSelectboxFilter(array('?' => '?', '0' => "Have", '1' => "Don't have"), TRUE);
+			$grid['orders']->addSelectboxFilter(array('?' => '?', '0' => "Don't have", '1' => "Have"), TRUE);
 			$grid['orderDate']->addDateFilter();
 			$grid['status']->addSelectboxFilter();
 			$grid['creditLimit']->addFilter();

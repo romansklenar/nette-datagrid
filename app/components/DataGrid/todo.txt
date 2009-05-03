@@ -1,0 +1,9 @@
+TODO
+====
+
+- podpora pro translator
+- footer složený z operací a stránkovače
+- vyprofilovat
+- renderer pro jQuery UI framework
+- podpora pro SQLite
+- modetody pro vykreslení přesunout do vykreslovače

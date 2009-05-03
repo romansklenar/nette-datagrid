@@ -7,7 +7,7 @@ table.grid {
 table.grid tr {
 	background: #FFFFFF;
 }
-table.grid tr.alt {
+table.grid tr.even {
 	background: #F6F7FA;
 }
 table.grid tr:hover {
