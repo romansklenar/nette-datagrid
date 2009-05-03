@@ -4,9 +4,6 @@
 {? $control->renderGrid('errors')}
 {? $control->renderGrid('body')}
 
-<!-- 
-TODO: spodni stranu tabulky (toolbar) udelat jako <a href="http://extjs.com/deploy/dev/examples/grid/paging.html">zde</a></li> tak aby byl soucasti tabulky (posledni radek)
--->
 @{if count($component->operations) && $component->hasChecker() && is_array($component->onOperationSubmit)}
 <div class="toolbar">
 {$form['operations']->label}

@@ -5,13 +5,13 @@ require_once dirname(__FILE__) . '/DataGridRenderer.php';
 
 
 /**
- * Converts a data grid into the HTML output.
+ * Custom data grid renderer cooperating with jQuery UI framework.
  *
  * @author     Roman Sklenář
  * @copyright  Copyright (c) 2009 Roman Sklenář
  * @example    http://nettephp.com/extras/datagrid
  * @package    Nette\Extras\DataGrid
- * @version    $Id: DataGridRenderer.php 7 2009-05-02 22:09:15Z RSklenar@seznam.cz $
+ * @version    $Id$
  */
 class CustomDataGridRenderer extends DataGridRenderer
 {
