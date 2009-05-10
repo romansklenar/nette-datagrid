@@ -27,8 +27,8 @@ class DatagridModel extends BaseModel
 				throw new InvalidArgumentException("Model must have one primary key.");
 			}
 		}
-		
-		if (Environment::getConfig()->database->profiler) {
+
+		if ($this->connection->profiler) {
 			$this->connection->getProfiler()->setFile(Environment::expand('%logDir%') . '/sql.log');
 		}
 	}

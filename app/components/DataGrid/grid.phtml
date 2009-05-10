@@ -1,20 +1,8 @@
 {snippet grid}
 
-{? $control->renderGrid('begin')}
-{? $control->renderGrid('errors')}
-{? $control->renderGrid('body')}
-
-@{if count($component->operations) && $component->hasChecker() && is_array($component->onOperationSubmit)}
-<div class="toolbar">
-{$form['operations']->label}
-{$form['operations']->control}
-{$form['operationSubmit']->control}&nbsp;|&nbsp;
-{? $control->renderPaginator()}
-</div>
-@{/if}
-
-{? $control->renderGrid('end')}
-
+{? $control->render('begin')}
+{? $control->render('errors')}
+{? $control->render('body')}
+{? $control->render('end')}
 
 {/snippet}
-

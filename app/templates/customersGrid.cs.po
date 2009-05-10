@@ -1,0 +1,136 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: DataGrid example\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-09 21:25+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Roman Sklenář <mail@romansklenar.cz>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4 ? 1 : 2);\n"
+"X-Poedit-Language: Czech\n"
+"X-Poedit-Country: CZECH REPUBLIC\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ../../../templates\n"
+"X-Poedit-SearchPath-1: ../../../presenters\n"
+"X-Poedit-SearchPath-2: ../../../models\n"
+"X-Poedit-SearchPath-3: ../../../components\n"
+
+#: ----------- DataGrid behavior ------------
+msgid "Apply filters"
+msgstr "Filtrovat"
+
+msgid "Selected:"
+msgstr "Vybrané:"
+
+msgid "Send"
+msgstr "Proveď"
+
+msgid "First"
+msgstr "První"
+
+msgid "Previous"
+msgstr "Předchozí"
+
+msgid "Next"
+msgstr "Další"
+
+msgid "Last"
+msgstr "Poslední"
+
+msgid "Page"
+msgstr "Stránka"
+
+msgid "%label% %input% of %count%"
+msgstr "%label% %input% z %count%"
+
+msgid "%operations% | %paginator% | %info%"
+msgstr "%operations% | %paginator% | %info%"
+
+msgid "Displaying items %from% - %to% of %count%"
+msgstr "Zobrazuji položky %from% až %to% z %count%"
+
+#: ----------- customersGrid locale ------------
+#: operations
+msgid "delete"
+msgstr "smazat"
+
+msgid "deal"
+msgstr "vyřídit"
+
+msgid "print"
+msgstr "tisk"
+
+msgid "forward"
+msgstr "provést"
+
+#: selectboxes
+msgid "Don't have"
+msgstr "Nemá"
+
+msgid "Have"
+msgstr "Má"
+
+#: columns
+msgid "Name"
+msgstr "Jméno"
+
+msgid "Surname"
+msgstr "Příjmení"
+
+msgid "Address"
+msgstr "Adresa"
+
+msgid "City"
+msgstr "Město"
+
+msgid "Country"
+msgstr "Země"
+
+msgid "Postal code"
+msgstr "PSČ"
+
+msgid "Has orders?"
+msgstr "Má objednávky?"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Status"
+msgstr "Stav"
+
+msgid "Size"
+msgstr "Velikost"
+
+msgid "Actions"
+msgstr "Akce"
+
+#: actions
+msgid "Copy"
+msgstr "Kopírovat"
+
+msgid "Detail"
+msgstr "Detail"
+
+msgid "Edit"
+msgstr "Upravit"
+
+msgid "Delete"
+msgstr "Smazat"
+
+#: icons
+msgid "Shipped"
+msgstr "Doručeno"
+
+msgid "Resolved"
+msgstr "Vyřešeno"
+
+msgid "Cancelled"
+msgstr "Zrušeno"
+
+msgid "Without orders"
+msgstr "Bez objednávek"
+

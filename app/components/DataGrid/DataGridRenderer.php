@@ -63,14 +63,49 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		'row.footer' => array(
 			'container' => 'tr class=footer',
 			'cell' => array(
-				'container' => 'th', // .action
+				'container' => 'td',
 			),
 		),
-	
+		
+		'paginator' => array(
+			'container' => 'span class=paginator',
+			'button' => array(
+				'container' => 'span', 
+					// .paginator-prev, .paginator-next, 
+					// .paginator-first, .paginator-last
+			),
+		),
+		
+		'operations' => array(
+			'container' => 'span class=operations',
+		),
+		
+		'info' => array(
+			'container' => 'span class=grid-info',
+		),
 	);
+	
+	/** @var string */
+	public $footerFormat = '%operations% | %paginator% | %info%';
+	
+	public $infoFormat = 'Displaying items %from% - %to% of %count%';
+	
+	/** @var string  template file*/
+	public $file;
 
 	/** @var DataGrid */
-	protected $dataGrid;	
+	protected $dataGrid;
+
+	
+	
+	/**
+	 * Data grid renderer constructor.
+	 * @return void
+	 */
+	public function __construct()
+	{
+		$this->file = dirname(__FILE__) . '/grid.phtml';
+	}
 
 
 	/**
@@ -96,22 +131,14 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			foreach ($keys as $key) $dataGrid->addColumn($key);
 		}
 		
-		$s = '';
-		if  ($this->dataGrid->hasFilters() || $this->dataGrid->hasOperations()) {
-			if (!$mode || $mode === 'begin') {
-				$s .= $this->renderBegin();
-			}
-			if ((!$mode && $this->getValue('form errors')) || $mode === 'errors') {
-				$s .= $this->renderErrors();
-			}
+		if ($mode !== NULL) {
+			return call_user_func_array(array($this, 'render' . $mode), NULL);
 		}
-		if (!$mode || $mode === 'body') {
-			$s .= $this->renderBody();
-		}
-		if ((!$mode || $mode === 'end') && ($this->dataGrid->hasFilters() || $this->dataGrid->hasOperations())) {
-			$s .= $this->renderEnd();
-		}
-		return $s;
+		
+		$template = $this->dataGrid->getTemplate();
+		$template->setFile($this->file);
+		$template->registerFilter('Nette\Templates\CurlyBracketsFilter::invoke');
+		return $template->__toString();
 	}
 
 
@@ -122,11 +149,9 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	public function renderBegin()
 	{
 		$form = $this->dataGrid->getForm(TRUE);
-		
 		foreach ($form->getControls() as $control) {
 			$control->setOption('rendered', FALSE);
 		}
-		
 		return $form->getElementPrototype()->startTag();
 	}
 
@@ -170,7 +195,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 
 	/**
-	 * Renders form body.
+	 * Renders data grid body.
 	 * @return string
 	 */
 	public function renderBody()
@@ -198,6 +223,135 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		
 		return $table->render(0);
 	}
+	
+	
+	/**
+	 * Renders data grid paginator.
+	 * @return string
+	 */
+	public function renderPaginator()
+	{
+		if ($this->dataGrid->paginator->pageCount <= 1) return '';		
+		$this->dataGrid->paginator->page = $this->dataGrid->page;
+		
+		$container = $this->getWrapper('paginator container');
+		$button = $this->getWrapper('paginator button container');
+		$paginator = $this->dataGrid->paginator;
+		$translator = $this->dataGrid->getTranslator();
+		$a = Html::el('a')->class(DataGridColumn::$ajaxClass);
+		
+		// to-first button
+		$first = clone $button;
+		$first->class[] = 'paginator-first';
+		$title = '« ' . $this->translate('First');
+		if ($paginator->isFirst()) {
+			$first->setText($title);
+		} else {
+			$link = clone $a->href($this->dataGrid->link('page', 1));
+			$link->setText($title)->title($title);
+			$first->add($link);
+		}
+		$container->add($first);
+		
+		// previous button
+		$prev = clone $button;
+		$prev->class[] = 'paginator-prev';
+		$title = '« ' . $this->translate('Previous');
+		if ($paginator->isFirst()) {
+			$prev->setText($title);
+		} else {
+			$link = clone $a->href($this->dataGrid->link('page', $paginator->page - 1));
+			$link->setText($title)->title($title);
+			$prev->add($link);
+		}
+		$container->add($prev);
+		
+		// page input
+		$form = $this->dataGrid->getForm(TRUE);
+		$format = $this->translate('%label% %input% of %count%');
+		$html = str_replace(
+			array('%label%', '%input%', '%count%'),
+			array($form['page']->label, $form['page']->control, $paginator->pageCount),
+			$format
+		);
+		$container->add(Html::el()->setHtml($html));
+		
+		// next button
+		$next = clone $button;
+		$next->class[] = 'paginator-next';
+		$title = $this->translate('Next') . ' »';
+		if ($paginator->isLast()) {			
+			$next->setText($title);
+		} else {
+			$link = clone $a->href($this->dataGrid->link('page', $paginator->page + 1));
+			$link->setText($title)->title($title);
+			$next->add($link);
+		}
+		$container->add($next);
+		
+		// to-last button
+		$last = clone $button;
+		$last->class[] = 'paginator-last';
+		$title = $this->translate('Last') . ' »';
+		if ($paginator->isLast()) {			
+			$last->setText($title);
+		} else {
+			$link = clone $a->href($this->dataGrid->link('page', $paginator->pageCount));
+			$link->setText($title)->title($title);
+			$last->add($link);
+		}
+		$container->add($last);
+		
+		unset($first, $prev, $next, $last, $button, $paginator, $link, $a, $form);		
+		return $container->render();
+	}
+	
+	
+	/**
+	 * Renders data grid operation controls.
+	 * @return string
+	 */
+	public function renderOperations()
+	{
+		if (!$this->dataGrid->hasOperations()) return '';		
+		
+		$container = $this->getWrapper('operations container');
+		$form = $this->dataGrid->getForm(TRUE);		
+		$container->add($form['operations']->label);
+		$container->add($form['operations']->control);
+		$container->add($form['operationSubmit']->control);
+		
+		return $container->render();
+	}
+	
+	
+	/**
+	 * Renders info about data grid.
+	 * @return string
+	 */
+	public function renderInfo()
+	{
+		$container = $this->getWrapper('info container');
+		$paginator = $this->dataGrid->paginator;
+		
+		$this->infoFormat = $this->translate($this->infoFormat);
+		$html = str_replace(
+			array(
+				'%from%',
+				'%to%',
+				'%count%',
+			),
+			array(
+				$paginator->offset + 1,
+				$paginator->offset + $paginator->length,
+				$paginator->itemCount,
+			),
+			$this->infoFormat
+		);
+		
+		$container->setHtml($html);		
+		return $container->render();
+	}
 
 
 	/**
@@ -209,7 +363,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$row = $this->getWrapper('row.header container');
 		
 		// checker
-		if ($this->dataGrid->hasChecker()) {
+		if ($this->dataGrid->hasOperations()) {
 			$cell = $this->getWrapper('row.header cell container')->class('checker');
 			
 			if ($this->dataGrid->hasFilters()) {
@@ -275,16 +429,15 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				
 			} else {
 				if ($column->hasFilter()) {
-					$filter = $column->getFilter()->getFormControl()->control;
-					// or: $filter = $form['filters'][$column->getName()]->control
-					
-					if ($column->getFilter() instanceof SelectboxFilter) {
+					$filter = $column->getFilter();
+					if ($filter instanceof SelectboxFilter) {
 						$class = $this->getValue('row.filter control .select');
 					} else {
 						$class = $this->getValue('row.filter control .input');
 					}
-					$filter->class[] = $class;
-					$value = (string) $filter;
+					$control = $filter->getFormControl()->control;
+					$control->class[] = $class;
+					$value = (string) $control;
 				} else {
 					$value = '&nbsp;';
 				}
@@ -292,7 +445,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			
 			$cell->setHtml($value);
 			$row->add($cell);
-		}		
+		}
 		return $row;
 	}
 
@@ -307,7 +460,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$form = $this->dataGrid->getForm(TRUE);
 		$row = $this->getWrapper('row.content container');
 		
-		if ($this->dataGrid->hasChecker() || $this->dataGrid->hasActions()) {
+		if ($this->dataGrid->hasOperations() || $this->dataGrid->hasActions()) {
 			$primary = $this->dataGrid->getKeyName();
 			if (!array_key_exists($primary, $data)) {
 				throw new InvalidArgumentException("Invalid name of key for group operations or actions. Column '" . $primary . "' does not exist in data source.");
@@ -315,7 +468,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		}
 		
 		// checker
-		if ($this->dataGrid->hasChecker()) {
+		if ($this->dataGrid->hasOperations()) {
 			$value = $form['checker'][$data[$primary]]->getControl();
 			$cell = $this->getWrapper('row.content cell container')->setHtml((string)$value)->class('checker');
 			$row->add($cell);
@@ -329,8 +482,10 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			if ($column instanceof ActionColumn) {
 				$value = '';
 				foreach ($this->dataGrid->getActions() as $action) {
+					$html = $action->getHtml();
+					$html->title($this->translate($html->title));
 					$action->generateLink(array($primary => $data[$primary]));
-					$value .= $action->getHtml() . ' ';
+					$value .= $html->render() . ' ';
 				}
 				$cell->class[] = 'actions';
 				
@@ -341,6 +496,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$cell->setHtml((string)$value);
 			$row->add($cell);
 		}
+		unset($form, $primary, $cell, $value, $action);
 		return $row;
 	}
 
@@ -351,8 +507,35 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	 */
 	protected function generateFooterRow()
 	{
-		// TODO: implement!
-		return Html::el();
+		$form = $this->dataGrid->getForm(TRUE);
+		$paginator = $this->dataGrid->paginator;
+		$row = $this->getWrapper('row.footer container');
+		
+		$count = count($this->dataGrid->getColumns()->getInnerIterator());
+		if ($this->dataGrid->hasOperations()) $count++;
+		
+		$cell = $this->getWrapper('row.footer cell container');
+		$cell->colspan($count);
+		
+		$this->footerFormat = $this->translate($this->footerFormat);
+		$html = str_replace(
+			array(
+				'%operations%',
+				'%paginator%',
+				'%info%',
+			),
+			array(
+				$this->renderOperations(),
+				$this->renderPaginator(),
+				$this->renderInfo(),
+			),
+			$this->footerFormat
+		);
+		$html = trim($html, ' | ');
+		$cell->setHtml($html);
+		$row->add($cell);
+		
+		return $row;
 	}
 	
 	
@@ -380,5 +563,40 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$data = & $this->wrappers[$name[0]][$name[1]];
 		}
 		return $data;
+	}
+
+
+	/**
+	 * Returns DataGrid.
+	 * @return DataGrid
+	 */
+	public function getDataGrid()
+	{
+		return $this->dataGrid;
+	}
+	
+	
+	/********************* translator *********************/
+
+
+	/**
+	 * Returns translate adapter.
+	 * @return ITranslator|NULL
+	 */
+	final public function getTranslator()
+	{
+		return $this->getDataGrid()->getTranslator();
+	}
+
+
+	/**
+	 * Returns translated string.
+	 * @param  string
+	 * @return string
+	 */
+	public function translate($s)
+	{
+		$translator = $this->getTranslator();
+		return $translator === NULL ? $s : $translator->translate($s);
 	}
 }

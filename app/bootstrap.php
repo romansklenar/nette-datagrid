@@ -51,7 +51,7 @@ $loader->register();
 
 
 /** 2e) enable Profiler and RoutingDebugger */
-if (Environment::isDebugging() && !Environment::getHttpRequest()->isAjax()) {
+if ($mode == Debug::DEVELOPMENT) {
 	Debug::enableProfiler();
 }
 
@@ -101,4 +101,3 @@ $router[] = new SimpleRouter('Example:default');
 
 // Step 5: Run the application!
 $application->run();
-Debug::$counters['Allocated memory'] = TemplateHelpers::bytes(memory_get_usage()) . ' | ' . TemplateHelpers::bytes(memory_get_peak_usage()) . ' [peak]';

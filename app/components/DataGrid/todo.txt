@@ -1,9 +1,7 @@
 TODO
 ====
 
-- podpora pro translator
-- footer složený z operací a stránkovače (viz: http://extjs.com/deploy/dev/examples/grid/paging.html)
-- vyprofilovat
+- nastylovat footer + ikonky
+- funkcnost ajaxu pri POSTu
+- funkcnost page-inputu
 - renderer pro jQuery UI framework
-- podpora pro SQLite
-- modetody pro vykreslení přesunout do vykreslovače

@@ -80,15 +80,18 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/** @var string */
 	protected $keyName;
-
+	
+	/** @var array */
+	protected $receivedSignals = array();
+	
 	/** @var bool */
-	protected $isPaging;
-
+	protected $wasRegenerated = FALSE;
+	
 	/** @var bool */
-	protected $isSorting;
-
-	/** @var bool */
-	protected $isFiltering;
+	protected $wasRendered = FALSE;
+	
+	/** @var ITranslator */
+	protected $translator;
 
 
 	/**
@@ -188,14 +191,13 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Getter / property method.
-	 * Generates list of pages used for visual control.
+	 * Generates list of pages used for visual control. Use for your custom paginator rendering.
 	 * @return array
 	 */
-	public function getSteps()
+	public function getSteps($count = 15)
 	{
 		// paginator steps
 		$arr = range(max($this->paginator->firstPage, $this->page - 3), min($this->paginator->lastPage, $this->page + 3));
-		$count = 15;
 		$quotient = ($this->paginator->pageCount - 1) / $count;
 		for ($i = 0; $i <= $count; $i++) {
 			$arr[] = round($quotient * $i) + $this->paginator->firstPage;
@@ -203,6 +205,16 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		sort($arr);
 
 		return array_values(array_unique($arr));
+	}
+	
+	
+	/**
+	 * Setter / property method.
+	 * @return Paginator
+	 */
+	public function getPaginator()
+	{
+		return $this->paginator;
 	}
 
 
@@ -283,7 +295,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 
-	/********************* General data grid behavior *********************/
+	/********************* general data grid behavior *********************/
 
 
 
@@ -327,16 +339,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	}
 
 
-	/**
-	 * Does datagrid has a checker?
-	 * @return bool
-	 */
-	public function hasChecker()
-	{
-		return $this->rowsChecker;
-	}
-
-
 
 	/********************* signal handlers ********************/
 
@@ -349,8 +351,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function handlePage($page)
 	{
-		$this->isPaging = TRUE;
-		$this->paginator->page = $page;
+		$this->paginator->page = $this->page = $page > 0 ? $page : 1;
 		$this->invalidateControl('grid');
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
@@ -363,7 +364,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function handleOrder($by)
 	{
-		$this->isPaging = TRUE;
 		parse_str($this->order, $list);
 		
 		if (!isset($list[$by])) {
@@ -397,7 +397,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function handleFilter($by)
 	{
-		$this->isFiltering = TRUE;
 		$filters = array();
 		foreach ($by as $key => $value) {
 			if ($value !== '') $filters[$key] = $value;
@@ -455,7 +454,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 
-	/********************* Applycators (call before rendering only) *********************/
+	/********************* applycators (call before rendering only) *********************/
 
 
 
@@ -465,7 +464,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	protected function applyPaging()
 	{
-		if ($this->isFiltering && !$this->isPaging) {
+		if ($this->isSignalReceiver('filter') && !$this->isSignalReceiver('page')) {
 			$this->paginator->page = $this->page = 1;
 		} else {
 			$this->paginator->page = $this->page;
@@ -542,46 +541,26 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * Renders data grid.
 	 * @return void
 	 */
-	public function renderGrid()
+	public function render()
 	{
+		if (!$this->wasRendered) {
+			// apply filter items before rendering (must be in this order), but only once
+			$this->wasRendered = TRUE;
+			$this->applyFiltering();
+			$this->applySorting();
+			$this->applyPaging();
+		}
+		
+		if ($this->isSignalReceiver() && !$this->wasRegenerated) {
+			// regenerate only once
+			$this->wasRegenerated = TRUE;
+			$this->regenerateFormControls($this->getForm(TRUE));
+		}
 		$args = func_get_args();
 		array_unshift($args, $this);
 		$s = call_user_func_array(array($this->getRenderer(), 'render'), $args);
 		
 		echo mb_convert_encoding($s, 'HTML-ENTITIES', 'UTF-8');
-	}
-
-
-	/**
-	 * Renders table grid.
-	 * @return void
-	 */
-	public function render()
-	{
-		$template = $this->createTemplate();
-		$template->setFile(dirname(__FILE__) . '/grid.phtml');
-		$template->form = $this->_getComponent('form', TRUE, TRUE);
-		$template->registerFilter('Nette\Templates\CurlyBracketsFilter::invoke');
-		$template->render();
-	}
-
-
-	/**
-	 * Renders paginator.
-	 * @return void
-	 */
-	public function renderPaginator()
-	{
-		if ($this->paginator->pageCount < 2) return;
-		$this->paginator->page = $this->page;
-		
-		// render
-		$template = $this->createTemplate();
-		$template->paginator = $this->paginator;
-		$template->setFile(dirname(__FILE__) . '/paginator.phtml');
-		$template->registerFilter('Nette\Templates\CurlyBracketsFilter::invoke');
-		$template->steps = $this->getSteps();
-		$template->render();
 	}
 
 
@@ -599,6 +578,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		switch ($name) {
 			case 'form':
 				$form = new AppForm($this, $name);
+				$form->setTranslator($this->getTranslator());
 				$form->getElementPrototype()->class = 'gridform';
 				FormControl::$idMask = 'frm-grid' . String::capitalize($this->getName()) . '-%s-%s';
 				
@@ -619,13 +599,20 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 					}
 				}
 				
-				if ($this->rowsChecker) {
+				// checker
+				if ($this->hasOperations()) {
 					$primary = $this->getKeyName();
 					$sub = $form->addContainer('checker');
 					
 					foreach ($this->getRows() as $row) {
 						$sub->addCheckbox($row[$primary], $row[$primary]);
 					}
+				}				
+				
+				// page input
+				if ($this->paginator->pageCount >= 1) {
+					$form->addText('page', 'Page', 1)->addRule(Form::INTEGER, 'Page must be numeric value');
+					$form['page']->setValue($this->page);
 				}
 				
 				$renderer = $form->getRenderer();
@@ -649,39 +636,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function getForm($need = TRUE)
 	{
-		return $this->_getComponent('form', $need);
-	}
-
-
-	/**
-	 * Returns component specified by name or path.
-	 * @param  string
-	 * @param  bool   throw exception if component doesn't exist?
-	 * @param  bool   generate form controls for component 'form'? 
-	 * @return IComponent|NULL
-	 * 
-	 * @note: Duvod vzniku teto metody: pokud formular prijima signal na zpracovani filtru, 
-	 * tak by se komponenta 'fomr' vytvorila pred renderovanim a uz by na ni nesly spravne 
-	 * aplikovat tyto filtry, protoze cely container checker by byl naplnen komponentama/checkboxy,
-	 * ktere by se vazaly k neaktualnim radkum.
-	 * Dokud je metoda ComponentContainer::getComponent() final, musim takto Nette obchazet podtrzitkovou verzi teto metody.
-	 * 
-	 * Mozne (ne moc ciste) reseni, ktere by eliminovalo nutnost teto metody, 
-	 * je generovat do checkeru rovnou vsechny checkboxy a neomezovat se jen na ty mezi ofsett a limit, 
-	 * ale pri pak by nalezela na kazdy radek v tabulce jedna komponta (checkbox) => aplikace by se zpomalovala.
-	 * 
-	 * Dalsi reseni by bylo rozdelit filtracni cast a checkboxovou cast formulare do dvou nezavislych formularu,
-	 * to ale nepripada v uvahu kvuli nevalidniho html kodu a par omezeni, ktere by to prineslo.
-	 */
-	public function _getComponent($name, $need = TRUE, $regenerate = NULL)
-	{
-		$component = parent::getComponent($name, $need);
-		
-		// TODO: regenerate if is datagrid signal receiver only
-		if ($name == 'form' && $regenerate == TRUE) {
-			$this->regenerateFormControls($component);
-		}
-		return $component;
+		return $this->getComponent('form', $need);
 	}
 
 
@@ -692,11 +647,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	protected function regenerateFormControls(AppForm $form)
 	{
-		// filter items (must be in this order)
-		$this->applyFiltering();
-		$this->applySorting();
-		$this->applyPaging();
-			
 		// regenerate checker's checkbox controls
 		if ($this->rowsChecker) {
 			$primary = $this->getKeyName();
@@ -708,7 +658,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 		
 		// for selectbox filter controls update values if was filtered over column
-		if ($this->hasFilters() && $this->isFiltering) {
+		if ($this->hasFilters() && $this->isSignalReceiver('filter')) {
 			foreach ($this->getFilters() as $filter) {
 				if ($filter instanceof SelectboxFilter) {
 					$filter->generateItems();
@@ -716,7 +666,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			}
 		}
 		
-		return;
+		// page input
+		$form['page']->setValue($this->page);
 	}
 
 
@@ -742,7 +693,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 
-	/********************* control factories *********************/
+	/********************* component factories *********************/
 
 
 
@@ -854,6 +805,32 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		$this->getComponent('actions', TRUE)->addComponent($action, (string)$count);
 		return $action;
 	}
+	
+	
+	
+	/********************* translator ********************/
+
+
+
+	/**
+	 * Sets translate adapter.
+	 * @param  ITranslator
+	 * @return void
+	 */
+	public function setTranslator(ITranslator $translator = NULL)
+	{
+		$this->translator = $translator;
+	}
+
+
+	/**
+	 * Returns translate adapter.
+	 * @return ITranslator|NULL
+	 */
+	final public function getTranslator()
+	{
+		return $this->translator;
+	}
 
 
 
@@ -906,6 +883,36 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		$component = $this->getComponent('columns', TRUE)->getComponent($name, FALSE);
 		if ($component !== NULL) {
 			$this->getComponent('columns', TRUE)->removeComponent($component);
+		}
+	}
+	
+	
+	/********************* interface \ISignalReceiver *********************/
+
+
+	/**
+	 * Calls signal handler method.
+	 * @param  string
+	 * @return void
+	 */
+	public function signalReceived($signal)
+	{
+		$this->receivedSignals[] = $signal;
+		parent::signalReceived($signal);
+	}
+	
+	
+	/**
+	 * Checks if control received a signal.
+	 * @param  string  signal name
+	 * @return bool
+	 */
+	public function isSignalReceiver($signal = NULL)
+	{
+		if ($signal === NULL) { 
+			return count($this->receivedSignals) > 0;
+		} else {
+			return in_array($signal, $this->receivedSignals);
 		}
 	}
 

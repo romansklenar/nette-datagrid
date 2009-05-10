@@ -34,20 +34,28 @@ jQuery.extend({
 		//$("table.grid tr td.checker input:checked").removeAttr("checked");
 		
 		// vložit a zobrazit ikonku invertoru výběru (pro každý datagrid jen jedna ikonka)
-		$('<span class="icon icon-invert" title="Invertovat výběr" />').appendTo('table.grid tr.header th.checker');
+		$('<span class="icon icon-invert" title="Invert" />').appendTo('table.grid tr.header th.checker');
 		$('table.grid').find('tr.header th.checker span.icon-invert:not(:first)').remove();
 		
-		// přesunu odesílací tlačítko tak, aby bylo první ve formuláři, aby se na formulář po odeslání ENTEREM aplikovaly filtry
-		// (je nutné, jen pokud filtrační tlačítko není první tlačítko formuláře, např. při manuálním renderování)
-		//$("form.gridform table.grid tr.filters td.actions input:submit[name=filterSubmit]").prependTo("form.gridform").hide();
+		// u gridů s formulářem přesunu odesílací tlačítko tak, aby bylo první ve formuláři, aby se na formulář po odeslání ENTEREM aplikovaly filtry
 		// a na jeho místo vložím odesílací ikonku / odkaz nahrazující jeho úlohu (pro každý datagrid jen jednu)
-		/*
-		$('<a href="#" class="filter" title="Filtrovat">Filtrovat</a>').click(function () {
-			$(this).parents("form.gridform").find("input:submit[name=filterSubmit]").netteAjaxSubmit();
-			return false;
-		}).appendTo("form.gridform table.grid tr.filters td.actions");
-		$('form.gridform table.grid').find('tr.filters td.actions a.filter:not(:first)').remove();
-		*/
+		// (je nutné, jen pokud filtrační tlačítko není první tlačítko formuláře, např. při manuálním renderování)
+		$('form.gridform').each(function (i) {
+			var cell = $(this).find("tr.filters td.actions");
+			var submit = cell.find('input:submit[name=filterSubmit]');
+			submit.prependTo($(this)).hide();
+			
+			$('<a href="#" class="filter"></a>')
+				.appendTo(cell)
+				.click(function () {
+					submit.netteAjaxSubmit();
+					return false;
+				})
+				.attr({ title: submit.attr("value") })
+				.text(submit.attr("value"));
+
+			cell.find('a.filter:not(:first)').remove();
+		});		
 	}
 });
 

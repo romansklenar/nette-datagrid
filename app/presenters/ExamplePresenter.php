@@ -72,10 +72,12 @@ class ExamplePresenter extends BasePresenter
 			return;
 			
 			
-		case 'customersGrid':			
-			$model = new DatagridModel('customers');			
+		case 'customersGrid':
+			$translator = new Translator(Environment::expand('%templatesDir%/customersGrid.cs.mo'));
+			$model = new DatagridModel('customers');
 			$grid = new DataGrid;
-			$grid->setRenderer(new CustomDataGridRenderer);
+			$grid->setTranslator($translator);
+			//$grid->setRenderer(new CustomDataGridRenderer);
 			
 			$grid->rowsPerPage = 10; // display 10 rows per page
 			$grid->bindDataTable($model->getCustomerAndOrderInfo(), $model->table);
@@ -84,6 +86,7 @@ class ExamplePresenter extends BasePresenter
 			
 			$operations = array('delete' => 'delete', 'deal' => 'deal', 'print' => 'print', 'forward' => 'forward'); // define operations
 			// in czech for example: $operations = array('delete' => 'smazat', 'deal' => 'vyřídit', 'print' => 'tisk', 'forward' => 'předat');
+			// or you can left translate values by translator adapter
 			$callback = array($this, 'gridOperationHandler');
 			$grid->allowOperations($operations, $callback, 'customerNumber'); // allows checkboxes to do operations with more rows
 			
@@ -136,7 +139,7 @@ class ExamplePresenter extends BasePresenter
 			/**** add some actions ****/
 			
 			$grid->addActionColumn('Actions')->getHeaderPrototype()->style('text-align: center');
-			$grid['actions']->getCellPrototype()->style('text-align: center');
+			$grid['actions']->getHeaderPrototype()->style('width: 98px');
 			$icon = Html::el('span')->setHtml('&nbsp;');
 			$grid->addAction('Copy', 'Customer:copy', clone $icon->class('icon icon-copy'));
 			$grid->addAction('Detail', 'Customer:detail', clone $icon->class('icon icon-detail'));
@@ -202,7 +205,7 @@ class ExamplePresenter extends BasePresenter
 	 */
 	public function handlePositionMove($key, $dir)
 	{
-		// TODO: write more sophisticated handler :)
+		// TODO: write your own more sophisticated handler ;)
 		$model = new DatagridModel('offices');
 		
 		if ($dir == 'down') {

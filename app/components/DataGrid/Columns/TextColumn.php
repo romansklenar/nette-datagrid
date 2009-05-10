@@ -28,7 +28,14 @@ class TextColumn extends DataGridColumn
 				$value = $this->replacement[$value];
 			}
 		}
-		$value = String::truncate((string) $value, $this->maxLength);
+
+		// translate & truncate
+		if ($value instanceof Html) {
+			$value->setText(String::truncate($this->translate($value->getText()), $this->maxLength));
+			$value->title = $this->translate($value->title);
+		} else {
+			$value = String::truncate($this->translate($value), $this->maxLength);
+		}
 		
 		foreach ($this->formatCallback as $callback) {
 			if (is_callable($callback)) {

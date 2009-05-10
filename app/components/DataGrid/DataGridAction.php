@@ -50,14 +50,13 @@ class DataGridAction extends Component implements IDataGridAction
 	public function __construct($title, $destination, Html $icon = NULL, $useAjax = FALSE, $type = self::WITH_KEY)
 	{
 		parent::__construct();
-		
 		$this->type = $type;
 		$this->destination = $destination;
 		
 		$a = Html::el('a')->title($title);
 		if ($useAjax) $a->class(self::$ajaxClass);
+		
 		if ($icon !== NULL && $icon instanceof Html) {
-			$icon->title($title);
 			$a->add($icon);
 		} else {
 			$a->setText($title);

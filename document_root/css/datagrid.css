@@ -89,6 +89,15 @@ table.grid tr.filters td.actions {
 	text-align: left;
 	*padding: 6px !important;
 }
+table.grid tr.footer td {
+	background: #C6DBFF url('../images/th-bg.gif') no-repeat;
+	color: #505767;
+	border: 1px solid #BBCBF4;
+	padding: 0 10px;
+	text-align: left;
+	font-weight: bold;
+	line-height: 30px;
+}
 table.grid td span.positioner {
 	width: 22px;
 	height: 16px;
@@ -129,7 +138,6 @@ table.grid td span.positioner a.inactive span, table.grid td span.positioner a.i
 	margin-right: 0.1em;
 	padding: 0.2em 0.5em !important;
 	color: #999999;
-	background-color: whitesmoke;
 }
 .paginator a {
 	border: 1px solid #9AAFE5;
@@ -145,4 +153,13 @@ table.grid td span.positioner a.inactive span, table.grid td span.positioner a.i
 	border: 1px solid #2E6AB1;
 	color: white;
 	font-weight: bold;
+}
+
+
+.operations {
+	margin: 2em 0;
+}
+
+.grid-info {
+	margin: 2em 0;
 }

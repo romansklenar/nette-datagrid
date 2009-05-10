@@ -24,7 +24,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	protected $cell;
 
 	/** @var string */
-	public $caption;
+	protected $caption;
 
 	/** @var int */
 	protected $maxLength = 100;
@@ -253,5 +253,44 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 		$filter = new SelectboxFilter($items, $skipFirst);
 		$this->getDataGrid(TRUE)->getComponent('filters', TRUE)->addComponent($filter, $this->getName());
 		return $filter;
+	}
+	
+	
+	/********************* translator *********************/
+
+
+	/**
+	 * Returns translate adapter.
+	 * @return ITranslator|NULL
+	 */
+	final public function getTranslator()
+	{
+		return $this->getDataGrid()->getTranslator();
+	}
+
+
+	/**
+	 * Returns translated string.
+	 * @param  string
+	 * @return string
+	 */
+	public function translate($s)
+	{
+		$translator = $this->getTranslator();
+		return $translator === NULL ? $s : $translator->translate($s);
+	}
+	
+	
+	/**
+	 * Setter / property method.
+	 * @return string
+	 */
+	public function getCaption()
+	{
+		if ($this->caption instanceof Html && $this->caption->title) {
+			return $this->caption->title($this->translate($this->caption->title));
+		} else {
+			return $this->translate($this->caption);
+		}
 	}
 }
