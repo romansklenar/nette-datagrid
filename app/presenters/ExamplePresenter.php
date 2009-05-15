@@ -79,7 +79,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->setTranslator($translator);
 			//$grid->setRenderer(new CustomDataGridRenderer);
 			
-			$grid->rowsPerPage = 10; // display 10 rows per page
+			$grid->itemsPerPage = 10; // display 10 rows per page
 			$grid->bindDataTable($model->getCustomerAndOrderInfo(), $model->table);
 			
 			$grid->multiOrder = FALSE; // order by one column only
@@ -89,8 +89,8 @@ class ExamplePresenter extends BasePresenter
 			// or you can left translate values by translator adapter
 			$callback = array($this, 'gridOperationHandler');
 			$grid->allowOperations($operations, $callback, 'customerNumber'); // allows checkboxes to do operations with more rows
-			
-			
+
+
 			/**** add some columns ****/
 			
 			$grid->addColumn('customerName', 'Name');

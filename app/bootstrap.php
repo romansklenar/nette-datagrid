@@ -15,10 +15,6 @@ if (!is_dir(LIBS_DIR . '/Nette')) {
 require_once LIBS_DIR . '/Nette/loader.php';
 
 
-/** 1a) Load extension methods */
-require_once APP_DIR . '/extensions.php';
-
-
 
 // Step 2: Configure environment
 
@@ -50,13 +46,17 @@ $loader->autoRebuild = Environment::isDebugging() ? TRUE : FALSE; // rebuild if 
 $loader->register();
 
 
-/** 2e) enable Profiler and RoutingDebugger */
+/** 2e) load extension methods */
+require_once APP_DIR . '/extensions.php';
+
+
+/** 2f) enable Profiler and RoutingDebugger */
 if ($mode == Debug::DEVELOPMENT) {
 	Debug::enableProfiler();
 }
 
 
-/** 2f) Session setup [optional] */
+/** 2g) Session setup [optional] */
 if (Environment::getVariable('sessionDir') !== NULL && !is_writable(Environment::getVariable('sessionDir'))) {
 	die("Make directory '" . realpath(Environment::getVariable('sessionDir')) . "' writable!");
 }
@@ -69,8 +69,6 @@ $session->setSavePath(Environment::getVariable('sessionDir'));
 
 /** 3a) Setup Application, ErrorPresenter & exceptions catching */
 $application = Environment::getApplication();
-$application->errorPresenter = 'Error';
-$application->catchExceptions = Environment::isProduction();
 
 Presenter::$invalidLinkMode = Environment::isProduction() ? Presenter::INVALID_LINK_SILENT : Presenter::INVALID_LINK_EXCEPTION;
 Environment::setVariable('host', Environment::getHttpRequest()->getUri()->host);

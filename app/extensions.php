@@ -30,11 +30,9 @@ FormControl::extensionMethod('FormControl::setReadOnly', 'FormControl_setReadOnl
 
 
 /*
-require_once LIBS_DIR . '\dibi\dibi.php';
-
-function DibiDataSource_releaseOrder(DibiDataSource $_this)
+function DibiDataSource_flush(DibiDataSource $_this)
 {
-	$_this->sorting = array();
+	$_this->select(array())->where(array())->orderBy(array())->release();
 }
-DibiDataSource::extensionMethod('DibiDataSource::releaseOrder', 'DibiDataSource_releaseOrder');
+DibiDataSource::extensionMethod('DibiDataSource::flush', 'DibiDataSource_flush');
 */

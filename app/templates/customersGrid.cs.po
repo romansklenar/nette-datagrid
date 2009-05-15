@@ -29,6 +29,9 @@ msgstr "Vybrané:"
 msgid "Send"
 msgstr "Proveď"
 
+msgid "Change page"
+msgstr "Změnit stránku"
+
 msgid "First"
 msgstr "První"
 
@@ -43,6 +46,9 @@ msgstr "Poslední"
 
 msgid "Page"
 msgstr "Stránka"
+
+msgid "Page must be numeric value"
+msgstr "Číslo stránky musí být numerická hodnota"
 
 msgid "%label% %input% of %count%"
 msgstr "%label% %input% z %count%"

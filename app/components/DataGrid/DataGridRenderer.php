@@ -124,13 +124,6 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			throw new InvalidArgumentException("Data source was not setted. You must set data source to data grid before rendering.");
 		}
 		
-		if (!$dataGrid->hasColumns()) {
-			// auto-generate columns
-			$row = $dataGrid->dataSource->select('*')->fetch();
-			$keys = array_keys((array)$row);
-			foreach ($keys as $key) $dataGrid->addColumn($key);
-		}
-		
 		if ($mode !== NULL) {
 			return call_user_func_array(array($this, 'render' . $mode), NULL);
 		}
@@ -231,12 +224,11 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	 */
 	public function renderPaginator()
 	{
-		if ($this->dataGrid->paginator->pageCount <= 1) return '';		
-		$this->dataGrid->paginator->page = $this->dataGrid->page;
+		$paginator = $this->dataGrid->paginator;
+		if ($paginator->pageCount <= 1) return '';
 		
 		$container = $this->getWrapper('paginator container');
 		$button = $this->getWrapper('paginator button container');
-		$paginator = $this->dataGrid->paginator;
 		$translator = $this->dataGrid->getTranslator();
 		$a = Html::el('a')->class(DataGridColumn::$ajaxClass);
 		
@@ -275,6 +267,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$format
 		);
 		$container->add(Html::el()->setHtml($html));
+		$container->add($form['pageSubmit']->control);
 		
 		// next button
 		$next = clone $button;
@@ -342,7 +335,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				'%count%',
 			),
 			array(
-				$paginator->offset + 1,
+				$paginator->itemCount != 0 ? $paginator->offset + 1 : $paginator->offset,
 				$paginator->offset + $paginator->length,
 				$paginator->itemCount,
 			),

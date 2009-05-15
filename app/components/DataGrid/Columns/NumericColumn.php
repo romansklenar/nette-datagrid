@@ -74,7 +74,7 @@ class NumericColumn extends DataGridColumn
 			}
 			$value = $matches['value'];
 		}
-		$cond[] = array("[$column] $operator %s", $value);
+		$cond[] = array("[$column] $operator %f", $value);
 		
 		$datagrid = $this->getDataGrid(TRUE);
 		$datagrid->dataSource->where('%and', $cond);

@@ -5,7 +5,7 @@ DataGrid
 	 - Např. pomocí checkboxů vyberu více záznamů, které chci smazat, formulář odešlu a v handleru vidím, nad kterýma hodnotama tohoto primárního klíče mám akci provést.
 
 - tyto odesilaci tlacitka na hromadne operace: mely by mit uzivatelem definovan svuj handler v presenteru nebo v jine komponente
-- aby fungovalo filtrování po odeslání klávesou ENTER, musí být tlačítko 'filterSubmit' vykresleno jako první (i pokud je pouzito manualni vykresleni)
+
 
 Filtry
 ------

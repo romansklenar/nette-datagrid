@@ -1,7 +1,7 @@
 jQuery.extend({
 	//grafický efekt u překreslení všech snippetů
-	updateSnippet: function (id, html) {
-		$("#" + id).animate({ opacity: 0.5 }, "fast", "swing", function () {
+	updateSnippet: function(id, html) {
+		$("#" + id).animate({ opacity: 0.5 }, "fast", "swing", function() {
 			$(this).html(html).animate({ opacity: 1 }, "fast", "swing");
 			
 			jQuery.registerAfterUpdate();
@@ -9,9 +9,9 @@ jQuery.extend({
 	},
 	
 	// akce, které je nutno provést i po každém překreslení snippetů
-	registerAfterUpdate: function() {
+	registerAfterUpdate: function(e) {
 		// skryj efektivně všechny flash zprávičky po pěti sekundách
-		$(".flash").fadeTo(5000, 0.9, function () {
+		$(".flash").fadeTo(5000, 0.9, function(e) {
 			$(this).animate({"opacity": 0}, 2000);
 			$(this).slideUp(1000);
 		});
@@ -40,14 +40,14 @@ jQuery.extend({
 		// u gridů s formulářem přesunu odesílací tlačítko tak, aby bylo první ve formuláři, aby se na formulář po odeslání ENTEREM aplikovaly filtry
 		// a na jeho místo vložím odesílací ikonku / odkaz nahrazující jeho úlohu (pro každý datagrid jen jednu)
 		// (je nutné, jen pokud filtrační tlačítko není první tlačítko formuláře, např. při manuálním renderování)
-		$('form.gridform').each(function (i) {
+		$('form.gridform').each(function(i) {
 			var cell = $(this).find("tr.filters td.actions");
 			var submit = cell.find('input:submit[name=filterSubmit]');
-			submit.prependTo($(this)).hide();
+			submit.hide();//.prependTo($(this));
 			
 			$('<a href="#" class="filter"></a>')
 				.appendTo(cell)
-				.click(function () {
+				.click(function(e) {
 					submit.netteAjaxSubmit();
 					return false;
 				})
@@ -55,7 +55,30 @@ jQuery.extend({
 				.text(submit.attr("value"));
 
 			cell.find('a.filter:not(:first)').remove();
-		});		
+		});
+		
+		// ajaxové filtrování formulářů datagridů po stisknutí klávesy <ENTER>
+		$("form.gridform table.grid tr.filters input[type=text]").keypress(function(e) {
+			if (e.keyCode == 13) {
+				$(this).parents("form.gridform").find("input:submit[name=filterSubmit]").netteAjaxSubmit();
+				return false;
+			}
+		});
+		
+		// ajaxové filtrování formulářů datagridů pomocí změny hodnoty selectboxu nebo checkboxu
+		$("form.gridform table.grid tr.filters select, form.gridform table.grid tr.filters input[type=checkbox]").change(function(e) {
+			$(this).parents("form.gridform").find("input:submit[name=filterSubmit]").netteAjaxSubmit();
+			return false;
+		});
+		
+		// ajaxová změna stránky formuláře datagridů po stisknutí klávesy <ENTER>
+		$("form.gridform table.grid tr.footer input[name=pageSubmit]").hide();
+		$("form.gridform table.grid tr.footer input[name=page]").keypress(function(e) {
+			if (e.keyCode == 13) {
+				$(this).parents("form.gridform").find("input:submit[name=pageSubmit]").netteAjaxSubmit();
+				return false;
+			}
+		});
 	}
 });
 
@@ -66,13 +89,13 @@ $(function () {
 	$.registerAfterUpdate();
 
 	// přiřaď všem současným i budoucím odkazům s třídou ajaxlink po kliknutí tuto funkci
-	$("a.ajaxlink").live("click", function () {
+	$("a.ajaxlink").live('click', function(e) {
 		$.netteAjax(this.href);
 		return false;
 	});
 	
 	// ajaxové odeslání na všech současných i budoucích formulářích
-	$("form.ajaxform").live('submit', function() {
+	$("form.ajaxform").live('submit', function(e) {
 		$(this).netteAjaxSubmit();
 		return false;
 	});
@@ -90,7 +113,7 @@ $(function () {
 	});
 	
 	// ajax-loader
-	$('<div id="ajax-spinner"></div>').ajaxStart(function () {
+	$('<div id="ajax-spinner"></div>').ajaxStart(function(e) {
 		$(this).show();
 	}).ajaxStop(function () {
 		$(this).hide();
@@ -99,21 +122,17 @@ $(function () {
 	
 	/******** DataGrid ******/
 	
-	// ajaxové odeslání pomocí tlačítka na všech současných i budoucích formulářích datagridů
-	$("form.gridform").live('submit', function () {
-		$(this).netteAjaxSubmit();
+	// ajaxové odeslání na všech současných i budoucích formulářích datagridů
+	$("form.gridform").live('submit', function(e) {
+		//$(this).netteAjaxSubmit();
+		alert('(form.gridform).live(submit)');
 		return false;
 	});
 	
 	// ajaxové odeslání pomocí tlačítka na všech současných i budoucích formulářích datagridů
-	$("form.gridform :submit").live('click', function() {
-    	$(this).netteAjaxSubmit();
-    	return false;
-	});
-	
-	// ajaxové odeslání formulářích datagridů pomocí změny hodnoty selectboxu nebo checkboxu (aplikace filtrů)
-	$("form.gridform table.grid tr.filters select, form.gridform table.grid tr.filters input[type=checkbox]").live('change', function() {
-		$(this).parents("form.gridform").find("input:submit[name=filterSubmit]").netteAjaxSubmit();
+	$("form.gridform :submit").live('click', function(e) {
+		//$(this).netteAjaxSubmit();
+		alert('(form.gridform :submit).live(click)');
 		return false;
 	});
 	
@@ -150,7 +169,7 @@ $(function () {
 	});
 	
 	// invertor vybraných řádků v gridu
-	$("table.grid tr.header th.checker span.icon-invert").live('click', function () {
+	$("table.grid tr.header th.checker span.icon-invert").live('click', function(e) {
 		var table = $(this).parents("table.grid");
 		var selected = table.find("tr.selected");
 		var unselected = table.find("tr").filter(":not(.selected)");

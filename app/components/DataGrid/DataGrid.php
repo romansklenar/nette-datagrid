@@ -54,9 +54,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/** @persistent */
 	public $filters = '';
 
-	/** @var int */
-	protected $rowsPerPage = 15;
-
 	/** @var DibiDataSource */
 	protected $dataSource;
 
@@ -68,9 +65,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/** @var array */
 	public $operations = array();
-
-	/** @var bool  render left side column of checkboxes to allow group operations? */
-	protected $rowsChecker = FALSE;
 
 	/** @var array  of valid callback(s) */
 	protected $onOperationSubmit;
@@ -84,10 +78,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/** @var array */
 	protected $receivedSignals = array();
 	
-	/** @var bool */
-	protected $wasRegenerated = FALSE;
-	
-	/** @var bool */
+	/** @var bool  was method render() called? */
 	protected $wasRendered = FALSE;
 	
 	/** @var ITranslator */
@@ -102,7 +93,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		parent::__construct();
 		$this->paginator = new Paginator;
-		$this->paginator->itemsPerPage = $this->rowsPerPage;
+		$this->setItemsPerPage(15);
 		
 		$this->addComponent(new ComponentContainer(), 'columns');
 		$this->addComponent(new ComponentContainer(), 'filters');
@@ -170,12 +161,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
-	public function setRowsPerPage($value)
+	public function setItemsPerPage($value)
 	{
 		if ($value <= 0) {
 			throw new InvalidArgumentException("Parametr must be positive number, '$value' given.");
 		}
-		$this->paginator->itemsPerPage = $this->rowsPerPage = (int) $value;
+		$this->paginator->itemsPerPage = (int) $value;
 	}
 
 
@@ -183,9 +174,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * Getter / property method.
 	 * @return int
 	 */
-	public function getRowsPerPage()
+	public function getItemsPerPage()
 	{
-		return (int) $this->rowsPerPage;
+		return $this->paginator->itemsPerPage;
 	}
 
 
@@ -248,9 +239,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * Iterates over all datagrid rows.
+	 * Iterates over datagrid rows.
 	 * @throws InvalidStateException
-	 * @return ArrayIterator
+	 * @return DibiResultIterator
 	 */
 	public function getRows()
 	{
@@ -346,12 +337,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Changes page number.
-	 * @param  string
+	 * @param  int
 	 * @return void
 	 */
 	public function handlePage($page)
 	{
-		$this->paginator->page = $this->page = $page > 0 ? $page : 1;
+		$this->paginator->page = $this->page = ($page > 0 ? $page : 1);
 		$this->invalidateControl('grid');
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
@@ -385,7 +376,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		
 		$this->order = http_build_query($list, '', '&');
 		$this->invalidateControl('grid');
-		
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
 
@@ -403,8 +393,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 		$this->filters = http_build_query($filters, '', '&');
 		$this->invalidateControl('grid');
-		$this->invalidateControl('paginator');
-		
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
 
@@ -421,12 +409,19 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function onSubmitHandler(AppForm $form)
 	{
+		$this->receivedSignals[] = 'submit';
+		
 		// was form submitted?
-		if ($form->isSubmitted() && $form->isValid()) {
+		if ($form->isSubmitted()) {
 			$values = $form->getValues();
 			
 			if ($form['filterSubmit']->isSubmittedBy()) {
+				$this->receivedSignals[] = 'filter';
 				$this->handleFilter($values['filters']);
+				
+			} elseif ($form['pageSubmit']->isSubmittedBy()) {
+				$this->receivedSignals[] = 'page';
+				$this->handlePage($values['page']);
 					
 			} elseif ($form['operationSubmit']->isSubmittedBy()) {
 				trigger_error('No user defined handler for group operations; assign valid callback to your group operations handler into DataGrid::$operationsHandler variable.', E_USER_WARNING);
@@ -451,6 +446,17 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		$this->onSubmitHandler($button->getParent());
 	}
+	
+	
+	/**
+	 * Change page handler. Left functionality on method onSubmitHandler.
+	 * @param  Button
+	 * @return void
+	 */
+	public function onClickPageHandler(Button $button)
+	{
+		$this->onSubmitHandler($button->getParent());
+	}
 
 
 
@@ -464,13 +470,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	protected function applyPaging()
 	{
-		if ($this->isSignalReceiver('filter') && !$this->isSignalReceiver('page')) {
-			$this->paginator->page = $this->page = 1;
-		} else {
-			$this->paginator->page = $this->page;
+		if (!$this->isSignalReceiver('submit')) {
+			$this->paginator->itemCount = count($this->dataSource);
 		}
-		
-		$this->paginator->itemCount = count($this->dataSource);
+
+		$this->paginator->page = $this->page;
 		$this->dataSource->applyLimit($this->paginator->length, $this->paginator->offset);
 	}
 
@@ -544,18 +548,26 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public function render()
 	{
 		if (!$this->wasRendered) {
-			// apply filter items before rendering (must be in this order), but only once
 			$this->wasRendered = TRUE;
+			
+			if (!$this->hasColumns()) {
+				// auto-generate columns
+				$ds = clone $this->dataSource;
+				$row = $ds->select('*')->fetch();
+				$keys = array_keys((array)$row);
+				foreach ($keys as $key) $this->addColumn($key);
+			}
+			
+			// filter items (must be in this order)
 			$this->applyFiltering();
 			$this->applySorting();
 			$this->applyPaging();
+			
+			if ($this->isSignalReceiver('filter') || $this->isSignalReceiver('page')) {
+				$this->regenerateFormControls($this->getForm(TRUE));
+			}
 		}
-		
-		if ($this->isSignalReceiver() && !$this->wasRegenerated) {
-			// regenerate only once
-			$this->wasRegenerated = TRUE;
-			$this->regenerateFormControls($this->getForm(TRUE));
-		}
+
 		$args = func_get_args();
 		array_unshift($args, $this);
 		$s = call_user_func_array(array($this->getRenderer(), 'render'), $args);
@@ -577,17 +589,30 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		switch ($name) {
 			case 'form':
+				// NOTE: signal-submit on form disregard component's state
+				//		because form is created directly by Presenter in signal handling phase
+				//		and this principle is used to detect submit signal
+				if (!$this->wasRendered) {
+					$this->receivedSignals[] = 'submit';
+				}
+
 				$form = new AppForm($this, $name);
 				$form->setTranslator($this->getTranslator());
 				$form->getElementPrototype()->class = 'gridform';
-				FormControl::$idMask = 'frm-grid' . String::capitalize($this->getName()) . '-%s-%s';
+				//FormControl::$idMask = 'frm-grid' . String::capitalize($this->getName()) . '-%s-%s';
 				
 				$form->addSubmit('filterSubmit', 'Apply filters')
 					->onClick[] = array($this, 'onClickFilterHandler');
 				
 				$form->addSelect('operations', 'Selected:', $this->operations);
-				$form->addSubmit('operationSubmit', 'Send')
-					->onClick= $this->onOperationSubmit;
+				$form->addSubmit('operationSubmit', 'Send')->onClick = $this->onOperationSubmit;
+				
+				// page input
+				$form->addText('page', 'Page', 1);
+				$form['page']->setValue($this->paginator->page);
+				$form->addSubmit('pageSubmit', 'Change page')
+					->onClick[] = array($this, 'onClickPageHandler');
+
 				
 				// generate filters FormControls
 				if ($this->hasFilters()) {
@@ -604,15 +629,18 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 					$primary = $this->getKeyName();
 					$sub = $form->addContainer('checker');
 					
+					if ($this->isSignalReceiver('submit')) {
+						$ds = clone $this->dataSource;
+						$this->applyFiltering();
+						$this->applySorting();
+						$this->applyPaging();
+					}
+					
 					foreach ($this->getRows() as $row) {
 						$sub->addCheckbox($row[$primary], $row[$primary]);
 					}
-				}				
-				
-				// page input
-				if ($this->paginator->pageCount >= 1) {
-					$form->addText('page', 'Page', 1)->addRule(Form::INTEGER, 'Page must be numeric value');
-					$form['page']->setValue($this->page);
+					
+					if ($this->isSignalReceiver('submit')) $this->dataSource = $ds;
 				}
 				
 				$renderer = $form->getRenderer();
@@ -648,7 +676,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	protected function regenerateFormControls(AppForm $form)
 	{
 		// regenerate checker's checkbox controls
-		if ($this->rowsChecker) {
+		if ($this->hasOperations()) {
 			$primary = $this->getKeyName();
 			$form->removeComponent($form['checker']);
 			$sub = $form->addContainer('checker');
@@ -667,7 +695,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 		
 		// page input
-		$form['page']->setValue($this->page);
+		$form['page']->setValue($this->paginator->page);
 	}
 
 
@@ -681,7 +709,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public function allowOperations(array $operations, $callback = NULL, $key = NULL)
 	{
 		$this->operations = $operations;
-		$this->rowsChecker = TRUE;
 		
 		if ($key != NULL && $this->keyName == NULL) {
 			$this->setKeyName($key);
@@ -923,9 +950,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function __toString()
 	{
-		$args = func_get_args();
-		array_unshift($args, $this);
-		$s = call_user_func_array(array($this->getRenderer(), 'render'), $args);
+		$s = call_user_func_array(array($this->getRenderer(), 'render'), array($this));
 		return mb_convert_encoding($s, 'HTML-ENTITIES', 'UTF-8');
 	}
 }
