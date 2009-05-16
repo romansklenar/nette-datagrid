@@ -93,8 +93,8 @@ class PositionColumn extends NumericColumn
 		$uplink = $presenter->link($this->destination, array('key' => $value, 'dir' => 'up'));
 		$downlink = $presenter->link($this->destination, array('key' => $value, 'dir' => 'down'));
 		
-		$up = Html::el('a')->title($this->moves['up'])->href($uplink)->add(Html::el('span')->class('up')->setHtml('&nbsp;'));
-		$down = Html::el('a')->title($this->moves['down'])->href($downlink)->add(Html::el('span')->class('down')->setHtml('&nbsp;'));
+		$up = Html::el('a')->title($this->moves['up'])->href($uplink)->add(Html::el('span')->class('up'));
+		$down = Html::el('a')->title($this->moves['down'])->href($downlink)->add(Html::el('span')->class('down'));
 		
 		if ($this->useAjax) {
 			$up->class(self::$ajaxClass);
@@ -112,6 +112,6 @@ class PositionColumn extends NumericColumn
 		}
 		
 		$positioner = Html::el('span')->class('positioner')->add($up)->add($down);
-		return $positioner . '&nbsp;' . $value;
+		return $positioner . $value;
 	}
 }

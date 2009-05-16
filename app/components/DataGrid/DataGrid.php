@@ -470,10 +470,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	protected function applyPaging()
 	{
-		if (!$this->isSignalReceiver('submit')) {
-			$this->paginator->itemCount = count($this->dataSource);
-		}
-
+		$this->paginator->itemCount = count($this->dataSource);
 		$this->paginator->page = $this->page;
 		$this->dataSource->applyLimit($this->paginator->length, $this->paginator->offset);
 	}
@@ -599,7 +596,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				$form = new AppForm($this, $name);
 				$form->setTranslator($this->getTranslator());
 				$form->getElementPrototype()->class = 'gridform';
-				//FormControl::$idMask = 'frm-grid' . String::capitalize($this->getName()) . '-%s-%s';
+				FormControl::$idMask = 'frm-grid' . String::capitalize($this->getName()) . '-%s-%s';
 				
 				$form->addSubmit('filterSubmit', 'Apply filters')
 					->onClick[] = array($this, 'onClickFilterHandler');

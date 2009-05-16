@@ -70,9 +70,13 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		'paginator' => array(
 			'container' => 'span class=paginator',
 			'button' => array(
-				'container' => 'span', 
-					// .paginator-prev, .paginator-next, 
-					// .paginator-first, .paginator-last
+				'first' => 'span class="paginator-first"',
+				'prev' => 'span class="paginator-prev"',
+				'next' => 'span class="paginator-next"',
+				'last' => 'span class="paginator-last"',
+			),
+			'controls' => array(
+				'container' => 'span class=paginator-controls', 
 			),
 		),
 		
@@ -86,8 +90,12 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	);
 	
 	/** @var string */
-	public $footerFormat = '%operations% | %paginator% | %info%';
+	public $footerFormat = '%operations% %paginator% %info%';
 	
+	/** @var string */
+	public $paginatorFormat = '%label% %input% of %count%';
+	
+	/** @var string */
 	public $infoFormat = 'Displaying items %from% - %to% of %count%';
 	
 	/** @var string  template file*/
@@ -131,7 +139,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$template = $this->dataGrid->getTemplate();
 		$template->setFile($this->file);
 		$template->registerFilter('Nette\Templates\CurlyBracketsFilter::invoke');
-		return $template->__toString();
+		return $template->__toString(TRUE);
 	}
 
 
@@ -228,74 +236,79 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		if ($paginator->pageCount <= 1) return '';
 		
 		$container = $this->getWrapper('paginator container');
-		$button = $this->getWrapper('paginator button container');
 		$translator = $this->dataGrid->getTranslator();
 		$a = Html::el('a')->class(DataGridColumn::$ajaxClass);
 		
 		// to-first button
-		$first = clone $button;
-		$first->class[] = 'paginator-first';
-		$title = '« ' . $this->translate('First');
-		if ($paginator->isFirst()) {
-			$first->setText($title);
+		$first = $this->getWrapper('paginator button first');
+		$title = $this->translate('First');
+		$link = clone $a->href($this->dataGrid->link('page', 1));
+		if ($first instanceof Html) {
+			if ($paginator->isFirst()) $first->class[] = 'inactive';
+			else $first = $link->add($first);
+			$first->title($title);
 		} else {
-			$link = clone $a->href($this->dataGrid->link('page', 1));
-			$link->setText($title)->title($title);
-			$first->add($link);
+			$first = $link->setText($title);
 		}
 		$container->add($first);
 		
 		// previous button
-		$prev = clone $button;
-		$prev->class[] = 'paginator-prev';
-		$title = '« ' . $this->translate('Previous');
-		if ($paginator->isFirst()) {
-			$prev->setText($title);
+		$prev = $this->getWrapper('paginator button prev');
+		$title = $this->translate('Previous');
+		$link = clone $a->href($this->dataGrid->link('page', $paginator->page - 1));
+		if ($prev instanceof Html) {
+			if ($paginator->isFirst()) $prev->class[] = 'inactive';
+			else $prev = $link->add($prev);
+			$prev->title($title);
 		} else {
-			$link = clone $a->href($this->dataGrid->link('page', $paginator->page - 1));
-			$link->setText($title)->title($title);
-			$prev->add($link);
+			$prev = $link->setText($title);
 		}
 		$container->add($prev);
 		
 		// page input
+		$controls = $this->getWrapper('paginator controls container');
 		$form = $this->dataGrid->getForm(TRUE);
-		$format = $this->translate('%label% %input% of %count%');
+		$format = $this->translate($this->paginatorFormat);
 		$html = str_replace(
 			array('%label%', '%input%', '%count%'),
 			array($form['page']->label, $form['page']->control, $paginator->pageCount),
 			$format
 		);
-		$container->add(Html::el()->setHtml($html));
-		$container->add($form['pageSubmit']->control);
+		$controls->add(Html::el()->setHtml($html));
+		$container->add($controls);
 		
 		// next button
-		$next = clone $button;
-		$next->class[] = 'paginator-next';
-		$title = $this->translate('Next') . ' »';
-		if ($paginator->isLast()) {			
-			$next->setText($title);
+		$next = $this->getWrapper('paginator button next');
+		$title = $this->translate('Next');
+		$link = clone $a->href($this->dataGrid->link('page', $paginator->page + 1));
+		if ($next instanceof Html) {
+			if ($paginator->isLast()) $next->class[] = 'inactive';
+			else $next = $link->add($next);
+			$next->title($title);
 		} else {
-			$link = clone $a->href($this->dataGrid->link('page', $paginator->page + 1));
-			$link->setText($title)->title($title);
-			$next->add($link);
+			$next = $link->setText($title);
 		}
 		$container->add($next);
 		
 		// to-last button
-		$last = clone $button;
-		$last->class[] = 'paginator-last';
-		$title = $this->translate('Last') . ' »';
-		if ($paginator->isLast()) {			
-			$last->setText($title);
+		$last = $this->getWrapper('paginator button last');
+		$title = $this->translate('Last');
+		$link = clone $a->href($this->dataGrid->link('page', $paginator->pageCount));
+		if ($last instanceof Html) {
+			if ($paginator->isLast()) $last->class[] = 'inactive';
+			else $last = $link->add($last);
+			$last->title($title);
 		} else {
-			$link = clone $a->href($this->dataGrid->link('page', $paginator->pageCount));
-			$link->setText($title)->title($title);
-			$last->add($link);
+			$last = $link->setText($title);
 		}
 		$container->add($last);
 		
-		unset($first, $prev, $next, $last, $button, $paginator, $link, $a, $form);		
+		// page change submit
+		$control = $form['pageSubmit']->control;
+		$control->title = $control->value;
+		$container->add($control);
+		
+		unset($first, $prev, $next, $last, $button, $paginator, $link, $a, $form);
 		return $container->render();
 	}
 	
@@ -306,13 +319,13 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	 */
 	public function renderOperations()
 	{
-		if (!$this->dataGrid->hasOperations()) return '';		
+		if (!$this->dataGrid->hasOperations()) return '';
 		
 		$container = $this->getWrapper('operations container');
-		$form = $this->dataGrid->getForm(TRUE);		
+		$form = $this->dataGrid->getForm(TRUE);	
 		$container->add($form['operations']->label);
 		$container->add($form['operations']->control);
-		$container->add($form['operationSubmit']->control);
+		$container->add($form['operationSubmit']->control->title($form['operationSubmit']->control->value));
 		
 		return $container->render();
 	}
@@ -342,7 +355,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$this->infoFormat
 		);
 		
-		$container->setHtml($html);		
+		$container->setHtml($html);
 		return $container->render();
 	}
 
@@ -382,8 +395,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				}
 				
 				if (count($list) > 1 && isset($list[$column->getName()])) {
-					$text .= '&nbsp;<span>' . $list[$column->getName()][1] . '</span>';
-				}				
+					$text .= Html::el('span')->setHtml($list[$column->getName()][1]);
+				}
 				
 				$value = (string) Html::el('a')->href($column->getLink())->class($class)->setHtml($text);
 			}
@@ -417,6 +430,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			if ($column instanceof ActionColumn) {
 				$control = $form['filterSubmit']->control;
 				$control->class[] = $this->getValue('row.filter control .submit');
+				$control->title = $control->value;
 				$value = (string) $control;
 				$cell->class[] = 'actions';
 				
@@ -432,7 +446,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 					$control->class[] = $class;
 					$value = (string) $control;
 				} else {
-					$value = '&nbsp;';
+					$value = '';
 				}
 			}
 			
@@ -524,7 +538,6 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			),
 			$this->footerFormat
 		);
-		$html = trim($html, ' | ');
 		$cell->setHtml($html);
 		$row->add($cell);
 		
@@ -539,7 +552,19 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	protected function getWrapper($name)
 	{
 		$data = $this->getValue($name);
-		return $data instanceof Html ? clone $data : Html::el($data);
+		if ($data instanceof Html) return clone $data;
+		elseif ($data === NULL) return NULL;
+		$el = Html::el($data);
+
+		$pattern = '/(?<attr>[\w]+)="(?<value>[\w|\s|_| |-]+)"/i';
+		if (preg_match_all($pattern, $data, $matches)) { 
+			$attrs = array();
+			foreach ($matches['attr'] as $key => $attr) {
+				$attrs[$attr] = explode(' ', $matches['value'][$key]);
+			}
+			$el->attrs = $attrs;
+		}
+		return $el;
 	}
 
 

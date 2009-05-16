@@ -37,26 +37,6 @@ jQuery.extend({
 		$('<span class="icon icon-invert" title="Invert" />').appendTo('table.grid tr.header th.checker');
 		$('table.grid').find('tr.header th.checker span.icon-invert:not(:first)').remove();
 		
-		// u gridů s formulářem přesunu odesílací tlačítko tak, aby bylo první ve formuláři, aby se na formulář po odeslání ENTEREM aplikovaly filtry
-		// a na jeho místo vložím odesílací ikonku / odkaz nahrazující jeho úlohu (pro každý datagrid jen jednu)
-		// (je nutné, jen pokud filtrační tlačítko není první tlačítko formuláře, např. při manuálním renderování)
-		$('form.gridform').each(function(i) {
-			var cell = $(this).find("tr.filters td.actions");
-			var submit = cell.find('input:submit[name=filterSubmit]');
-			submit.hide();//.prependTo($(this));
-			
-			$('<a href="#" class="filter"></a>')
-				.appendTo(cell)
-				.click(function(e) {
-					submit.netteAjaxSubmit();
-					return false;
-				})
-				.attr({ title: submit.attr("value") })
-				.text(submit.attr("value"));
-
-			cell.find('a.filter:not(:first)').remove();
-		});
-		
 		// ajaxové filtrování formulářů datagridů po stisknutí klávesy <ENTER>
 		$("form.gridform table.grid tr.filters input[type=text]").keypress(function(e) {
 			if (e.keyCode == 13) {
@@ -124,15 +104,13 @@ $(function () {
 	
 	// ajaxové odeslání na všech současných i budoucích formulářích datagridů
 	$("form.gridform").live('submit', function(e) {
-		//$(this).netteAjaxSubmit();
-		alert('(form.gridform).live(submit)');
+		$(this).netteAjaxSubmit();
 		return false;
 	});
 	
 	// ajaxové odeslání pomocí tlačítka na všech současných i budoucích formulářích datagridů
 	$("form.gridform :submit").live('click', function(e) {
-		//$(this).netteAjaxSubmit();
-		alert('(form.gridform :submit).live(click)');
+		$(this).netteAjaxSubmit();
 		return false;
 	});
 	
@@ -179,5 +157,4 @@ $(function () {
 		unselected.addClass("selected");
 		unselected.find("td.checker input:checkbox").attr("checked", "checked");
 	});
-
 });

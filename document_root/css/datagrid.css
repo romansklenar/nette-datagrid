@@ -16,30 +16,50 @@ table.grid tr:hover {
 table.grid tr.selected {
 	background: #B3F76F !important;
 }
-table.grid tr.filters, table.grid tr.filters td {
-	background: #C6DBFF url('../images/th-bg-mid.gif') no-repeat;
-	padding: 3px 6px !important;
-}
-table.grid tr.filters input[type="text"], table.grid tr.filters select {
-	width: 100%;
+
+
+table.grid input[type=text], table.grid select {
 	color: #525B37;
 	font-family: Arial,sans-serif;
 	border: 1px #CCCCCC solid;
 	padding: 2px 0px;
 	margin: 0 auto;
 }
-table.grid tr.filters select {
+table.grid tr.filters input[type=text], table.grid tr.filters select {
+	width: 100%;
+}
+table.grid select {
 	padding: 1px 0px;
 }
-table.grid tr.filters input[type="text"]:hover, table.grid tr.filters input[type="text"]:focus {
+table.grid input[type=text]:hover, table.grid input[type=text]:focus {
 	background-color: #F6F7FA;
 }
-table.grid tr.filters input[type="checkbox"], table.grid tr.filters input[type="checkbox"]:hover {
+table.grid input[type=checkbox], table.grid input[type=checkbox]:hover {
 	border: none;
 	*background-color: #C6DBFF;
 	display: block;
 	margin: 0 auto;
 }
+table.grid input[type=submit] {
+	border: 0px;
+	color: #165CA3;
+	font-weight: bold;
+	font-family: Arial,sans-serif;
+	cursor: pointer;
+	padding-right: 18px;
+	background: transparent no-repeat right center;
+}
+table.grid input[name=filterSubmit] {
+	background-image: url('../images/icons/find.png') !important;
+}
+table.grid input[name=operationSubmit] {
+	background-image: url('../images/icons/accept.png') !important;
+}
+table.grid input[name=pageSubmit] {
+	background-image: url('../images/icons/arrow_rotate_clockwise.png') !important;
+}
+
+
 table.grid td, table.grid th {
 	color: #525b37;
 	border: 1px solid #BBCBF4;
@@ -51,21 +71,25 @@ table.grid th {
 	text-align: left;
 	padding: 0 10px;
 }
-table.grid th.checker, table.grid td.checker,
-table.grid td.actions {
+table.grid th.checker, table.grid td.checker, table.grid td.actions {
 	text-align: center;
 }
-table.grid th span {
+table.grid tr.header th span {
 	color: #7D9DC9;
 	font-size: 90%;
+	padding-left: 6px;
 }
-table.grid th span.link {
+table.grid tr.filters, table.grid tr.filters td {
+	background: #C6DBFF url('../images/th-bg-mid.gif') no-repeat;
+	padding: 3px 6px !important;
+}
+table.grid tr.header th span.link {
 	color: #165CA3;
 }
 table.grid th a, table.grid tr.filters a.filter {
 	color: #165CA3;
 	text-decoration: none;
-	padding-right: 20px; /* padding: 6px 20px 6px 12px; */
+	padding-right: 20px;
 	line-height: 30px;
 }
 table.grid th .asc, table.grid th a:hover {
@@ -96,13 +120,14 @@ table.grid tr.footer td {
 	padding: 0 10px;
 	text-align: left;
 	font-weight: bold;
-	line-height: 30px;
+	line-height: 1em;
 }
 table.grid td span.positioner {
 	width: 22px;
 	height: 16px;
 	display: block;
 	float: left;
+	margin-right: 2px;
 }
 table.grid td span.positioner a span {
 	border: none;
@@ -128,38 +153,56 @@ table.grid td span.positioner a.inactive span, table.grid td span.positioner a.i
 	background: none !important;
 	cursor: default;
 }
-
-
-.paginator {
-	margin: 2em 0;
-	font-size: 90%;
+table.grid tr.footer select, table.grid tr.footer input[type=text] {
+	margin: 0 0.2em;
+	padding: 0 0.2em !important;
 }
-.paginator a, .paginator span {
-	margin-right: 0.1em;
-	padding: 0.2em 0.5em !important;
-	color: #999999;
-}
-.paginator a {
-	border: 1px solid #9AAFE5;
-	text-decoration: none;
-	color: #105CB6;
-	background-color: #FFFFFF
-}
-.paginator span.button {
-	border: 1px solid #DDDDDD;
-}
-.paginator .current {
-	background: #2E6AB1;
-	border: 1px solid #2E6AB1;
-	color: white;
-	font-weight: bold;
+table.grid tr.footer input {
+	text-align: center;
 }
 
 
-.operations {
-	margin: 2em 0;
+/** footer **/
+table.grid .paginator, table.grid .operations, table.grid .grid-info {
+	padding: 0.6em 1.8em 0.6em 0.1em;
+	float: left;
 }
-
-.grid-info {
-	margin: 2em 0;
+table.grid .grid-info {
+	float: right;
+}
+table.grid .paginator .paginator-controls {
+	float: left;
+	padding: 0em;
+}
+table.grid .paginator a {
+	float: left !important;
+	padding: 0em !important;
+}
+table.grid .paginator .paginator-first, table.grid .paginator .paginator-prev, 
+table.grid .paginator .paginator-next,  table.grid .paginator .paginator-last {
+	margin: 0em 0.2em;
+	float: left;
+	margin: 1px 4px;
+	height: 16px;
+	width: 16px;
+	background-repeat: no-repeat;
+	display: block;
+	overflow: hidden;
+	text-indent: -99999px;
+}
+table.grid .paginator .paginator-first {
+	background-image: url('../images/icons/control_start_blue.png');
+}
+table.grid .paginator .paginator-prev {
+	background-image: url('../images/icons/control_left_blue.png');
+}
+table.grid .paginator .paginator-next {
+	background-image: url('../images/icons/control_right_blue.png');
+}
+table.grid .paginator .paginator-last {
+	background-image: url('../images/icons/control_end_blue.png');
+}
+table.grid .inactive {
+	opacity: 0.40;
+	=filter: alpha(opacity=40);
 }

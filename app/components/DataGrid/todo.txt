@@ -1,7 +1,7 @@
 TODO
 ====
 
-? lokalizace flash zpravicek
-- nastylovat footer + ikonky
+- úprava ikonek (invert, left) v PS, šířka linky footeru na cca 1500px
 - renderer pro jQuery UI CSS framework
+? lokalizace flash zpráviček
 ? našeptávání - http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete

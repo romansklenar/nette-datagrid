@@ -53,8 +53,8 @@ msgstr "Číslo stránky musí být numerická hodnota"
 msgid "%label% %input% of %count%"
 msgstr "%label% %input% z %count%"
 
-msgid "%operations% | %paginator% | %info%"
-msgstr "%operations% | %paginator% | %info%"
+msgid "%operations% %paginator% %info%"
+msgstr "%operations% %paginator% %info%"
 
 msgid "Displaying items %from% - %to% of %count%"
 msgstr "Zobrazuji položky %from% až %to% z %count%"

@@ -268,13 +268,20 @@ span.icon {
 .icon-find {
 	background-image: url('../images/icons/find.png');
 }
-.icon-invert, .icon-refresh {
+.icon-refresh {
 	background-image: url('../images/icons/arrow_refresh.png');
+}
+.icon-invert {
+	background-image: url('../images/icons/contrast.png');
 }
 .icon-invert, .icon-find {
 	cursor: pointer;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	padding: 0 !important;
 }
-.icon-shipped, .icon-resolved, .icon-cancelled, .icon-no-orders {
+.icon-shipped, .icon-resolved, .icon-cancelled, 
+.icon-no-orders, .icon-invert, .icon-find {
 	float: none !important
 }
 .icon-shipped {

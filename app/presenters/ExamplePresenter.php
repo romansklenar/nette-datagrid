@@ -55,7 +55,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->keyName = 'officeCode'; // for actions or operations
 			
 			$pos = array('up' => 'Move up', 'down' => 'Move down');
-			$grid->addPositionColumn('position', '# Position', 'positionMove!', $pos)->addFilter();
+			$grid->addPositionColumn('position', 'Position', 'positionMove!', $pos)->addFilter();
 			$grid->addColumn('phone', 'Phone')->addFilter();
 			$grid->addColumn('addressLine1', 'Address')->addFilter();
 			$grid->addColumn('city', 'City')->addFilter();
@@ -63,7 +63,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->addNumericColumn('postalCode', 'Postal code')->addFilter();
 			
 			$grid->addActionColumn('Actions');
-			$icon = Html::el('span')->setHtml('&nbsp;');
+			$icon = Html::el('span');
 			$grid->addAction('New entry', 'Office:new', clone $icon->class('icon icon-add'), FALSE, DataGridAction::WITHOUT_KEY);
 			$grid->addAction('Edit', 'Office:edit', clone $icon->class('icon icon-edit'));
 			$grid->addAction('Delete', 'Office:delete', clone $icon->class('icon icon-del'));
@@ -73,15 +73,17 @@ class ExamplePresenter extends BasePresenter
 			
 			
 		case 'customersGrid':
-			$translator = new Translator(Environment::expand('%templatesDir%/customersGrid.cs.mo'));
 			$model = new DatagridModel('customers');
 			$grid = new DataGrid;
+			$translator = new Translator(Environment::expand('%templatesDir%/customersGrid.cs.mo'));
 			$grid->setTranslator($translator);
-			//$grid->setRenderer(new CustomDataGridRenderer);
+			
+			$renderer = new DataGridRenderer;
+			$renderer->paginatorFormat = '%input%'; // customize format of paginator
+			$grid->setRenderer($renderer);
 			
 			$grid->itemsPerPage = 10; // display 10 rows per page
-			$grid->bindDataTable($model->getCustomerAndOrderInfo(), $model->table);
-			
+			$grid->bindDataTable($model->getCustomerAndOrderInfo(), $model->table);			
 			$grid->multiOrder = FALSE; // order by one column only
 			
 			$operations = array('delete' => 'delete', 'deal' => 'deal', 'print' => 'print', 'forward' => 'forward'); // define operations
@@ -126,7 +128,7 @@ class ExamplePresenter extends BasePresenter
 			$grid['orderDate']->getCellPrototype()->style('text-align: center');
 			
 			// by replacement of given pattern
-			$el = Html::el('span')->style('margin: 0 auto')->setHtml('&nbsp;');
+			$el = Html::el('span')->style('margin: 0 auto');
 			$grid['status']->replacement['Shipped'] = clone $el->class("icon icon-shipped")->title("Shipped");
 			$grid['status']->replacement['Resolved'] = clone $el->class("icon icon-resolved")->title("Resolved");
 			$grid['status']->replacement['Cancelled'] = clone $el->class("icon icon-cancelled")->title("Cancelled");
@@ -140,7 +142,7 @@ class ExamplePresenter extends BasePresenter
 			
 			$grid->addActionColumn('Actions')->getHeaderPrototype()->style('text-align: center');
 			$grid['actions']->getHeaderPrototype()->style('width: 98px');
-			$icon = Html::el('span')->setHtml('&nbsp;');
+			$icon = Html::el('span');
 			$grid->addAction('Copy', 'Customer:copy', clone $icon->class('icon icon-copy'));
 			$grid->addAction('Detail', 'Customer:detail', clone $icon->class('icon icon-detail'));
 			$grid->addAction('Edit', 'Customer:edit', clone $icon->class('icon icon-edit'));
