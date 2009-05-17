@@ -45,13 +45,13 @@ require_once LIBS_DIR . '/Nette/Forms/INamingContainer.php';
  */
 class DataGrid extends Control implements ArrayAccess, INamingContainer
 {
-	/** @persistent */
+	/** @persistent int */
 	public $page = 1;
 
-	/** @persistent */
+	/** @persistent string */
 	public $order = '';
 
-	/** @persistent */
+	/** @persistent string */
 	public $filters = '';
 
 	/** @var DibiDataSource */
@@ -95,9 +95,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		$this->paginator = new Paginator;
 		$this->setItemsPerPage(15);
 		
-		$this->addComponent(new ComponentContainer(), 'columns');
-		$this->addComponent(new ComponentContainer(), 'filters');
-		$this->addComponent(new ComponentContainer(), 'actions');
+		$this->addComponent(new ComponentContainer, 'columns');
+		$this->addComponent(new ComponentContainer, 'filters');
+		$this->addComponent(new ComponentContainer, 'actions');
 	}
 
 
@@ -470,8 +470,15 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	protected function applyPaging()
 	{
-		$this->paginator->itemCount = count($this->dataSource);
 		$this->paginator->page = $this->page;
+		$this->paginator->itemCount = count($this->dataSource);
+		if ($this->paginator->itemCount < 1 && !empty($this->filters)) {
+			// NOTE: don't use flash messages (because you can't - header already sent)
+			$this->getTemplate()->flashes[] = (object) array(
+				'message' => $this->translate("Used filters did not match any items."),
+				'type' => 'info',
+			);
+		}
 		$this->dataSource->applyLimit($this->paginator->length, $this->paginator->offset);
 	}
 
@@ -571,6 +578,20 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		
 		echo mb_convert_encoding($s, 'HTML-ENTITIES', 'UTF-8');
 	}
+	
+	
+	/**
+	 * Template factory.
+	 * @return ITemplate
+	 */
+	protected function createTemplate()
+	{
+		$template = parent::createTemplate();
+		if ($this->getTranslator() !== NULL) {
+			$template->setTranslator($this->getTranslator());
+		}
+		return $template;
+	}
 
 
 
@@ -579,7 +600,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * Component factory
+	 * Component factory.
 	 * @see Nette/ComponentContainer#createComponent()
 	 */
 	protected function createComponent($name)
@@ -854,6 +875,17 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	final public function getTranslator()
 	{
 		return $this->translator;
+	}
+
+
+	/**
+	 * Returns translated string.
+	 * @param  string
+	 * @return string
+	 */
+	public function translate($s)
+	{
+		return $this->translator === NULL ? $s : $this->translator->translate($s);
 	}
 
 

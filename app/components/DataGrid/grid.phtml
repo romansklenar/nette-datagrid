@@ -1,5 +1,9 @@
 {snippet grid}
 
+{foreach $flashes as $flash}
+<div class="flash {$flash->type}">{$flash->message}</div>
+{/foreach}
+
 {? $control->render('begin')}
 {? $control->render('errors')}
 {? $control->render('body')}

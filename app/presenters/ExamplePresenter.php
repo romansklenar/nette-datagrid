@@ -30,7 +30,7 @@ class ExamplePresenter extends BasePresenter
 		case 'baseGrid':			
 			$model = new DatagridModel('customers');
 			$grid = new DataGrid;
-			$grid->bindDataTable($model->getCustomerAndOrderInfo(), $model->table);
+			$grid->bindDataTable($model->getCustomerAndOrderInfo());
 			
 			// if no columns are defined, takes all cols from given data source
 			$grid->addColumn('customerName', 'Name');
@@ -83,7 +83,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->setRenderer($renderer);
 			
 			$grid->itemsPerPage = 10; // display 10 rows per page
-			$grid->bindDataTable($model->getCustomerAndOrderInfo(), $model->table);			
+			$grid->bindDataTable($model->getCustomerAndOrderInfo());			
 			$grid->multiOrder = FALSE; // order by one column only
 			
 			$operations = array('delete' => 'delete', 'deal' => 'deal', 'print' => 'print', 'forward' => 'forward'); // define operations
