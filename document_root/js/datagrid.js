@@ -103,11 +103,9 @@ $("table.grid td:not(.checker)").live("click", function () {
 
 // invertor
 $("table.grid tr.header th.checker").livequery(function () {
-	$(this).append($('<span class="icon icon-invert" title="Invert" />'));
-});
-
-$("table.grid tr.header th.checker span.icon-invert").live('click', function() {
-	$(this).parents("table.grid").find("td.checker input:checkbox").click();
+	$(this).append($('<span class="icon icon-invert" title="Invert" />').click(function () {
+		$(this).parents("table.grid").find("td.checker input:checkbox").click();
+	}));
 });
 
 /**
@@ -128,7 +126,7 @@ $("form.gridform table.grid tr.filters input[type=text]").livequery("keypress", 
 });
 
 // ajaxové filtrování formulářů datagridů pomocí změny hodnoty selectboxu nebo checkboxu
-$("form.gridform table.grid tr.filters select, form.gridform table.grid tr.filters input:checkbox").livequery("change", function (e) {
+$("form.gridform table.grid tr.filters").find("select, input:checkbox").livequery("change", function (e) {
 	$(this).parents("form.gridform").find("input:submit[name=filterSubmit]").ajaxSubmit();
 	return false;
 });
