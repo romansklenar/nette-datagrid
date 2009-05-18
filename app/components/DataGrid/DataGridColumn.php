@@ -39,7 +39,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	public $orderable = TRUE;	
 
 	/** @var string */
-	static public $ajaxClass = 'ajaxlink';
+	static public $ajaxClass = 'ajax';
 
 
 	/**

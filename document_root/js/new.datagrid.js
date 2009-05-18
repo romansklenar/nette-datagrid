@@ -1,79 +1,4 @@
 /**
- * Ajax
- */
-
-// ajax spinner
-$(function () {
-	// přidám spinner do stránky
-	$('<div id="ajax-spinner"></div>').hide().ajaxStart(function () {
-		$(this).show();
-	}).ajaxStop(function () {
-		// nastavení původních vlastností, třeba kvůli odesílání formuláře
-		$(this).hide().css({
-			position: "fixed",
-			left: "50%",
-			top: "50%"
-		});
-	}).appendTo("body");
-});
-
-// prolínací efekt při updatu snippetu
-jQuery.extend({
-	updateSnippet: function (id, html) {
-		$("#" + id).fadeOut("fast", function () {
-			$(this).html(html).fadeIn("fast");
-		});
-	}
-});
-
-// links
-$("a.ajax").live("click", function (event) {
-	$.get(this.href);
-
-	// spinner position
-	$("#ajax-spinner").css({
-		position: "absolute",
-		left: event.pageX + 20,
-		top: event.pageY + 40
-	});
-
-	return false;
-});
-
-// form buttons
-$("form.ajax :submit, :submit.ajax, form.gridform :submit").live("click", function (event) {
-	 $(this).ajaxSubmit();
-
-	// spinner position
-	if (event.pageX && event.pageY) {
-		$("#ajax-spinner").css({
-			position: "absolute",
-			left: event.pageX + 20,
-			top: event.pageY + 40
-		});
-	}
-
-	return false;
-});
-
-// forms
-$("form.ajax, form.gridForm").livequery("submit", function () {
-	$(this).ajaxSubmit();
-	return false;
-});
-
-/**
- * Flash messages
- * zmizení za 5 s
- */
-$("div.flash").livequery(function () {
-	var el = $(this);
-	setTimeout(function () {
-		el.slideUp();
-	}, 5000);
-});
-
-/**
  * Datagrid
  */
 
@@ -103,7 +28,9 @@ $("table.grid td:not(.checker)").live("click", function () {
 
 // invertor
 $("table.grid tr.header th.checker").livequery(function () {
-	$(this).append($('<span class="icon icon-invert" title="Invert" />'));
+	var inverter = $('<span class="icon icon-invert" title="Invert" />');
+	
+	$(this).append(inverter);
 });
 
 $("table.grid tr.header th.checker span.icon-invert").live('click', function() {
@@ -128,7 +55,7 @@ $("form.gridform table.grid tr.filters input[type=text]").livequery("keypress", 
 });
 
 // ajaxové filtrování formulářů datagridů pomocí změny hodnoty selectboxu nebo checkboxu
-$("form.gridform table.grid tr.filters select, form.gridform table.grid tr.filters input:checkbox").livequery("change", function (e) {
+$("form.gridform table.grid tr.filters").find("select, input:checkbox").livequery("change", function (e) {
 	$(this).parents("form.gridform").find("input:submit[name=filterSubmit]").ajaxSubmit();
 	return false;
 });
@@ -143,3 +70,7 @@ $("form.gridform table.grid tr.footer input[name=page]").livequery("keypress", f
 		return false;
 	}
 });
+
+
+
+

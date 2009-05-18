@@ -1,67 +1,100 @@
+/**
+ * AJAX Nette Framwork plugin for jQuery
+ *
+ * @copyright  Copyright (c) 2009 Jan Marek
+ * @license    MIT
+ * @link       http://nettephp.com/cs/extras/jquery-ajax
+ * @version    0.1
+ */
+
 jQuery.extend({
 	updateSnippet: function (id, html) {
 		$("#" + id).html(html);
 	},
 
+	netteCallback: function (data) {
+		// redirect
+		if (data.redirect) {
+			window.location.href = data.redirect;
+		}
 
-	ajaxCallback: function (callback) {
-		return function (data) {
-			// redirect
-			if (data.redirect) {
-				window.location.href = data.redirect;
+		// snippets
+		if (data.snippets) {
+			for (var i in data.snippets) {
+				jQuery.updateSnippet(i, data.snippets[i]);
 			}
+		}
+	}
+});
 
-			// snipety
-			if (data.snippets) {
-				for (var i in data.snippets) {
-					jQuery.updateSnippet(i, data.snippets[i]);
+jQuery.ajaxSetup({
+	success: jQuery.netteCallback,
+	dataType: "json"
+});
+
+/**
+ * AJAX form plugin for jQuery
+ *
+ * @copyright  Copyright (c) 2009 Jan Marek
+ * @license    MIT
+ * @link       http://nettephp.com/cs/extras/ajax-form
+ * @version    0.1
+ */
+
+jQuery.fn.extend({
+	ajaxSubmit: function (callback) {
+		var form;
+		var sendValues = {};
+
+		// submit button
+		if (this.is(":submit")) {
+			form = this.parents("form");
+			sendValues[this.attr("name")] = this.val() || "";
+
+		// form
+		} else if (this.is("form")) {
+			form = this;
+
+		// invalid element, do nothing
+		} else {
+			return null;
+		}
+
+		// validation
+		if (form.get(0).onsubmit && !form.get(0).onsubmit()) return null;
+
+		// get values
+		var values = form.serializeArray();
+
+		for (var i = 0; i < values.length; i++) {
+			var name = values[i].name;
+
+			// multi
+			if (name in sendValues) {
+				var val = sendValues[name];
+
+				if (!(val instanceof Array)) {
+					val = [val];
 				}
-			}
 
-			// callback
-			if (callback) {
-				callback(data);
-			}
-			
-		};
-	},
-
-
-	netteAjax: function () {
-		var args = jQuery.makeArray(arguments);
-
-		var url = args.shift();
-		var type = "get";
-		var params = null;
-		var callback = null;
-
-		// argumenty funkce
-		for (var i = 0; i < args.length; i++) {
-			// nastavit callback
-			if (jQuery.isFunction(args[i])) {
-				callback = args[i];
-				continue;
-			}
-			// nastavit typ
-			if (typeof args[i] == "string") {
-				if (args[i].toLowerCase() == "post") {
-					type = "post";
-				}
-				continue;
-			}
-			// nastavit parametry
-			if (args[i] instanceof Object) {
-				params = args[i];
+				val.push(values[i].value);
+				sendValues[name] = val;
+			} else {
+				sendValues[name] = values[i].value;
 			}
 		}
 
-		return jQuery.ajax({
-			type: type,
-			url: url,
-			data: params,
-			success: jQuery.ajaxCallback(callback),
-			dataType: "json",
-			cache: false
-		});
+		// send ajax request
+		var ajaxOptions = {
+			url: form.attr("action"),
+			data: sendValues,
+			type: form.attr("method") || "get"
+		};
+
+		if (callback) {
+			ajaxOptions.success = callback;
+		}
+
+		return jQuery.ajax(ajaxOptions);
 	}
 });
