@@ -14,9 +14,13 @@ class ExamplePresenter extends BasePresenter
 	 */
 	public function renderDefault()
 	{
+		Debug::timer('grids-creating');
+
 		$this->template->baseGrid = $this->getComponent('baseGrid');
 		$this->template->officesGrid = $this->getComponent('officesGrid');
 		$this->template->customersGrid = $this->getComponent('customersGrid');
+		
+		Environment::setVariable('creating', Debug::timer('grids-creating') * 1000);
 	}
 	
 	
@@ -59,8 +63,8 @@ class ExamplePresenter extends BasePresenter
 			$grid->addColumn('phone', 'Phone')->addFilter();
 			$grid->addColumn('addressLine1', 'Address')->addFilter();
 			$grid->addColumn('city', 'City')->addFilter();
-			$grid->addColumn('country', 'Country')->addSelectboxFilter();
-			$grid->addNumericColumn('postalCode', 'Postal code')->addFilter();
+			$grid->addColumn('country', 'Country')->addSelectboxFilter()->translateItems(FALSE);
+			$grid->addColumn('postalCode', 'Postal code')->addFilter();
 			
 			$grid->addActionColumn('Actions');
 			$icon = Html::el('span');
@@ -75,6 +79,7 @@ class ExamplePresenter extends BasePresenter
 		case 'customersGrid':
 			$model = new DatagridModel('customers');
 			$grid = new DataGrid;
+			
 			$translator = new Translator(Environment::expand('%templatesDir%/customersGrid.cs.mo'));
 			$grid->setTranslator($translator);
 			
@@ -96,11 +101,11 @@ class ExamplePresenter extends BasePresenter
 			/**** add some columns ****/
 			
 			$grid->addColumn('customerName', 'Name');
-			$grid->addColumn('contactLastName', 'Surname'); // ->addFilter();
+			$grid->addColumn('contactLastName', 'Surname');
 			$grid->addColumn('addressLine1', 'Address')->getHeaderPrototype()->style('width: 180px');
-			$grid->addColumn('city', 'City'); // ->addSelectboxFilter();
-			$grid->addColumn('country', 'Country'); // ->addSelectboxFilter();
-			$grid->addColumn('postalCode', 'Postal code'); // ->addCheckboxFilter();
+			$grid->addColumn('city', 'City');
+			$grid->addColumn('country', 'Country');
+			$grid->addColumn('postalCode', 'Postal code');
 			$caption = Html::el('span')->setText('O')->title('Has orders?')->class('link');
 			$grid->addCheckboxColumn('orders', $caption)->getHeaderPrototype()->style('text-align: center');
 			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y'); // czech format: '%d.%m.%Y'
@@ -113,8 +118,8 @@ class ExamplePresenter extends BasePresenter
 			$grid['customerName']->addFilter();
 			$grid['contactLastName']->addFilter();
 			$grid['addressLine1']->addFilter();
-			$grid['city']->addSelectboxFilter();
-			$grid['country']->addSelectboxFilter();
+			$grid['city']->addSelectboxFilter()->translateItems(FALSE);
+			$grid['country']->addSelectboxFilter()->translateItems(FALSE);
 			$grid['postalCode']->addFilter();
 			$grid['orders']->addSelectboxFilter(array('?' => '?', '0' => "Don't have", '1' => "Have"), TRUE);
 			$grid['orderDate']->addDateFilter();
@@ -140,8 +145,7 @@ class ExamplePresenter extends BasePresenter
 			
 			/**** add some actions ****/
 			
-			$grid->addActionColumn('Actions')->getHeaderPrototype()->style('text-align: center');
-			$grid['actions']->getHeaderPrototype()->style('width: 98px');
+			$grid->addActionColumn('Actions')->getHeaderPrototype()->style('width: 98px');
 			$icon = Html::el('span');
 			$grid->addAction('Copy', 'Customer:copy', clone $icon->class('icon icon-copy'));
 			$grid->addAction('Detail', 'Customer:detail', clone $icon->class('icon icon-detail'));
@@ -168,13 +172,14 @@ class ExamplePresenter extends BasePresenter
 	{
 		// how to findout which checkboxes in checker was checked?  $values['checker']['ID'] => bool(TRUE)
 		$form = $button->getParent();
+		$grid = $this->getComponent('customersGrid');
 				
 		// was submitted?
 		if ($form->isSubmitted() && $form->isValid()) {
 			$values = $form->getValues();
 			
 			if ($button->getName() === 'operationSubmit') {
-				$action = $values['operations'];				
+				$operation = $values['operations'];				
 			} else {
 				throw new InvalidArgumentException("Unknown submit button '" . $button->getName() . "'.");
 			}
@@ -185,16 +190,17 @@ class ExamplePresenter extends BasePresenter
 			}
 			
 			if (count($rows) > 0) {
-				$rows = implode(',', $rows);
-				$this->presenter->flashMessage("Group operations $action over rows $rows succesfully done.", 'success');
+				$msg = $grid->translate("Operation %s over row %s succesfully done.", count($rows), $grid->translate($operation), implode(', ', $rows));
+				$grid->flashMessage($msg, 'success');
+				$msg = $grid->translate("This is demo application only, changes will not be done.");
+				$grid->flashMessage($msg, 'info');
 			} else {
-				$this->presenter->flashMessage("No rows selected for group operations.", 'warning');
+				$msg = $grid->translate("No rows selected.");
+				$grid->flashMessage($msg, 'warning');
 			}
 		}
 		
-		
-		$this->invalidateControl('flashMessage');
-		$this->getComponent('customersGrid')->invalidateControl('grid');
+		$grid->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
 	
@@ -207,24 +213,12 @@ class ExamplePresenter extends BasePresenter
 	 */
 	public function handlePositionMove($key, $dir)
 	{
-		// TODO: write your own more sophisticated handler ;)
+		// TODO: write your own more sophisticated handler ;) $model->officePositionMove($key, $dir)
 		$model = new DatagridModel('offices');
+		$model->officePositionMove($key, $dir);
 		
-		if ($dir == 'down') {
-			$old = $model->connection->query('SELECT [officeCode] FROM [offices] WHERE [position] = %i', $key)->fetchSingle();
-			$new = $model->connection->query('SELECT [officeCode] FROM [offices] WHERE [position] = %i', $key+1)->fetchSingle();
-			$model->connection->query('UPDATE [offices] SET [position] = %i', $key+1, ' WHERE [officeCode] = %i', $old['officeCode']);
-			$model->connection->query('UPDATE [offices] SET [position] = %i', $key, ' WHERE [officeCode] = %i', $new['officeCode']);
-			
-		} else {
-			$old = $model->connection->query('SELECT [officeCode] FROM [offices] WHERE [position] = %i', $key)->fetchSingle();
-			$new = $model->connection->query('SELECT [officeCode] FROM [offices] WHERE [position] = %i', $key-1)->fetchSingle();
-			$model->connection->query('UPDATE [offices] SET [position] = %i', $key-1, ' WHERE [officeCode] = %i', $old['officeCode']);
-			$model->connection->query('UPDATE [offices] SET [position] = %i', $key, ' WHERE [officeCode] = %i', $new['officeCode']);		}
-		
-		$this->flashMessage('Succesfully moved.', 'info');
-		$this->invalidateControl('flashMessage');
-		$this->getComponent('officesGrid')->invalidateControl('grid');
+		$this->getComponent('officesGrid')->flashMessage('Succesfully moved.', 'info');
+		$this->getComponent('officesGrid')->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
 }

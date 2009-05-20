@@ -110,6 +110,20 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	{
 		return $this->cell;
 	}
+	
+	
+	/**
+	 * Setter / property method.
+	 * @return string
+	 */
+	public function getCaption()
+	{
+		if ($this->caption instanceof Html && $this->caption->title) {
+			return $this->caption->title($this->getDataGrid(TRUE)->translate($this->caption->title));
+		} else {
+			return $this->getDataGrid(TRUE)->translate($this->caption);
+		}
+	}
 
 
 
@@ -244,53 +258,15 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	/**
 	 * Adds select box filter input to data grid.
 	 * @param  array   items from which to choose
-	 * @param  int     skip first items value from validation? 
+	 * @param  int     skip first items value from validation?
+	 * @param  bool    translate all items in selectbox?
 	 * @return IDataGridColumnFilter
 	 * @throws InvalidArgumentException
 	 */
-	public function addSelectboxFilter($items = NULL, $skipFirst = NULL)
+	public function addSelectboxFilter($items = NULL, $skipFirst = NULL, $translateItems = TRUE)
 	{
 		$filter = new SelectboxFilter($items, $skipFirst);
 		$this->getDataGrid(TRUE)->getComponent('filters', TRUE)->addComponent($filter, $this->getName());
 		return $filter;
-	}
-	
-	
-	/********************* translator *********************/
-
-
-	/**
-	 * Returns translate adapter.
-	 * @return ITranslator|NULL
-	 */
-	final public function getTranslator()
-	{
-		return $this->getDataGrid()->getTranslator();
-	}
-
-
-	/**
-	 * Returns translated string.
-	 * @param  string
-	 * @return string
-	 */
-	public function translate($s)
-	{
-		$translator = $this->getTranslator();
-		return $translator === NULL ? $s : $translator->translate($s);
-	}
-	
-	
-	/**
-	 * Setter / property method.
-	 * @return string
-	 */
-	public function getCaption()
-	{
-		if ($this->caption instanceof Html && $this->caption->title) {
-			return $this->caption->title($this->translate($this->caption->title));
-		} else {
-			return $this->translate($this->caption);
-		}
 	}
 }

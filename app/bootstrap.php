@@ -75,8 +75,9 @@ Environment::setVariable('host', Environment::getHttpRequest()->getUri()->host);
 
 
 /** 3b) establish database connection and initialize services */
-$application->onStartup[] = 'BaseModel::initialize';
 $application->onStartup[] = 'Services::initialize';
+$application->onStartup[] = 'BaseModel::initialize';
+$application->onShutdown[] = 'BaseModel::disconnect';
 
 
 
@@ -99,3 +100,8 @@ $router[] = new SimpleRouter('Example:default');
 
 // Step 5: Run the application!
 $application->run();
+
+$creating  = number_format(Environment::getVariable('creating'), 1, '.', ' ');
+$rendering = number_format(Environment::getVariable('rendering'), 1, '.', ' ');
+$total = number_format(Environment::getVariable('creating') + Environment::getVariable('rendering'), 1, '.', ' ');
+Debug::$counters['DataGrids time'] = "$total ms (C: $creating ms | R: $rendering ms)";

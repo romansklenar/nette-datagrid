@@ -8,5 +8,9 @@
  */
 class CustomerPresenter extends BasePresenter
 {
-
+	public function startup()
+	{
+		$this->flashMessage("Sorry, this is DataGrid demo application only.", 'info');
+		$this->redirect('Example:default');
+	}
 }

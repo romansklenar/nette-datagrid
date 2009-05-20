@@ -30,27 +30,23 @@ class ActionColumn extends DataGridColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
-	 * @return string
+	 * @throws InvalidStateException
+	 * @return void
 	 */
 	public function formatContent($value)
 	{
-		trigger_error('ActionColumn cannot be formated.', E_USER_WARNING);
-		// TODO: or throw exception?
-		//throw new InvalidStateException("ActionColumn cannot be formated.");
-		return $value;
+		throw new InvalidStateException("ActionColumn cannot be formated.");
 	}
 	
 	
 	/**
 	 * Filters data source.
 	 * @param  mixed
+	 * @throws InvalidStateException
 	 * @return void
 	 */
 	public function applyFilter($value)
 	{
-		trigger_error('ActionColumn cannot be filtered.', E_USER_WARNING);
-		// TODO: or throw exception?
-		//throw new InvalidStateException("ActionColumn cannot be filtered.");
-		return;
+		throw new InvalidStateException("ActionColumn cannot be filtered.");
 	}
 }

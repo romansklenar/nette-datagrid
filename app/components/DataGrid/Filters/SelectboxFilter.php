@@ -22,18 +22,24 @@ class SelectboxFilter extends DataGridColumnFilter
 	protected $items;
 	
 	/** @var bool */
-	protected $skipFirst;	
+	protected $translateItems;
+	
+	/** @var bool */
+	protected $skipFirst;
 	
 	
 	/**
 	 * Selectbox filter constructor.
 	 * @param  array   items from which to choose
-	 * @param  int     skip first items value from validation? 
+	 * @param  int     skip first items value from validation?
+	 * @param  bool    translate all items in selectbox?
+	 * @return void
 	 */
-	public function __construct(array $items = NULL, $skipFirst = NULL)
+	public function __construct(array $items = NULL, $skipFirst = NULL, $translateItems = TRUE)
 	{
 		$this->items = $items;
 		$this->skipFirst = $skipFirst;
+		$this->translateItems = $translateItems;
 		parent::__construct();
 	}
 	
@@ -91,6 +97,23 @@ class SelectboxFilter extends DataGridColumnFilter
 			$this->element->skipFirst();
 		}
 		
+		// translate items?
+		if (!$this->translateItems) {
+			$this->element->setTranslator(NULL);
+		}
+		
 		return $this->element;
+	}
+	
+	
+	/**
+	 * Translate all items in selectbox?
+	 * @param  bool
+	 * @return FormControl  provides a fluent interface
+	 */
+	public function translateItems($translate)
+	{
+		$this->translateItems = (bool) $translate;
+		return $this->getFormControl();
 	}
 }

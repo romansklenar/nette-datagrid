@@ -472,7 +472,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		$this->paginator->page = $this->page;
 		$this->paginator->itemCount = count($this->dataSource);
-		if ($this->paginator->itemCount < 1 && !empty($this->filters)) {
+		if ($this->wasRendered && $this->paginator->itemCount < 1 && !empty($this->filters)) {
 			// NOTE: don't use flash messages (because you can't - header already sent)
 			$this->getTemplate()->flashes[] = (object) array(
 				'message' => $this->translate("Used filters did not match any items."),
@@ -616,8 +616,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 				$form = new AppForm($this, $name);
 				$form->setTranslator($this->getTranslator());
-				$form->getElementPrototype()->class = 'gridform';
-				FormControl::$idMask = 'frm-grid' . String::capitalize($this->getName()) . '-%s-%s';
+				FormControl::$idMask = 'frm-datagrid-' . String::capitalize($this->getName()) . '-%s-%s';
 				
 				$form->addSubmit('filterSubmit', 'Apply filters')
 					->onClick[] = array($this, 'onClickFilterHandler');
@@ -885,7 +884,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function translate($s)
 	{
-		return $this->translator === NULL ? $s : $this->translator->translate($s);
+		$args = func_get_args();
+		return $this->translator === NULL ? $s : call_user_func_array(array($this->getTranslator(), 'translate'), $args);
 	}
 
 

@@ -27,7 +27,7 @@ class DatagridModel extends BaseModel
 				throw new InvalidArgumentException("Model must have one primary key.");
 			}
 		}
-
+		
 		if ($this->connection->profiler) {
 			$this->connection->getProfiler()->setFile(Environment::expand('%logDir%') . '/sql.log');
 		}
@@ -73,6 +73,33 @@ class DatagridModel extends BaseModel
 				LEFT JOIN orders AS o ON c.customerNumber = o.customerNumber 
 			GROUP BY c.customerNumber'
 		);
+	}
+	
+	
+	/**
+	 * Position moving routine (only for table Offices).
+	 * @param  string  which item of datagrid (position value)
+	 * @param  string  move which direction
+	 * @return void
+	 */
+	public function officePositionMove($key, $dir)
+	{
+		// TODO: write your own more sophisticated handler ;)
+		$this->table = 'offices';
+		$this->primary = 'officeCode';
+		
+		if ($dir == 'down') {
+			$old = $this->findAll()->where('[position] = %i', $key)->fetch();
+			$new = $this->findAll()->where('[position] = %i', $key + 1)->fetch();
+			$this->update($old->officeCode, array('position' => $key + 1));
+			$this->update($new->officeCode, array('position' => $key));
+			
+		} else {
+			$old = $this->findAll()->where('[position] = %i', $key)->fetch();
+			$new = $this->findAll()->where('[position] = %i', $key - 1)->fetch();
+			$this->update($old->officeCode, array('position' => $key - 1));
+			$this->update($new->officeCode, array('position' => $key));
+		}
 	}
 	
 	

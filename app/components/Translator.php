@@ -42,7 +42,7 @@ class Translator extends Object implements /*Nette\*/ITranslator
 	/**
 	 * Translates the given string.
 	 * @param  string	translation string
-	 * @param  int		count
+	 * @param  int		count (positive number)
 	 * @return string
 	 */
 	public function translate($message, $count = 1)
@@ -50,7 +50,7 @@ class Translator extends Object implements /*Nette\*/ITranslator
 		$message = (string)$message;
 		if (!empty($message) && isset($this->dictionary[$message])) {
 			$word = $this->dictionary[$message];
-		
+			
 			$s = preg_replace('/([a-z]+)/', '$$1', "n=$count;" . $this->meta['Plural-Forms']);
 			eval($s);
 			$message = $word->translate($plural);
@@ -58,6 +58,7 @@ class Translator extends Object implements /*Nette\*/ITranslator
 		
 		$args = func_get_args();
 		if (count($args) > 1) {
+			array_shift($args);
 			array_shift($args);
 			$message = vsprintf($message, $args);
 		}
@@ -195,30 +196,30 @@ class Word extends Object
 	/**
 	 * @return string
 	 */
-	public function getTranslation($index = 0)
+	public function getTranslation($form = 0)
 	{
-		return is_array($this->translation) ? $this->translation[$index] : $this->translation;
+		return is_array($this->translation) ? $this->translation[$form] : $this->translation;
 	}
 	
 	
 	/**
 	 * @return string
 	 */
-	public function getMessage($index = 0)
+	public function getMessage($form = 0)
 	{
-		return is_array($this->message) ? $this->message[$index] : $this->message;
+		return is_array($this->message) ? $this->message[$form] : $this->message;
 	}	
 	
 	
 	/**
 	 * Translates a word.
 	 * @param  string  translation string
-	 * @param  int	 count
+	 * @param  int     form of translation
 	 * @return string
 	 */
-	public function translate($plural = 0)
+	public function translate($form = 0)
 	{
-		$msg = $this->getTranslation($plural);
-		return !empty($msg) ? $msg : $this->getMessage($plural);
+		$msg = $this->getTranslation($form);
+		return !empty($msg) ? $msg : $this->getMessage($form);
 	}
 }

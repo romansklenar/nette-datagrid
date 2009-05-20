@@ -1,116 +1,123 @@
 /**
- * Ajax
+ * Common AJAX setup
  */
 
 // ajax spinner
 $(function () {
-	// přidám spinner do stránky
 	$('<div id="ajax-spinner"></div>').hide().ajaxStart(function () {
 		$(this).show();
 	}).ajaxStop(function () {
-		// nastavení původních vlastností, třeba kvůli odesílání formuláře
-		$(this).hide().css({
-			position: "fixed",
-			left: "50%",
-			top: "50%"
-		});
+		$(this).hide();
 	}).appendTo("body");
 });
 
 // prolínací efekt při updatu snippetu
 jQuery.extend({
 	updateSnippet: function (id, html) {
-		$("#" + id).fadeOut("fast", function () {
-			$(this).html(html).fadeIn("fast");
+		$("#" + id).fadeTo("fast", 0.3, function () {
+			$(this).html(html).fadeTo("fast", 1);
 		});
 	}
 });
+
+// skrývání flash zpráviček
+$("div.flash").livequery(function () {
+	var el = $(this);
+	setTimeout(function () {
+		el.animate({"opacity": 0}, 2000);
+		el.slideUp();
+	}, 7000);
+});
+
+
+
+/**
+ * Datagrid AJAX support
+ */
 
 // links
-$("a.ajax").live("click", function (event) {
+$("table.datagrid a.ajax").live("click", function () {
 	$.get(this.href);
-
-	// spinner position
-	$("#ajax-spinner").css({
-		position: "absolute",
-		left: event.pageX + 20,
-		top: event.pageY + 40
-	});
-
 	return false;
 });
 
-// form buttons
-$("form.ajax :submit, :submit.ajax, form.gridform :submit").live("click", function (event) {
+//form buttons
+$("form.datagrid :submit").live("click", function () {
 	 $(this).ajaxSubmit();
-
-	// spinner position
-	if (event.pageX && event.pageY) {
-		$("#ajax-spinner").css({
-			position: "absolute",
-			left: event.pageX + 20,
-			top: event.pageY + 40
-		});
-	}
-
 	return false;
 });
 
-// forms
-$("form.ajax, form.gridForm").livequery("submit", function () {
+// form submit
+$("form.datagrid").livequery("submit", function () {
 	$(this).ajaxSubmit();
 	return false;
 });
 
-/**
- * Flash messages
- * zmizení za 5 s
- */
-$("div.flash").livequery(function () {
-	var el = $(this);
-	setTimeout(function () {
-		el.slideUp();
-	}, 5000);
-});
+
 
 /**
- * Datagrid
- */
-
-/**
- * Výběr
+ * Datagrid JS support
  */
 
 // obarvování zaškrtnutého řádku
-function datagridColorRow() {
-	var tr = $(this).parent().parent();
-
-	if ($(this).is(":checked")) {
-		tr.addClass("selected");
-	} else {
-		tr.removeClass("selected");
-	}
+function datagridCheckboxClicked() {
+	var tr = $(this).parents("tr");
+	if ($(this).is(":checked")) tr.addClass("selected");
+	else tr.removeClass("selected");
 }
-// při označení a odznačení
-$("table.grid td.checker input:checkbox").live("click", datagridColorRow);
-// při načtení
-$("table.grid td.checker input:checkbox").livequery(datagridColorRow);
+
+// při označení / odznačení a načtení
+$("table.datagrid td.checker input:checkbox").livequery(datagridCheckboxClicked)
+	.live("click", datagridCheckboxClicked);
 
 // zaškrtávání celým řádkem
-$("table.grid td:not(.checker)").live("click", function () {
-	$(this).parent().find("td.checker input:checkbox").click();
+var previous = null; // index from
+$("table.datagrid tr td:not(.checker)").live("click", function (e) {
+	var row = $(this).parents("tr");
+	
+	// výběr více řádků při držení klavesy SHIFT nebo CTRL
+	if ((e.shiftKey || e.ctrlKey) && previous) {			
+		var current = $(this).parents("table.datagrid").find("tr").index($(this).parents("tr")); // index to
+		if (previous > current) {
+			var tmp = current;
+			current = previous; previous = tmp;
+		}
+		current++;
+		row = $(this).parents("table.datagrid").find("tr").slice(previous, current);
+		
+	} else {
+		previous = $(this).parents("table.datagrid").find("tr").index($(this).parents("tr"));
+	}
+	
+	// zvýraznění řádku(ů)
+	if ($(this).parent().hasClass("selected")) {
+		row.removeClass("selected");
+		row.find("td.checker input:checkbox").removeAttr("checked");
+		
+	} else {
+		if (row.find("td.checker input:checkbox").is(":checkbox")) {
+			row.addClass("selected");
+			row.find("td.checker input:checkbox").attr("checked", "checked");
+		}
+	}		
 });
 
 // invertor
-$("table.grid tr.header th.checker").livequery(function () {
+$("table.datagrid tr.header th.checker").livequery(function () {
 	$(this).append($('<span class="icon icon-invert" title="Invert" />').click(function () {
-		$(this).parents("table.grid").find("td.checker input:checkbox").click();
+		// NOTE: příliš pomalé v Opeře
+		//$(this).parents("table.datagrid").find("td.checker input:checkbox").click();
+		
+		var table = $(this).parents("table.datagrid");
+		var selected = table.find("tr.selected");
+		var unselected = table.find("tr").filter(":not(.selected)");
+		
+		selected.removeClass("selected");
+		selected.find("td.checker input:checkbox").removeAttr("checked");
+		unselected.addClass("selected");
+		unselected.find("td.checker input:checkbox").attr("checked", "checked");
 	}));
 });
-
-/**
- * Filtry
- */
 
 // datepicker
 $("input.datepicker:not([readonly])").livequery(function () {
@@ -118,26 +125,26 @@ $("input.datepicker:not([readonly])").livequery(function () {
 });
 
 // ajaxové filtrování formulářů datagridů po stisknutí klávesy <ENTER>
-$("form.gridform table.grid tr.filters input[type=text]").livequery("keypress", function (e) {
+$("form.datagrid table.datagrid tr.filters input[type=text]").livequery("keypress", function (e) {
 	if (e.keyCode == 13) {
-		$(this).parents("form.gridform").find("input:submit[name=filterSubmit]").ajaxSubmit();
+		$(this).parents("form.datagrid").find("input:submit[name=filterSubmit]").ajaxSubmit();
 		return false;
 	}
 });
 
 // ajaxové filtrování formulářů datagridů pomocí změny hodnoty selectboxu nebo checkboxu
-$("form.gridform table.grid tr.filters").find("select, input:checkbox").livequery("change", function (e) {
-	$(this).parents("form.gridform").find("input:submit[name=filterSubmit]").ajaxSubmit();
+$("form.datagrid table.datagrid tr.filters").find("input:checkbox, select").livequery("change", function (e) {
+	$(this).parents("form.datagrid").find("input:submit[name=filterSubmit]").ajaxSubmit();
 	return false;
 });
 
 // ajaxová změna stránky formuláře datagridů po stisknutí klávesy <ENTER>
-$("form.gridform table.grid tr.footer input[name=pageSubmit]").livequery(function () {
+$("form.datagrid table.datagrid tr.footer input[name=pageSubmit]").livequery(function () {
 	$(this).hide();
 });
-$("form.gridform table.grid tr.footer input[name=page]").livequery("keypress", function (e) {
+$("form.datagrid table.datagrid tr.footer input[name=page]").livequery("keypress", function (e) {
 	if (e.keyCode == 13) {
-		$(this).parents("form.gridform").find("input:submit[name=pageSubmit]").ajaxSubmit();
+		$(this).parents("form.datagrid").find("input:submit[name=pageSubmit]").ajaxSubmit();
 		return false;
 	}
 });

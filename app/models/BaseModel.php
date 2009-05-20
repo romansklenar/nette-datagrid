@@ -37,16 +37,28 @@ abstract class BaseModel extends Object implements IModel
 	public function __destruct()
 	{
 		$this->onShutdown($this);
-		$this->connection->disconnect();
 	}
+	
 	
 	public static function initialize()
 	{
-		dibi::connect(Environment::getConfig('database'));
+		$conf = Environment::getConfig('database');
+		dibi::connect($conf->sqlite);
 
+		$driver = dibi::getConnection()->getConfig('driver');
+		if ($driver == 'sqlite') {
+			dibi::getConnection()->getDriver()->registerFunction('regexp', 'Sqlite::regexp', 2);
+		}
+		
 		if (Environment::getConfig('database')->profiler) {
 			dibi::getProfiler()->setFile(Environment::expand('%logDir%') . '/sql.log');
 		}
+	}
+	
+	
+	public static function disconnect()
+	{
+		dibi::getConnection()->disconnect();
 	}
 	
 	

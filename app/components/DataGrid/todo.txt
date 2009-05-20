@@ -1,8 +1,4 @@
 TODO
 ====
 
-- pouva6ovat, jestli by nestálo za to používat jen metodu translate přímo z datagridu
-- úprava ikonek (invert, left) v PS, šířka linky footeru na cca 1500px (btw co takhle sipky z jQuery??)
-- renderer pro jQuery UI CSS framework
-? lokalizace flash zpráviček
 ? našeptávání - http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete

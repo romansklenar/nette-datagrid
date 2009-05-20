@@ -19,18 +19,17 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 {
 	/** @var array  of HTML tags */
 	public $wrappers = array(
+		'datagrid' => array(
+			'container' => 'table class=datagrid',
+		),
+		
 		'form' => array(
-			'container' => 'class=gridform',
-			'errors' => TRUE,
+			'.class' => 'datagrid',
 		),
 		
 		'error' => array(
 			'container' => 'ul class=error',
 			'item' => 'li',
-		),
-		
-		'grid' => array(
-			'container' => 'table class=grid',
 		),
 		
 		'row.header' => array(
@@ -153,6 +152,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		foreach ($form->getControls() as $control) {
 			$control->setOption('rendered', FALSE);
 		}
+		$form->getElementPrototype()->class[] = $this->getValue('form .class');
 		return $form->getElementPrototype()->startTag();
 	}
 
@@ -169,7 +169,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 
 	/**
-	 * Renders validation errors (probably not necessary).
+	 * Renders validation errors.
 	 * @return string
 	 */
 	public function renderErrors()
@@ -201,7 +201,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	 */
 	public function renderBody()
 	{
-		$table = $this->getWrapper('grid container');
+		$table = $this->getWrapper('datagrid container');
 		
 		// headers
 		$table->add($this->generateHeaderRow());
@@ -237,11 +237,13 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		
 		$container = $this->getWrapper('paginator container');
 		$translator = $this->dataGrid->getTranslator();
-		$a = Html::el('a')->class(DataGridColumn::$ajaxClass);
+		
+		$a = Html::el('a');
+		$a->class[] = DataGridAction::$ajaxClass;
 		
 		// to-first button
 		$first = $this->getWrapper('paginator button first');
-		$title = $this->translate('First');
+		$title = $this->dataGrid->translate('First');
 		$link = clone $a->href($this->dataGrid->link('page', 1));
 		if ($first instanceof Html) {
 			if ($paginator->isFirst()) $first->class[] = 'inactive';
@@ -254,7 +256,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		
 		// previous button
 		$prev = $this->getWrapper('paginator button prev');
-		$title = $this->translate('Previous');
+		$title = $this->dataGrid->translate('Previous');
 		$link = clone $a->href($this->dataGrid->link('page', $paginator->page - 1));
 		if ($prev instanceof Html) {
 			if ($paginator->isFirst()) $prev->class[] = 'inactive';
@@ -268,7 +270,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		// page input
 		$controls = $this->getWrapper('paginator controls container');
 		$form = $this->dataGrid->getForm(TRUE);
-		$format = $this->translate($this->paginatorFormat);
+		$format = $this->dataGrid->translate($this->paginatorFormat);
 		$html = str_replace(
 			array('%label%', '%input%', '%count%'),
 			array($form['page']->label, $form['page']->control, $paginator->pageCount),
@@ -279,7 +281,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		
 		// next button
 		$next = $this->getWrapper('paginator button next');
-		$title = $this->translate('Next');
+		$title = $this->dataGrid->translate('Next');
 		$link = clone $a->href($this->dataGrid->link('page', $paginator->page + 1));
 		if ($next instanceof Html) {
 			if ($paginator->isLast()) $next->class[] = 'inactive';
@@ -292,7 +294,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		
 		// to-last button
 		$last = $this->getWrapper('paginator button last');
-		$title = $this->translate('Last');
+		$title = $this->dataGrid->translate('Last');
 		$link = clone $a->href($this->dataGrid->link('page', $paginator->pageCount));
 		if ($last instanceof Html) {
 			if ($paginator->isLast()) $last->class[] = 'inactive';
@@ -340,7 +342,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$container = $this->getWrapper('info container');
 		$paginator = $this->dataGrid->paginator;
 		
-		$this->infoFormat = $this->translate($this->infoFormat);
+		$this->infoFormat = $this->dataGrid->translate($this->infoFormat);
 		$html = str_replace(
 			array(
 				'%from%',
@@ -370,7 +372,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		
 		// checker
 		if ($this->dataGrid->hasOperations()) {
-			$cell = $this->getWrapper('row.header cell container')->class('checker');
+			$cell = $this->getWrapper('row.header cell container');
+			$cell->class[] = 'checker';
 			
 			if ($this->dataGrid->hasFilters()) {
 				$cell->rowspan(2);
@@ -477,7 +480,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		// checker
 		if ($this->dataGrid->hasOperations()) {
 			$value = $form['checker'][$data[$primary]]->getControl();
-			$cell = $this->getWrapper('row.content cell container')->setHtml((string)$value)->class('checker');
+			$cell = $this->getWrapper('row.content cell container')->setHtml((string)$value);
+			$cell->class[] = 'checker';
 			$row->add($cell);
 		}
 		
@@ -490,7 +494,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				$value = '';
 				foreach ($this->dataGrid->getActions() as $action) {
 					$html = $action->getHtml();
-					$html->title($this->translate($html->title));
+					$html->title($this->dataGrid->translate($html->title));
 					$action->generateLink(array($primary => $data[$primary]));
 					$value .= $html->render() . ' ';
 				}
@@ -524,7 +528,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$cell = $this->getWrapper('row.footer cell container');
 		$cell->colspan($count);
 		
-		$this->footerFormat = $this->translate($this->footerFormat);
+		$this->footerFormat = $this->dataGrid->translate($this->footerFormat);
 		$html = str_replace(
 			array(
 				'%operations%',
@@ -591,30 +595,5 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	public function getDataGrid()
 	{
 		return $this->dataGrid;
-	}
-	
-	
-	/********************* translator *********************/
-
-
-	/**
-	 * Returns translate adapter.
-	 * @return ITranslator|NULL
-	 */
-	final public function getTranslator()
-	{
-		return $this->getDataGrid()->getTranslator();
-	}
-
-
-	/**
-	 * Returns translated string.
-	 * @param  string
-	 * @return string
-	 */
-	public function translate($s)
-	{
-		$translator = $this->getTranslator();
-		return $translator === NULL ? $s : $translator->translate($s);
 	}
 }
