@@ -1,7 +1,5 @@
 <?php
 
-require_once LIBS_DIR . '/Nette/Component.php';
-
 require_once dirname(__FILE__) . '/IDataGridAction.php';
 
 

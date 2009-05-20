@@ -14,12 +14,6 @@
 
 
 
-require_once LIBS_DIR . '/Nette/Application/Control.php';
-
-require_once LIBS_DIR . '/Nette/Forms/INamingContainer.php';
-
-
-
 /**
  * A data bound list control that displays the items from data source in a table.
  * The DataGrid control allows you to select, sort, and manage these items.
