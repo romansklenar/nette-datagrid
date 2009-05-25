@@ -1,69 +1,62 @@
-----------------------------------------------------------------------------------
-Tento text je NEOFICIÁLNÍM pøekladem "Nette license". Nevyjadøuje právní podstatu
-podmínek pro šíøení tohoto softwaru - k tomuto úèelu slouí vıhradnì pùvodní
-anglická verze licence.
-----------------------------------------------------------------------------------
-
-
-Nette Licence, verze 1
-======================
+The Nette License, Version 1
+============================
 
 Copyright (c) 2004, 2008 David Grudl (http://davidgrudl.com)
-Všechna práva vyhrazena.
+All rights reserved.
 
-Tato licence je právní ujednání mezi vámi a Davidem Grudlem (dále Author)
-pro potøeby pouití Nette Frameworku (dále "Software"). Získáním, pouitím
-a/nebo zkopírováním Software projevujete souhlas s tím, e jste pøeèetli,
-porozumìli a budete jednat v souladu s podmínkami této licence.
-
-
-POVOLENÉ POUITÍ
-----------------
-
-Je povoleno pouívat, kopírovat, modifikovat a distribuovat Software
-a jeho dokumentaci, v pùvodním i upravovaném tvaru, pro jakıkoliv úèel,
-za pøedpokladu, e jsou splnìny tyto podmínky:
-
-1. Kopie této licenèní smlouvy musí bıt souèástí distribuce.
-
-2. Šíøenı zdrojovı kód musí zachovat vıše uvedenou informaci o autorskıch
-   právech ve všech souborech zdrojového kódu.
-
-3. Šíøenı binární tvar musí reprodukovat vıše uvedenou informaci o autorskıch
-   právech v dokumentaci a/nebo jinıch materiálech poskytovanıch s distribucí.
-
-4. Produkty odvozené od Software musí obsahovat potvrzení, e jsou odvozené
-   od Nette Frameworku, ve své dokumentaci a/nebo jinıch materiálech
-   poskytovanıch s distribucí.
-
-5. Název "Nette Framework" nesmí bıt pouit pøi podpoøe nebo propagaci produktù
-   odvozenımi ze Software bez pøedchozího písemného souhlasu Autora.
-
-6. Produkty odvozené od Software nesmí bıt nazvány "Nette Framework",
-   ani se nesmí "Nette" objevit v jejich názvu bez pøedchozího
-   písemného souhlasu Autora.
+This license is a legal agreement between you and David Grudl (the "Author")
+for the use of Nette Framework (the "Software"). By obtaining, using and/or
+copying the Software, you agree that you have read, understood, and will
+comply with the terms and conditions of this license.
 
 
-ZBAVENÍ ZODPOVÌDNOSTI
----------------------
+PERMITTED USE
+-------------
 
-Souhlasíte se zbavením zodpovìdnosti a krytím Autora a pøispìvatelù vùèi
-jakımkoliv pøímım, nepøímım, náhodnım nebo následnım odjinud pocházejícím škodám,
-alobám nebo sporùm, jako i pøed všemi souvisejícími náklady, závazky,
-odškodnìními, úhradami nebo poplatky vyplıvajících z pouívání nebo
-nesprávného uití Software, nebo z porušení podmínek této licence.
+You are permitted to use, copy, modify, and distribute the Software and its
+documentation, with or without modification, for any purpose, provided that
+the following conditions are met:
+
+1. A copy of this license agreement must be included with the distribution.
+
+2. Redistributions of source code must retain the above copyright notice in
+   all source code files.
+
+3. Redistributions in binary form must reproduce the above copyright notice
+   in the documentation and/or other materials provided with the distribution.
+
+4. Products derived from the Software must include an acknowledgment that
+   they are derived from Nette Framework in their documentation and/or other
+   materials provided with the distribution.
+
+5. The name "Nette Framework" must not be used to endorse or promote products
+   derived from the Software without prior written permission from Author.
+
+6. Products derived from the Software may not be called "Nette Framework",
+   nor may "Nette" appear in their name, without prior written
+   permission from Author.
 
 
-ZÁRUKA SE NEPOSKYTUJE
----------------------
+INDEMNITY
+---------
 
-TENTO SOFTWARE JE POSKYTOVÁN DRITELEM LICENCE A JEHO PØISPÌVATELI "JAK STOJÍ A LEÍ"
-A JAKÉKOLIV VİSLOVNÉ NEBO PØEDPOKLÁDANÉ ZÁRUKY VÈETNÌ, ALE NEJEN, PØEDPOKLÁDANİCH
-OBCHODNÍCH ZÁRUK A ZÁRUKY VHODNOSTI PRO JAKİKOLIV ÚÈEL JSOU POPØENY.
-DRITEL, ANI PØISPÌVATELÉ NEBUDOU V ÁDNÉM PØÍPADÌ ODPOVÌDNI ZA JAKÉKOLIV PØÍMÉ,
-NEPØÍMÉ, NÁHODNÉ, ZVLÁŠTNÍ, PØÍKLADNÉ NEBO VYPLİVAJÍCÍ ŠKODY (VÈETNÌ, ALE NEJEN,
-ŠKOD VZNIKLİCH NARUŠENÍM DODÁVEK ZBOÍ NEBO SLUEB; ZTRÁTOU POUITELNOSTI,
-DAT NEBO ZISKÙ; NEBO PØERUŠENÍM OBCHODNÍ ÈINNOSTI) JAKKOLIV ZPÙSOBENÉ NA ZÁKLADÌ
-JAKÉKOLIV TEORIE O ZODPOVÌDNOSTI, A U PLYNOUCÍ Z JINÉHO SMLUVNÍHO VZTAHU,
-URÈITÉ ZODPOVÌDNOSTI NEBO PØEÈINU (VÈETNÌ NEDBALOSTI) NA JAKÉMKOLIV ZPÙSOBU POUITÍ
-TOHOTO SOFTWARE, I V PØÍPADÌ, E DRITEL PRÁV BYL UPOZORNÌN NA MONOST TAKOVİCH ŠKOD.
+You agree to indemnify and hold harmless the Author and any contributors
+for any direct, indirect, incidental, or consequential third-party claims,
+actions or suits, as well as any related expenses, liabilities, damages,
+settlements or fees arising from your use or misuse of the Software,
+or a violation of any terms of this license.
+
+
+DISCLAIMER OF WARRANTY
+----------------------
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
