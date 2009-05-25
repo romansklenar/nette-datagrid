@@ -8,7 +8,8 @@ require_once dirname(__FILE__) . '/IDataGridColumnFilter.php';
  * Base class that implements the basic common functionality to data grid column's filters.
  *
  * @author     Roman Sklenář
- * @copyright  Copyright (c) 2009 Roman Sklenář
+ * @copyright  Copyright (c) 2009 Roman Sklenář (http://romansklenar.cz)
+ * @license    New BSD License
  * @example    http://nettephp.com/extras/datagrid
  * @package    Nette\Extras\DataGrid
  * @version    $Id$

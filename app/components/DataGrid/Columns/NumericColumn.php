@@ -8,7 +8,8 @@ require_once dirname(__FILE__) . '/../DataGridColumn.php';
  * Representation of numeric data grid column.
  *
  * @author     Roman Sklenář
- * @copyright  Copyright (c) 2009 Roman Sklenář
+ * @copyright  Copyright (c) 2009 Roman Sklenář (http://romansklenar.cz)
+ * @license    New BSD License
  * @example    http://nettephp.com/extras/datagrid
  * @package    Nette\Extras\DataGrid
  * @version    $Id$

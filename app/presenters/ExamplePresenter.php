@@ -190,12 +190,12 @@ class ExamplePresenter extends BasePresenter
 			}
 			
 			if (count($rows) > 0) {
-				$msg = $grid->translate("Operation %s over row %s succesfully done.", count($rows), $grid->translate($operation), implode(', ', $rows));
+				$msg = $grid->translate('Operation %2$s over row %3$s succesfully done.', count($rows), $grid->translate($operation), implode(', ', $rows));
 				$grid->flashMessage($msg, 'success');
-				$msg = $grid->translate("This is demo application only, changes will not be done.");
+				$msg = $grid->translate('This is demo application only, changes will not be done.');
 				$grid->flashMessage($msg, 'info');
 			} else {
-				$msg = $grid->translate("No rows selected.");
+				$msg = $grid->translate('No rows selected.');
 				$grid->flashMessage($msg, 'warning');
 			}
 		}

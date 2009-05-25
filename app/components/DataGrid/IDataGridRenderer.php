@@ -4,7 +4,8 @@
  * Defines method that must implement data grid rendered.
  *
  * @author     Roman Sklenář
- * @copyright  Copyright (c) 2009 Roman Sklenář
+ * @copyright  Copyright (c) 2009 Roman Sklenář (http://romansklenar.cz)
+ * @license    New BSD License
  * @package    Nette\Extras\DataGrid
  * @version    $Id$
  */

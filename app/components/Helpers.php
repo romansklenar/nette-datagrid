@@ -6,7 +6,7 @@
  * @author     David Grudl
  * @package    Nette\Extras
  */
-class Helpers
+class Helpers extends Object
 {
 	/**
 	 * Static class - cannot be instantiated.

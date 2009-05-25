@@ -8,7 +8,8 @@ require_once dirname(__FILE__) . '/TextColumn.php';
  * Representation of image data grid column.
  *
  * @author     Roman Sklenář
- * @copyright  Copyright (c) 2009 Roman Sklenář
+ * @copyright  Copyright (c) 2009 Roman Sklenář (http://romansklenar.cz)
+ * @license    New BSD License 
  * @example    http://nettephp.com/extras/datagrid
  * @package    Nette\Extras\DataGrid
  * @version    $Id$

@@ -8,7 +8,8 @@ require_once dirname(__FILE__) . '/NumericColumn.php';
  * Representation of positioning data grid column, that provides moving entries up or down.
  *
  * @author     Roman Sklenář
- * @copyright  Copyright (c) 2009 Roman Sklenář
+ * @copyright  Copyright (c) 2009 Roman Sklenář (http://romansklenar.cz)
+ * @license    New BSD License
  * @example    http://nettephp.com/extras/datagrid
  * @package    Nette\Extras\DataGrid
  * @version    $Id$

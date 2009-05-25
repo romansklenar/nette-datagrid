@@ -144,11 +144,11 @@ msgid "Without orders"
 msgstr "Bez objednávek"
 
 #: operation handler
-msgid "Operation %s over row %s succesfully done."
-msgid_plural "Operation %s over rows %s succesfully done."
-msgstr[0] "Operace %s nad řádkem %s úspěšně provedena."
-msgstr[1] "Operace %s nad řádky %s úspěšně provedena."
-msgstr[2] "Operace %s nad řádky %s úspěšně provedena."
+msgid "Operation %2$s over row %3$s succesfully done."
+msgid_plural "Operation %2$s over rows %3$s succesfully done."
+msgstr[0] "Operace %2$s nad řádkem %3$s úspěšně provedena."
+msgstr[1] "Operace %2$s nad řádky %3$s úspěšně provedena."
+msgstr[2] "Operace %2$s nad řádky %3$s úspěšně provedena."
 
 msgid "No rows selected."
 msgstr "Nebyly vybrány žádné řádky."

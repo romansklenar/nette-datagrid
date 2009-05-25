@@ -1,7 +1,7 @@
-DataGrid (extended)
------------------
+DataGrid
+--------
 
 Instalation:
-	- run script 'app/models/birt.mysql.sql' on your MySQL database.
-	- set passwords in 'app/config.ini'.
+	- [optional] run script 'app/models/birt.mysql.sql' on your MySQL database.
+	- [optional] set connection settings in 'app/config.ini'.
 	- make sure that directories 'app/log', 'app/sessions' and 'app/temp' are writeable

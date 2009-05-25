@@ -2,12 +2,16 @@
 
 /**
  * Gettext translator.
- * This solution is mostly based on Zend_Translate_Adapter_Gettext (c) Zend Technologies USA Inc. (http://www.zend.com), new BSD license
+ * This solution is partitionaly based on Zend_Translate_Adapter_Gettext (c) Zend Technologies USA Inc. (http://www.zend.com), new BSD license
  *
  * @author     Roman Sklenář
- * @package    DataGrid\Example
+ * @copyright  Copyright (c) 2009 Roman Sklenář (http://romansklenar.cz)
+ * @license    New BSD License
+ * @example    http://nettephp.com/extras/translator
+ * @package    Nette\Extras\Translator
+ * @version    $Id$
  */
-class Translator extends Object implements /*Nette\*/ITranslator
+class Translator extends Object implements ITranslator
 {
 	/** @var string */
 	public $locale;
@@ -47,7 +51,7 @@ class Translator extends Object implements /*Nette\*/ITranslator
 	 */
 	public function translate($message, $count = 1)
 	{
-		$message = (string)$message;
+		$message = (string) $message;
 		if (!empty($message) && isset($this->dictionary[$message])) {
 			$word = $this->dictionary[$message];
 			
@@ -58,7 +62,6 @@ class Translator extends Object implements /*Nette\*/ITranslator
 		
 		$args = func_get_args();
 		if (count($args) > 1) {
-			array_shift($args);
 			array_shift($args);
 			$message = vsprintf($message, $args);
 		}
@@ -72,7 +75,7 @@ class Translator extends Object implements /*Nette\*/ITranslator
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
-	protected function buildDictionary($filename)
+	private function buildDictionary($filename)
 	{
 		$this->endian = FALSE;
 		$this->file = @fopen($filename, 'rb');
@@ -170,7 +173,11 @@ class Translator extends Object implements /*Nette\*/ITranslator
  * Class that represents translatable word.
  * 
  * @author     Roman Sklenář
- * @package    DataGrid\Example
+ * @copyright  Copyright (c) 2009 Roman Sklenář
+ * @license    New BSD License
+ * @example    http://nettephp.com/extras/translator
+ * @package    Nette\Extras\Translator
+ * @version    $Id$
  */
 class Word extends Object
 {
