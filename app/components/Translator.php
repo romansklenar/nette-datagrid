@@ -165,7 +165,7 @@ class Translator extends Object implements ITranslator
 			$tmp = preg_split("($pattern)", $meta);
 			$this->meta[trim($tmp[0])] = count($tmp) > 2 ? ltrim(strstr($meta, $pattern), $pattern) : $tmp[1];
 		}
-	}	
+	}
 }
 
 
@@ -215,7 +215,7 @@ class Word extends Object
 	public function getMessage($form = 0)
 	{
 		return is_array($this->message) ? $this->message[$form] : $this->message;
-	}	
+	}
 	
 	
 	/**
