@@ -199,28 +199,41 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	 */
 	public function renderBody()
 	{
-		$table = $this->getWrapper('datagrid container');
+		$container = $this->getWrapper('datagrid container');
 		
 		// headers
-		$table->add($this->generateHeaderRow());
-		
-		// filters
+		$header = Html::el($container->getName() == 'table' ? 'thead' : NULL);
+		$header->add($this->generateHeaderRow());
+
 		if ($this->dataGrid->hasFilters()) {
-			$table->add($this->generateFilterRow());
+			$header->add($this->generateFilterRow());
 		}
 		
-		// rows
+		// footer
+		$footer = Html::el($container->getName() == 'table' ? 'tfoot' : NULL);
+		$footer->add($this->generateFooterRow());
+		
+		// body
+		$body = Html::el($container->getName() == 'table' ? 'tbody' : NULL);
 		$iterator = new SmartCachingIterator($this->dataGrid->getRows());
 		foreach ($iterator as $data) {
 			$row = $this->generateContentRow($data);
 			$row->addClass($iterator->isEven() ? $this->getValue('row.content .even') : NULL);
-			$table->add($row);
+			$body->add($row);
 		}
 		
-		// footer
-		$table->add($this->generateFooterRow());
+		if ($container->getName() == 'table') {
+			$container->add($header);
+			$container->add($footer);
+			$container->add($body);
+			
+		} else {
+			$container->add($header);
+			$container->add($body);
+			$container->add($footer);
+		}
 		
-		return $table->render(0);
+		return $container->render(0);
 	}
 	
 	

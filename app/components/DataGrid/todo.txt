@@ -2,8 +2,6 @@ TODO
 ====
 
 ? našeptávání - http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete
-- thead, tfoot, tbody
-- unikatnejsi nazev tridy u ajaxovych odkazu
 - razeni u sloupcu - zobrazení obou šipek u každého sloupce
 	Kliknutím na samotný název sloupce se setřídí jenom podle něj (poprvé
 	vzestupně, podruhé sestupně). Při najetí myší nad název sloupce se

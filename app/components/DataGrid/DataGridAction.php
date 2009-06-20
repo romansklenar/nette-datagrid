@@ -25,7 +25,7 @@ class DataGridAction extends Component implements IDataGridAction
 	protected $html;
 	
 	/** @var string */
-	static public $ajaxClass = 'ajax';
+	static public $ajaxClass = 'datagrid-ajax';
 
 	/** @var string */
 	public $type;

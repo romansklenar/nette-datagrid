@@ -36,7 +36,7 @@ $("div.flash").livequery(function () {
  */
 
 // links
-$("table.datagrid a.ajax").live("click", function () {
+$("table.datagrid a.datagrid-ajax").live("click", function () {
 	$.get(this.href);
 	return false;
 });
