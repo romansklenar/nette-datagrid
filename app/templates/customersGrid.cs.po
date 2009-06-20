@@ -47,6 +47,12 @@ msgstr "Poslední"
 msgid "Page"
 msgstr "Stránka"
 
+msgid "Change"
+msgstr "Změnit"
+
+msgid "all"
+msgstr "vše"
+
 msgid "Page must be numeric value"
 msgstr "Číslo stránky musí být numerická hodnota"
 
@@ -56,8 +62,8 @@ msgstr "%label% %input% z %count%"
 msgid "%operations% %paginator% %info%"
 msgstr "%operations% %paginator% %info%"
 
-msgid "Displaying items %from% - %to% of %count%"
-msgstr "Zobrazuji položky %from% až %to% z %count%"
+msgid "Items %from% - %to% of %count% | Display: %selectbox%"
+msgstr "Položky %from% až %to% z %count% | Zobraz: %selectbox%"
 
 msgid "Used filters did not match any items."
 msgstr "Použitým filtrům neodpovídají žádné záznamy."

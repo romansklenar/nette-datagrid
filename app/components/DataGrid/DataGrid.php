@@ -47,6 +47,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/** @persistent string */
 	public $filters = '';
+	
+	/** @persistent int */
+	public $itemsPerPage = 15;
+	
+	/** @var array */
+	public $displayedItems = array('all', 5, 10, 15, 20, 50, 100);
 
 	/** @var DibiDataSource */
 	protected $dataSource;
@@ -87,8 +93,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		parent::__construct();
 		$this->paginator = new Paginator;
-		$this->setItemsPerPage(15);
-		
 		$this->addComponent(new ComponentContainer, 'columns');
 		$this->addComponent(new ComponentContainer, 'filters');
 		$this->addComponent(new ComponentContainer, 'actions');
@@ -151,16 +155,19 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/**
 	 * Setter / property method.
 	 * Defines number of rows per one page on the grid.
-	 * @param  int
+	 * @param  int|string
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
 	public function setItemsPerPage($value)
 	{
-		if ($value <= 0) {
-			throw new InvalidArgumentException("Parametr must be positive number, '$value' given.");
+		if (is_string($value) || $value == 0) {
+			$this->itemsPerPage = $this->paginator->itemsPerPage = count($this->dataSource);
+		} elseif ($value < 0) {
+			throw new InvalidArgumentException("Parametr must be non-negative number, '$value' given.");
+		} else {
+			$this->itemsPerPage = $this->paginator->itemsPerPage = (int) $value;
 		}
-		$this->paginator->itemsPerPage = (int) $value;
 	}
 
 
@@ -401,6 +408,20 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	}
 
 
+	/**
+	 * Change number of displayed items.
+	 * @param  string
+	 * @return void
+	 */
+	public function handleItems($value)
+	{
+		$this->setItemsPerPage((int) $value);
+		
+		$this->invalidateControl();
+		if (!$this->presenter->isAjax()) $this->redirect('this');
+	}
+
+
 
 	/********************* submit handlers *********************/
 
@@ -426,11 +447,15 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			} elseif ($form['pageSubmit']->isSubmittedBy()) {
 				$this->receivedSignals[] = 'page';
 				$this->handlePage($values['page']);
-					
+				
+			} elseif ($form['itemsSubmit']->isSubmittedBy()) {
+				$this->receivedSignals[] = 'items';
+				$this->handleItems($values['items']);
+				
 			} elseif ($form['operationSubmit']->isSubmittedBy()) {
 				trigger_error('No user defined handler for operations; assign valid callback to operations handler into DataGrid::$operationsHandler variable.', E_USER_WARNING);
 				return;
-			
+				
 			} else {
 				// unknown submit button
 				throw new InvalidStateException("Unknown submit button.");
@@ -458,6 +483,17 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @return void
 	 */
 	public function onClickPageHandler(Button $button)
+	{
+		$this->onSubmitHandler($button->getParent());
+	}
+	
+	
+	/**
+	 * Change page handler. Left functionality on method onSubmitHandler.
+	 * @param  Button
+	 * @return void
+	 */
+	public function onClickItemsHandler(Button $button)
 	{
 		$this->onSubmitHandler($button->getParent());
 	}
@@ -521,6 +557,16 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	}
 
 
+	/**
+	 * Applies filtering on data grid.
+	 * @return void
+	 */
+	protected function applyItems()
+	{
+		$this->setItemsPerPage($this->itemsPerPage);
+	}
+
+	
 
 	/********************* renderers *********************/
 
@@ -582,6 +628,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			}
 			
 			// filter items (must be in this order)
+			$this->applyItems();
 			$this->applyFiltering();
 			$this->applySorting();
 			$this->applyPaging();
@@ -649,7 +696,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				$form['page']->setValue($this->paginator->page);
 				$form->addSubmit('pageSubmit', 'Change page')
 					->onClick[] = array($this, 'onClickPageHandler');
-
+				
+				// items per page selector
+				$form->addSelect('items', 'Items per page', array_combine($this->displayedItems, $this->displayedItems));
+				$form['items']->setValue($this->paginator->itemsPerPage);
+				$form->addSubmit('itemsSubmit', 'Change')
+					->onClick[] = array($this, 'onClickItemsHandler');
 				
 				// generate filters FormControls
 				if ($this->hasFilters()) {
@@ -731,8 +783,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			}
 		}
 		
-		// page input
+		// page input & items selectbox
 		$form['page']->setValue($this->paginator->page);
+		$form['items']->setValue($this->paginator->itemsPerPage);
 	}
 
 

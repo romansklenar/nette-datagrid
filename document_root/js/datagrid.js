@@ -134,7 +134,7 @@ $("form.datagrid table.datagrid tr.filters input[type=text]").livequery("keypres
 });
 
 // ajaxové filtrování formulářů datagridů pomocí změny hodnoty selectboxu nebo checkboxu
-$("form.datagrid table.datagrid tr.filters").find("input:checkbox, select").livequery("change", function (e) {
+$("form.datagrid table.datagrid").find("tr.filters input:checkbox, tr.filters select").livequery("change", function (e) {
 	$(this).parents("form.datagrid").find("input:submit[name=filterSubmit]").ajaxSubmit();
 	return false;
 });
@@ -148,4 +148,12 @@ $("form.datagrid table.datagrid tr.footer input[name=page]").livequery("keypress
 		$(this).parents("form.datagrid").find("input:submit[name=pageSubmit]").ajaxSubmit();
 		return false;
 	}
+});
+
+//ajaxová změna počtu řádků na stránku datagridů pomocí změny hodnoty selectboxu
+$("form.datagrid table.datagrid tr.footer input[name=itemsSubmit]").livequery(function () {
+	$(this).hide();
+});
+$("form.datagrid table.datagrid tr.footer select[name=items]").livequery("change", function (e) {
+	$(this).parents("form.datagrid").find("input:submit[name=itemsSubmit]").ajaxSubmit();
 });

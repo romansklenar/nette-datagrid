@@ -94,7 +94,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	public $paginatorFormat = '%label% %input% of %count%';
 	
 	/** @var string */
-	public $infoFormat = 'Displaying items %from% - %to% of %count%';
+	public $infoFormat = 'Items %from% - %to% of %count% | Display: %selectbox%';
 	
 	/** @var string  template file*/
 	public $file;
@@ -322,7 +322,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		if (!$this->dataGrid->hasOperations()) return '';
 		
 		$container = $this->getWrapper('operations container');
-		$form = $this->dataGrid->getForm(TRUE);	
+		$form = $this->dataGrid->getForm(TRUE);
 		$container->add($form['operations']->label);
 		$container->add($form['operations']->control);
 		$container->add($form['operationSubmit']->control->title($form['operationSubmit']->control->value));
@@ -339,6 +339,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	{
 		$container = $this->getWrapper('info container');
 		$paginator = $this->dataGrid->paginator;
+		$form = $this->dataGrid->getForm(TRUE);
 		
 		$this->infoFormat = $this->dataGrid->translate($this->infoFormat);
 		$html = str_replace(
@@ -346,11 +347,13 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				'%from%',
 				'%to%',
 				'%count%',
+				'%selectbox%',
 			),
 			array(
 				$paginator->itemCount != 0 ? $paginator->offset + 1 : $paginator->offset,
 				$paginator->offset + $paginator->length,
 				$paginator->itemCount,
+				$form['items']->control . $form['itemsSubmit']->control->title($form['itemsSubmit']->control->value),
 			),
 			$this->infoFormat
 		);

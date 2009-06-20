@@ -5,7 +5,6 @@ TODO
 - upravit v renderer podle zmen v Nette\Web\Html @ http://code.google.com/p/nette/source/detail?r=336
 - thead, tfoot, tbody
 - unikatnejsi nazev tridy u ajaxovych odkazu
-- uživatelem ovlivnitelný počet vypsaných řádků (select s výběrem z 20, 50, 500, vše) ve footeru
 - razeni u sloupcu - zobrazení obou šipek u každého sloupce
 	Kliknutím na samotný název sloupce se setřídí jenom podle něj (poprvé
 	vzestupně, podruhé sestupně). Při najetí myší nad název sloupce se

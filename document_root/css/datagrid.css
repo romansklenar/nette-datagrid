@@ -55,7 +55,7 @@ table.datagrid input[name=filterSubmit] {
 table.datagrid input[name=operationSubmit] {
 	background-image: url('../images/icons/accept.png') !important;
 }
-table.datagrid input[name=pageSubmit] {
+table.datagrid input[name=pageSubmit], table.datagrid input[name=itemsSubmit] {
 	background-image: url('../images/icons/arrow_rotate_clockwise.png') !important;
 }
 
