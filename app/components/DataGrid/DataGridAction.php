@@ -53,7 +53,7 @@ class DataGridAction extends Component implements IDataGridAction
 		$this->destination = $destination;
 		
 		$a = Html::el('a')->title($title);
-		if ($useAjax) $a->class[] = self::$ajaxClass;
+		if ($useAjax) $a->addClass(self::$ajaxClass);
 		
 		if ($icon !== NULL && $icon instanceof Html) {
 			$a->add($icon);

@@ -2,7 +2,6 @@ TODO
 ====
 
 ? našeptávání - http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete
-- upravit v renderer podle zmen v Nette\Web\Html @ http://code.google.com/p/nette/source/detail?r=336
 - thead, tfoot, tbody
 - unikatnejsi nazev tridy u ajaxovych odkazu
 - razeni u sloupcu - zobrazení obou šipek u každého sloupce

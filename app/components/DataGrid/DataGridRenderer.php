@@ -150,7 +150,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		foreach ($form->getControls() as $control) {
 			$control->setOption('rendered', FALSE);
 		}
-		$form->getElementPrototype()->class[] = $this->getValue('form .class');
+		$form->getElementPrototype()->addClass($this->getValue('form .class'));
 		return $form->getElementPrototype()->startTag();
 	}
 
@@ -213,7 +213,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$iterator = new SmartCachingIterator($this->dataGrid->getRows());
 		foreach ($iterator as $data) {
 			$row = $this->generateContentRow($data);
-			$row->class[] = $iterator->isEven() ? $this->getValue('row.content .even') : '';
+			$row->addClass($iterator->isEven() ? $this->getValue('row.content .even') : NULL);
 			$table->add($row);
 		}
 		
@@ -237,14 +237,14 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$translator = $this->dataGrid->getTranslator();
 		
 		$a = Html::el('a');
-		$a->class[] = DataGridAction::$ajaxClass;
+		$a->addClass(DataGridAction::$ajaxClass);
 		
 		// to-first button
 		$first = $this->getWrapper('paginator button first');
 		$title = $this->dataGrid->translate('First');
 		$link = clone $a->href($this->dataGrid->link('page', 1));
 		if ($first instanceof Html) {
-			if ($paginator->isFirst()) $first->class[] = 'inactive';
+			if ($paginator->isFirst()) $first->addClass('inactive');
 			else $first = $link->add($first);
 			$first->title($title);
 		} else {
@@ -257,7 +257,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$title = $this->dataGrid->translate('Previous');
 		$link = clone $a->href($this->dataGrid->link('page', $paginator->page - 1));
 		if ($prev instanceof Html) {
-			if ($paginator->isFirst()) $prev->class[] = 'inactive';
+			if ($paginator->isFirst()) $prev->addClass('inactive');
 			else $prev = $link->add($prev);
 			$prev->title($title);
 		} else {
@@ -282,7 +282,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$title = $this->dataGrid->translate('Next');
 		$link = clone $a->href($this->dataGrid->link('page', $paginator->page + 1));
 		if ($next instanceof Html) {
-			if ($paginator->isLast()) $next->class[] = 'inactive';
+			if ($paginator->isLast()) $next->addClass('inactive');
 			else $next = $link->add($next);
 			$next->title($title);
 		} else {
@@ -295,7 +295,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$title = $this->dataGrid->translate('Last');
 		$link = clone $a->href($this->dataGrid->link('page', $paginator->pageCount));
 		if ($last instanceof Html) {
-			if ($paginator->isLast()) $last->class[] = 'inactive';
+			if ($paginator->isLast()) $last->addClass('inactive');
 			else $last = $link->add($last);
 			$last->title($title);
 		} else {
@@ -374,7 +374,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		// checker
 		if ($this->dataGrid->hasOperations()) {
 			$cell = $this->getWrapper('row.header cell container');
-			$cell->class[] = 'checker';
+			$cell->addClass('checker');
 			
 			if ($this->dataGrid->hasFilters()) {
 				$cell->rowspan(2);
@@ -407,7 +407,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			
 			$cell = $this->getWrapper('row.header cell container')->setHtml($value);
 			$cell->attrs = $column->getHeaderPrototype()->attrs;
-			if ($column instanceof ActionColumn) $cell->class[] = 'actions';
+			if ($column instanceof ActionColumn) $cell->addClass('actions');
 			
 			$row->add($cell);
 		}
@@ -433,10 +433,10 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			
 			if ($column instanceof ActionColumn) {
 				$control = $form['filterSubmit']->control;
-				$control->class[] = $this->getValue('row.filter control .submit');
+				$control->addClass($this->getValue('row.filter control .submit'));
 				$control->title = $control->value;
 				$value = (string) $control;
-				$cell->class[] = 'actions';
+				$cell->addClass('actions');
 				
 			} else {
 				if ($column->hasFilter()) {
@@ -447,7 +447,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 						$class = $this->getValue('row.filter control .input');
 					}
 					$control = $filter->getFormControl()->control;
-					$control->class[] = $class;
+					$control->addClass($class);
 					$value = (string) $control;
 				} else {
 					$value = '';
@@ -482,7 +482,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		if ($this->dataGrid->hasOperations()) {
 			$value = $form['checker'][$data[$primary]]->getControl();
 			$cell = $this->getWrapper('row.content cell container')->setHtml((string)$value);
-			$cell->class[] = 'checker';
+			$cell->addClass('checker');
 			$row->add($cell);
 		}
 		
@@ -499,7 +499,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 					$action->generateLink(array($primary => $data[$primary]));
 					$value .= $html->render() . ' ';
 				}
-				$cell->class[] = 'actions';
+				$cell->addClass('actions');
 				
 			} else {
 				$value = $column->formatContent($data[$column->getName()]);
@@ -557,19 +557,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	protected function getWrapper($name)
 	{
 		$data = $this->getValue($name);
-		if ($data instanceof Html) return clone $data;
-		elseif ($data === NULL) return NULL;
-		$el = Html::el($data);
-
-		$pattern = '/(?<attr>[\w]+)="(?<value>[\w|\s|_| |-]+)"/i';
-		if (preg_match_all($pattern, $data, $matches)) { 
-			$attrs = array();
-			foreach ($matches['attr'] as $key => $attr) {
-				$attrs[$attr] = explode(' ', $matches['value'][$key]);
-			}
-			$el->attrs = $attrs;
-		}
-		return $el;
+		return $data instanceof Html ? clone $data : Html::el($data);
 	}
 
 
