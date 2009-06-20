@@ -57,7 +57,9 @@ class SelectboxFilter extends DataGridColumnFilter
 		$dataGrid = $this->lookup('DataGrid', TRUE);
 		
 		$columnName = $this->getName();
-		$fluent = $dataGrid->dataSource->toFluent();
+		$dataSource = clone $dataGrid->dataSource;
+		$dataSource->applyLimit(NULL);
+		$fluent = $dataSource->toFluent();
 		$fluent->clause('select', TRUE);
 		$fluent->select();
 		$fluent->distinct($columnName);

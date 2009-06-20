@@ -2,3 +2,25 @@ TODO
 ====
 
 ? našeptávání - http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete
+- upravit v renderer podle zmen v Nette\Web\Html @ http://code.google.com/p/nette/source/detail?r=336
+- thead, tfoot, tbody
+- unikatnejsi nazev tridy u ajaxovych odkazu
+- uživatelem ovlivnitelný počet vypsaných řádků (select s výběrem z 20, 50, 500, vše) ve footeru
+- razeni u sloupcu - zobrazení obou šipek u každého sloupce
+	Kliknutím na samotný název sloupce se setřídí jenom podle něj (poprvé
+	vzestupně, podruhé sestupně). Při najetí myší nad název sloupce se
+	navíc zobrazí dvě ikony pro vzestupné a sestupné třídění. Kliknutím na
+	tyto ikony se sloupec přidá ke stávajícímu řazení (pokud tam ještě není).
+- loadState & saveState & Session - pamatovat si stav datagridu (razeni, filtry, strankovani, ...) + pridat prvek na reset + mit moznost tuto feature vypnout
+	 v saveState() se uloží hodnoty persistentních parametrů i do 
+	session a při vytváření komponenty při volání loadState() se zase ověří, 
+	zda-li již tam nejsou a pokud by neměly persistenty přiřazeny žádné hodnoty 
+	vzaly by se odsuď.
+- defaultního řazení: $grid->setOrder($column, DESC/ASC).
+	V případě, že by uživatel řadil výsledky dle sebe, tak by se defaultní řazení 
+	nepoužilo (použilo by se jen v případě, kdy není uplatněno manuální řazení).
+
+
+- optimalizace SelectboxFilter::generateItems()
+	az bude umet DibiDataSource DISTINCT prepsat, prozatimni reseni: prevedeno na fluent a na nem aplikovan DISTINCT 
+	(testovano na 50000 radkove tabulce - nativni DDS s DISTINCT je o 1/3 rychlejsi nez prevod z DSS na fluent a pak DISTINCT)

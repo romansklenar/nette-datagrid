@@ -558,7 +558,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		if (!$this->wasRendered) {
 			$this->wasRendered = TRUE;
-			$this->dataSource->release();
 			
 			if (!$this->hasColumns() || (count($this->getColumns()->getInnerIterator()) == 1 && $this->hasActions())) {
 				// auto-generate columns
@@ -578,7 +577,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				}
 			}
 			
-			if (!$this->hasRows()) {
+			if (!count($this->dataSource)) {
 				$this->flashMessage($this->translate("Empty datasource given."), 'info');
 			}
 			
