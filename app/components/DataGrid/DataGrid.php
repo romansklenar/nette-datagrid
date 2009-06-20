@@ -1,8 +1,7 @@
 <?php
 
 /**
- * This source file is subject to the "Nette license" that is bundled
- * with this package in the file license.txt.
+ * This source file is subject to the "New BSD License".
  *
  * For more information please see http://nettephp.com
  *
@@ -128,13 +127,13 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		if ($this->keyName != NULL) {
 			return $this->keyName;
 		}
-		throw new InvalidStateException("Name of key for group operations or actions was not set for DataGrid '" . $this->getName() . "'.");
+		throw new InvalidStateException("Name of key for operations or actions was not set for DataGrid '" . $this->getName() . "'.");
 	}
 
 
 	/**
 	 * Setter / property method.
-	 * Key name must be set if you want to use group operations or actions.
+	 * Key name must be set if you want to use operations or actions.
 	 * @param  string  column name used to identifies each item/record in data grid (name of primary key of table/query from data source is recomended)
 	 * @return void
 	 */
@@ -286,6 +285,16 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
+	 * Does data grid has any row?
+	 * @return bool
+	 */
+	public function hasRows()
+	{
+		return count($this->getRows()) > 0;
+	}
+
+
+	/**
 	 * Does data grid has any column?
 	 * @return bool
 	 */
@@ -316,7 +325,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * Does datagrid has any group operation?
+	 * Does datagrid has any operation?
 	 * @return bool
 	 */
 	public function hasOperations()
@@ -338,8 +347,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public function handlePage($page)
 	{
 		$this->paginator->page = $this->page = ($page > 0 ? $page : 1);
-		$this->invalidateControl('grid');
-		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
+		$this->invalidateControl();
+		if (!$this->presenter->isAjax()) $this->redirect('this');
 	}
 
 
@@ -370,8 +379,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 		
 		$this->order = http_build_query($list, '', '&');
-		$this->invalidateControl('grid');
-		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
+		$this->invalidateControl();
+		if (!$this->presenter->isAjax()) $this->redirect('this');
 	}
 
 
@@ -387,8 +396,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			if ($value !== '') $filters[$key] = $value;
 		}
 		$this->filters = http_build_query($filters, '', '&');
-		$this->invalidateControl('grid');
-		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
+		$this->invalidateControl();
+		if (!$this->presenter->isAjax()) $this->redirect('this');
 	}
 
 
@@ -419,7 +428,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				$this->handlePage($values['page']);
 					
 			} elseif ($form['operationSubmit']->isSubmittedBy()) {
-				trigger_error('No user defined handler for group operations; assign valid callback to your group operations handler into DataGrid::$operationsHandler variable.', E_USER_WARNING);
+				trigger_error('No user defined handler for operations; assign valid callback to operations handler into DataGrid::$operationsHandler variable.', E_USER_WARNING);
 				return;
 			
 			} else {
@@ -467,6 +476,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		$this->paginator->page = $this->page;
 		$this->paginator->itemCount = count($this->dataSource);
+		
 		if ($this->wasRendered && $this->paginator->itemCount < 1 && !empty($this->filters)) {
 			// NOTE: don't use flash messages (because you can't - header already sent)
 			$this->getTemplate()->flashes[] = (object) array(
@@ -548,13 +558,28 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		if (!$this->wasRendered) {
 			$this->wasRendered = TRUE;
+			$this->dataSource->release();
 			
-			if (!$this->hasColumns()) {
+			if (!$this->hasColumns() || (count($this->getColumns()->getInnerIterator()) == 1 && $this->hasActions())) {
 				// auto-generate columns
+				if ($this->hasActions()) {
+					$actionColumn = $this->getComponent('columns', TRUE)->getComponent('actions');
+					$this->getComponent('columns', TRUE)->removeComponent($actionColumn);
+					$actionColumn->setParent(NULL);
+				}
+				
 				$ds = clone $this->dataSource;
 				$row = $ds->select('*')->fetch();
 				$keys = array_keys((array)$row);
 				foreach ($keys as $key) $this->addColumn($key);
+				
+				if ($this->hasActions()) {
+					$this['actions'] = $actionColumn;
+				}
+			}
+			
+			if (!$this->hasRows()) {
+				$this->flashMessage($this->translate("Empty datasource given."), 'info');
 			}
 			
 			// filter items (must be in this order)
@@ -562,7 +587,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			$this->applySorting();
 			$this->applyPaging();
 			
-			if ($this->isSignalReceiver('filter') || $this->isSignalReceiver('page')) {
+			if ($this->isSignalReceiver('submit')) {
 				$this->regenerateFormControls($this->getForm(TRUE));
 			}
 		}
@@ -585,6 +610,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		if ($this->getTranslator() !== NULL) {
 			$template->setTranslator($this->getTranslator());
 		}
+		$template->registerFilter('Nette\Templates\CurlyBracketsFilter::invoke');
 		return $template;
 	}
 
@@ -712,8 +738,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * Allows group operations and adds checker (column filled by checkboxes).
-	 * @param  array  list of group operations (selectbox items)
+	 * Allows operations and adds checker (column filled by checkboxes).
+	 * @param  array  list of operations (selectbox items)
 	 * @param  mixed  valid callback handler which provides rutines from $operations
 	 * @param  string column name used to identifies each item/record in data grid (name of primary key of table/query from data source is recomended)
 	 * @return void

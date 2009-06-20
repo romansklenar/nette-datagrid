@@ -57,15 +57,16 @@ class SelectboxFilter extends DataGridColumnFilter
 		$dataGrid = $this->lookup('DataGrid', TRUE);
 		
 		$columnName = $this->getName();
-		$dataSource = clone $dataGrid->dataSource;
-		$dataSource->release();
+		$fluent = $dataGrid->dataSource->toFluent();
+		$fluent->clause('select', TRUE);
+		$fluent->select();
+		$fluent->distinct($columnName);
 		
 		$cond = array();
 		$cond[] = array("[$columnName] NOT LIKE %s", '');
 		
-		$dataSource->where('%and', $cond)->orderBy($columnName)->applyLimit(NULL);
-		$items = $dataSource->fetchPairs($columnName, $columnName);
-		ksort($items);
+		$fluent->where('%and', $cond)->orderBy($columnName);
+		$items = $fluent->fetchPairs($columnName, $columnName);
 		
 		$this->generatedItems = array_merge(array('?' => '?'), $items);
 		$this->skipFirst = TRUE;

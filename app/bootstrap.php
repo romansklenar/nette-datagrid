@@ -90,7 +90,7 @@ $router[] = new Route('index.php', array(
 ), Route::ONE_WAY);
 
 $router[] = new Route('<presenter>/<action>/', array(
-'presenter' => 'Example',
+	'presenter' => 'Example',
 	'action' => 'default',
 ));
 

@@ -64,7 +64,7 @@ table.datagrid input[name=pageSubmit] {
 table.datagrid td, table.datagrid th {
 	color: #525b37;
 	border: 1px solid #BBCBF4;
-	padding: 6px;
+	padding: 6px 10px;
 }
 table.datagrid th {
 	color: #505767;
@@ -74,8 +74,9 @@ table.datagrid th {
 }
 table.datagrid th.checker, table.datagrid td.checker, table.datagrid td.actions {
 	text-align: center;
+	padding-left: 6px;
 }
-table.datagrid tr.header th span {
+table.datagrid tr.header th a span {
 	color: #7D9DC9;
 	font-size: 90%;
 	padding-left: 6px;

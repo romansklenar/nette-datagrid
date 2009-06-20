@@ -62,6 +62,9 @@ msgstr "Zobrazuji položky %from% až %to% z %count%"
 msgid "Used filters did not match any items."
 msgstr "Použitým filtrům neodpovídají žádné záznamy."
 
+msgid "Empty datasource given."
+msgstr "Žádné záznamy."
+
 #: ----------- customersGrid locale ------------
 #: operations
 msgid "delete"

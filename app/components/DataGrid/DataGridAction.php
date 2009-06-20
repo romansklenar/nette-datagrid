@@ -70,10 +70,10 @@ class DataGridAction extends Component implements IDataGridAction
 	 */
 	public function generateLink(array $args = NULL)
 	{
-		$presenter = $this->lookup('Nette\Application\Presenter', TRUE);
+		$control = $this->dataGrid->lookup('Nette\Application\Control', TRUE);
 		switch ($this->type) {
-			case self::WITHOUT_KEY: $link = $presenter->link($this->destination); break;
-			case self::WITH_KEY: $link = $presenter->link($this->destination, $args); break;
+			case self::WITHOUT_KEY: $link = $control->link($this->destination); break;
+			case self::WITH_KEY: $link = $control->link($this->destination, $args); break;
 			default: throw new InvalidArgumentException("Invalid type of action.");
 		}
 		

@@ -136,7 +136,6 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		
 		$template = $this->dataGrid->getTemplate();
 		$template->setFile($this->file);
-		$template->registerFilter('Nette\Templates\CurlyBracketsFilter::invoke');
 		return $template->__toString(TRUE);
 	}
 
@@ -362,7 +361,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 
 	/**
-	 * Renders datagrid headrer.
+	 * Generates datagrid headrer.
 	 * @return Html
 	 */
 	protected function generateHeaderRow()
@@ -415,7 +414,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 
 	/**
-	 * Renders datagrid filter.
+	 * Generates datagrid filter.
 	 * @return Html
 	 */
 	protected function generateFilterRow()
@@ -460,7 +459,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 
 	/**
-	 * Renders datagrid row content.
+	 * Generates datagrid row content.
 	 * @param  DibiRow data
 	 * @return Html
 	 */
@@ -512,7 +511,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 
 	/**
-	 * Renders datagrid footer.
+	 * Generates datagrid footer.
 	 * @return Html
 	 */
 	protected function generateFooterRow()

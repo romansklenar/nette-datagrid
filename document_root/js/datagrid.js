@@ -61,7 +61,7 @@ $("form.datagrid").livequery("submit", function () {
 
 // obarvování zaškrtnutého řádku
 function datagridCheckboxClicked() {
-	var tr = $(this).parents("tr");
+	var tr = $(this).parent().parent();
 	if ($(this).is(":checked")) tr.addClass("selected");
 	else tr.removeClass("selected");
 }
@@ -73,20 +73,21 @@ $("table.datagrid td.checker input:checkbox").livequery(datagridCheckboxClicked)
 // zaškrtávání celým řádkem
 var previous = null; // index from
 $("table.datagrid tr td:not(.checker)").live("click", function (e) {
-	var row = $(this).parents("tr");
+	var row = $(this).parent("tr");
 	
 	// výběr více řádků při držení klavesy SHIFT nebo CTRL
-	if ((e.shiftKey || e.ctrlKey) && previous) {			
-		var current = $(this).parents("table.datagrid").find("tr").index($(this).parents("tr")); // index to
+	if ((e.shiftKey || e.ctrlKey) && previous) {
+		var current = $(this).parents("table.datagrid").find("tr").index($(this).parent("tr")); // index to
 		if (previous > current) {
 			var tmp = current;
-			current = previous; previous = tmp;
+			current = previous;
+			previous = tmp;
 		}
 		current++;
 		row = $(this).parents("table.datagrid").find("tr").slice(previous, current);
 		
 	} else {
-		previous = $(this).parents("table.datagrid").find("tr").index($(this).parents("tr"));
+		previous = $(this).parents("table.datagrid").find("tr").index($(this).parent("tr"));
 	}
 	
 	// zvýraznění řádku(ů)
@@ -99,12 +100,12 @@ $("table.datagrid tr td:not(.checker)").live("click", function (e) {
 			row.addClass("selected");
 			row.find("td.checker input:checkbox").attr("checked", "checked");
 		}
-	}		
+	}
 });
 
 // invertor
 $("table.datagrid tr.header th.checker").livequery(function () {
-	$(this).append($('<span class="icon icon-invert" title="Invert" />').click(function () {
+	$(this).append($('<span class="icon icon-invert" title="Invert" style="margin: 0pt auto; float: none;" />').click(function () {
 		// NOTE: příliš pomalé v Opeře
 		//$(this).parents("table.datagrid").find("td.checker input:checkbox").click();
 		
