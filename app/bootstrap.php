@@ -37,6 +37,7 @@ if (!is_writable(Environment::getVariable('logDir'))) {
 //Debug::$productionMode = $_SERVER['REMOTE_ADDR'] !== '127.0.0.1';  // admin's computer IP
 $mode = (Environment::isDebugging() && !Environment::getHttpRequest()->isAjax()) ? Debug::DEVELOPMENT : Debug::PRODUCTION;
 Debug::enable($mode, NULL);
+Debug::$strictMode = TRUE;
 
 
 /** 2d) enable RobotLoader - this allows load all classes automatically */

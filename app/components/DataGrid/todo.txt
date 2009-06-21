@@ -7,15 +7,6 @@ TODO
 	vzestupně, podruhé sestupně). Při najetí myší nad název sloupce se
 	navíc zobrazí dvě ikony pro vzestupné a sestupné třídění. Kliknutím na
 	tyto ikony se sloupec přidá ke stávajícímu řazení (pokud tam ještě není).
-- loadState & saveState & Session - pamatovat si stav datagridu (razeni, filtry, strankovani, ...) + pridat prvek na reset + mit moznost tuto feature vypnout
-	 v saveState() se uloží hodnoty persistentních parametrů i do 
-	session a při vytváření komponenty při volání loadState() se zase ověří, 
-	zda-li již tam nejsou a pokud by neměly persistenty přiřazeny žádné hodnoty 
-	vzaly by se odsuď.
-- defaultního řazení: $grid->setOrder($column, DESC/ASC).
-	V případě, že by uživatel řadil výsledky dle sebe, tak by se defaultní řazení 
-	nepoužilo (použilo by se jen v případě, kdy není uplatněno manuální řazení).
-
 
 - optimalizace SelectboxFilter::generateItems()
 	az bude umet DibiDataSource DISTINCT prepsat, prozatimni reseni: prevedeno na fluent a na nem aplikovan DISTINCT 

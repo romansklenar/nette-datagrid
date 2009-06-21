@@ -94,7 +94,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	public $paginatorFormat = '%label% %input% of %count%';
 	
 	/** @var string */
-	public $infoFormat = 'Items %from% - %to% of %count% | Display: %selectbox%';
+	public $infoFormat = 'Items %from% - %to% of %count% | Display: %selectbox% | %reset%';
 	
 	/** @var string  template file*/
 	public $file;
@@ -354,6 +354,9 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$paginator = $this->dataGrid->paginator;
 		$form = $this->dataGrid->getForm(TRUE);
 		
+		$stateSubmit = $form['resetSubmit']->control;
+		$stateSubmit->title($stateSubmit->value);
+		
 		$this->infoFormat = $this->dataGrid->translate($this->infoFormat);
 		$html = str_replace(
 			array(
@@ -361,17 +364,19 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				'%to%',
 				'%count%',
 				'%selectbox%',
+				'%reset%'
 			),
 			array(
 				$paginator->itemCount != 0 ? $paginator->offset + 1 : $paginator->offset,
 				$paginator->offset + $paginator->length,
 				$paginator->itemCount,
 				$form['items']->control . $form['itemsSubmit']->control->title($form['itemsSubmit']->control->value),
+				($this->dataGrid->rememberState ? $stateSubmit : ''),
 			),
 			$this->infoFormat
 		);
 		
-		$container->setHtml($html);
+		$container->setHtml(trim($html, ' | '));
 		return $container->render();
 	}
 
@@ -485,7 +490,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$row = $this->getWrapper('row.content container');
 		
 		if ($this->dataGrid->hasOperations() || $this->dataGrid->hasActions()) {
-			$primary = $this->dataGrid->getKeyName();
+			$primary = $this->dataGrid->keyName;
 			if (!array_key_exists($primary, $data)) {
 				throw new InvalidArgumentException("Invalid name of key for group operations or actions. Column '" . $primary . "' does not exist in data source.");
 			}

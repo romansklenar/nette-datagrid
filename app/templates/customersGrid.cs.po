@@ -29,8 +29,14 @@ msgstr "Vybrané:"
 msgid "Send"
 msgstr "Proveď"
 
+msgid "Change"
+msgstr "Změnit"
+
 msgid "Change page"
 msgstr "Změnit stránku"
+
+msgid "Reset state"
+msgstr "Resetovat stav"
 
 msgid "First"
 msgstr "První"
@@ -47,9 +53,6 @@ msgstr "Poslední"
 msgid "Page"
 msgstr "Stránka"
 
-msgid "Change"
-msgstr "Změnit"
-
 msgid "all"
 msgstr "vše"
 
@@ -62,8 +65,8 @@ msgstr "%label% %input% z %count%"
 msgid "%operations% %paginator% %info%"
 msgstr "%operations% %paginator% %info%"
 
-msgid "Items %from% - %to% of %count% | Display: %selectbox%"
-msgstr "Položky %from% až %to% z %count% | Zobraz: %selectbox%"
+msgid "Items %from% - %to% of %count% | Display: %selectbox% | %reset%"
+msgstr "Položky %from% až %to% z %count% | Zobraz: %selectbox% | %reset%"
 
 msgid "Used filters did not match any items."
 msgstr "Použitým filtrům neodpovídají žádné záznamy."

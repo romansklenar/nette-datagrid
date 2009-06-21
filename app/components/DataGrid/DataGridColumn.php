@@ -146,7 +146,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	 */
 	public function getLink()
 	{
-		return $this->lookup('DataGrid', TRUE)->link('order', $this->getName());
+		return $this->getDataGrid(TRUE)->link('order', $this->getName());
 	}
 
 

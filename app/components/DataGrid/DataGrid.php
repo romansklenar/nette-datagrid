@@ -16,17 +16,17 @@
 /**
  * A data bound list control that displays the items from data source in a table.
  * The DataGrid control allows you to select, sort, and manage these items.
- * 
+ *
  * <code>
  * $grid = new DataGrid;
  * $grid->bindDataTable($model->findAll($model->table)->toDataSource());
- * 
+ *
  * $grid->addColumn('column', 'Column caption')->addFilter();
  * $grid['column']->getCellPrototype()->style('text-align: center');
- * 
+ *
  * $grid->addActionColumn('Actions');
  * $grid->addAction('Edit', 'Item:edit');
- * 
+ *
  * $presenter->addComponent($grid, 'componentName');
  * </code>
  *
@@ -47,21 +47,18 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/** @persistent string */
 	public $filters = '';
-	
+
 	/** @persistent int */
 	public $itemsPerPage = 15;
-	
+
 	/** @var array */
 	public $displayedItems = array('all', 5, 10, 15, 20, 50, 100);
 
-	/** @var DibiDataSource */
-	protected $dataSource;
-
-	/** @var Paginator */
-	protected $paginator;
-
 	/** @var bool  multi column order */
 	public $multiOrder = TRUE;
+
+	/** @var string */
+	protected $defaultOrder = '';
 
 	/** @var array */
 	public $operations = array();
@@ -69,18 +66,30 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/** @var array  of valid callback(s) */
 	protected $onOperationSubmit;
 
+	/** @var bool  can datagrid save his state into session? */
+	public $rememberState = FALSE;
+
+	/** @var int|string  session timeout */
+	public $timeout = '+ 30 days';
+
 	/** @var IDataGridRenderer */
 	protected $renderer;
 
+	/** @var DibiDataSource */
+	protected $dataSource;
+
+	/** @var Paginator */
+	protected $paginator;
+
 	/** @var string */
-	protected $keyName;
-	
-	/** @var array */
-	protected $receivedSignals = array();
-	
+	public $keyName;
+
+	/** @var string */
+	protected $receivedSignal;
+
 	/** @var bool  was method render() called? */
 	protected $wasRendered = FALSE;
-	
+
 	/** @var ITranslator */
 	protected $translator;
 
@@ -91,17 +100,22 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		parent::__construct(); // intentionally without any arguments (because of session loadState)
 		$this->paginator = new Paginator;
 		$this->addComponent(new ComponentContainer, 'columns');
 		$this->addComponent(new ComponentContainer, 'filters');
 		$this->addComponent(new ComponentContainer, 'actions');
+
+		$session = $this->getSession();
+		if (!$session->isStarted()) {
+			$session->start();
+		}
 	}
 
 
 	/**
 	 * Binds data source to data grid.
-	 * @param DibiDataSource
+	 * @param  DibiDataSource
 	 * @throws DibiException
 	 * @return void
 	 */
@@ -122,63 +136,20 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	}
 
 
-	/**
-	 * Getter / property method.
-	 * @return DibiIndexInfo
-	 */
-	public function getKeyName()
+	public function setDefaultOrder(IDataGridColumn $column, $order = 'ASC')
 	{
-		if ($this->keyName != NULL) {
-			return $this->keyName;
+		$orders = array('ACS', 'DESC', 'asc', 'desc');
+		if (!in_array($order, $orders)) {
+			throw new InvalidArgumentException("Order must be in '" . implode(', ', $orders) . "', '$order' given.");
 		}
-		throw new InvalidStateException("Name of key for operations or actions was not set for DataGrid '" . $this->getName() . "'.");
-	}
 
-
-	/**
-	 * Setter / property method.
-	 * Key name must be set if you want to use operations or actions.
-	 * @param  string  column name used to identifies each item/record in data grid (name of primary key of table/query from data source is recomended)
-	 * @return void
-	 */
-	public function setKeyName($key)
-	{
-		$this->keyName = $key;
+		$this->defaultOrder = $column->getName() . '=' . strtolower($order[0]);
 	}
 
 
 
 	/********************* public getters and setters *********************/
 
-
-
-	/**
-	 * Setter / property method.
-	 * Defines number of rows per one page on the grid.
-	 * @param  int|string
-	 * @throws InvalidArgumentException
-	 * @return void
-	 */
-	public function setItemsPerPage($value)
-	{
-		if (is_string($value) || $value == 0) {
-			$this->itemsPerPage = $this->paginator->itemsPerPage = count($this->dataSource);
-		} elseif ($value < 0) {
-			throw new InvalidArgumentException("Parametr must be non-negative number, '$value' given.");
-		} else {
-			$this->itemsPerPage = $this->paginator->itemsPerPage = (int) $value;
-		}
-	}
-
-
-	/**
-	 * Getter / property method.
-	 * @return int
-	 */
-	public function getItemsPerPage()
-	{
-		return $this->paginator->itemsPerPage;
-	}
 
 
 	/**
@@ -198,8 +169,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 		return array_values(array_unique($arr));
 	}
-	
-	
+
+
 	/**
 	 * Setter / property method.
 	 * @return Paginator
@@ -261,7 +232,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public function getColumns()
 	{
 		return $this->getComponent('columns', TRUE)->getComponents(FALSE, 'IDataGridColumn');
-	}	
+	}
 
 
 	/**
@@ -342,6 +313,94 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 
+	/********************* component's state *********************/
+
+
+
+	/**
+	 * Loads params
+	 * @param  array
+	 * @return void
+	 */
+	public function loadState(array $params)
+	{
+		if ($this->rememberState) {
+			$session = $this->getStateSession();
+
+			if (!isset($session->currentState)) {
+				$session->currentState = $session->initState;
+			}
+
+			if (isset($session->currentState)) {
+				$cs = $session->currentState;
+				$is = $session->initState;
+
+				foreach ($cs as $key => $value) {
+					if ($cs[$key] != $is[$key]) {
+
+						// additional input validation
+						switch ($key) {
+							case 'page': $value = ($value > 0 ? $value : 1); break;
+							case 'order': break;
+							case 'filters': break;
+							case 'itemsPerPage': break;
+						}
+						$params[$key] = $value;
+					}
+				}
+			}
+		}
+		parent::loadState($params);
+	}
+
+
+	/**
+	 * Save params
+	 * @param  array
+	 * @return void
+	 */
+	public function saveState(array & $params)
+	{
+		parent::saveState($params);
+
+		if ($this->rememberState) {
+			$session = $this->getStateSession();
+
+			// backup component's state
+			if (!isset($session->initState)) {
+				$session->initState = $params;
+			}
+
+			// save component's state into session
+			$session->currentState = $params;
+			$session->setExpiration($this->timeout);
+		}
+	}
+
+
+	/**
+	 * Restores component's state.
+	 * @param  string
+	 * @return void
+	 */
+	public function restoreState()
+	{
+		$session = $this->getStateSession();
+
+		// restore components's init state
+		if (isset($session->initState)) {
+			$is = $session->initState;
+			$this->page = $is['page'];
+			$this->order = $is['order'];
+			$this->filters = $is['filters'];
+			$this->itemsPerPage = $is['itemsPerPage'];
+		}
+
+		$session->remove();
+	}
+
+
+
 	/********************* signal handlers ********************/
 
 
@@ -351,9 +410,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  int
 	 * @return void
 	 */
-	public function handlePage($page)
+	public function handlePage($goto)
 	{
-		$this->paginator->page = $this->page = ($page > 0 ? $page : 1);
+		$this->page = ($goto > 0 ? $goto : 1);
 		$this->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->redirect('this');
 	}
@@ -366,25 +425,30 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function handleOrder($by)
 	{
+		// default ordering
+		if (empty($this->order) && !empty($this->defaultOrder)) {
+			if (preg_match("~$by~", "~$this->defaultOrder~")) $this->order = $this->defaultOrder;
+		}
+
 		parse_str($this->order, $list);
-		
+
 		if (!isset($list[$by])) {
 			if (!$this->multiOrder) {
 				$list = array();
 			}
 			$list[$by] = 'a';
-		
+
 		} elseif ($list[$by] === 'd') {
 			if ($this->multiOrder) {
 				unset($list[$by]);
 			} else {
 				$list[$by] = 'a';
 			}
-		
+
 		} else {
 			$list[$by] = 'd';
 		}
-		
+
 		$this->order = http_build_query($list, '', '&');
 		$this->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->redirect('this');
@@ -415,8 +479,25 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function handleItems($value)
 	{
-		$this->setItemsPerPage((int) $value);
-		
+		if ($value < 0) {
+			throw new InvalidArgumentException("Parametr must be non-negative number, '$value' given.");
+		}
+		$this->itemsPerPage = $value;
+
+		$this->invalidateControl();
+		if (!$this->presenter->isAjax()) $this->redirect('this');
+	}
+
+
+	/**
+	 * Change component's state.
+	 * @param  string
+	 * @return void
+	 */
+	public function handleReset()
+	{
+		$this->restoreState();
+
 		$this->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->redirect('this');
 	}
@@ -432,70 +513,37 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  AppForm
 	 * @return void
 	 */
-	public function onSubmitHandler(AppForm $form)
+	public function formSubmitHandler(AppForm $form)
 	{
-		$this->receivedSignals[] = 'submit';
-		
+		$this->receivedSignal = 'submit';
+
 		// was form submitted?
 		if ($form->isSubmitted()) {
 			$values = $form->getValues();
-			
+
 			if ($form['filterSubmit']->isSubmittedBy()) {
-				$this->receivedSignals[] = 'filter';
 				$this->handleFilter($values['filters']);
-				
+
 			} elseif ($form['pageSubmit']->isSubmittedBy()) {
-				$this->receivedSignals[] = 'page';
 				$this->handlePage($values['page']);
-				
+
 			} elseif ($form['itemsSubmit']->isSubmittedBy()) {
-				$this->receivedSignals[] = 'items';
 				$this->handleItems($values['items']);
-				
+
+			} elseif ($form['resetSubmit']->isSubmittedBy()) {
+				$this->handleReset();
+
 			} elseif ($form['operationSubmit']->isSubmittedBy()) {
 				trigger_error('No user defined handler for operations; assign valid callback to operations handler into DataGrid::$operationsHandler variable.', E_USER_WARNING);
 				return;
-				
+
 			} else {
 				// unknown submit button
 				throw new InvalidStateException("Unknown submit button.");
 			}
-		
+
 		}
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
-	}
-
-
-	/**
-	 * Filter handler. Left functionality on method onSubmitHandler.
-	 * @param  Button
-	 * @return void
-	 */
-	public function onClickFilterHandler(Button $button)
-	{
-		$this->onSubmitHandler($button->getParent());
-	}
-	
-	
-	/**
-	 * Change page handler. Left functionality on method onSubmitHandler.
-	 * @param  Button
-	 * @return void
-	 */
-	public function onClickPageHandler(Button $button)
-	{
-		$this->onSubmitHandler($button->getParent());
-	}
-	
-	
-	/**
-	 * Change page handler. Left functionality on method onSubmitHandler.
-	 * @param  Button
-	 * @return void
-	 */
-	public function onClickItemsHandler(Button $button)
-	{
-		$this->onSubmitHandler($button->getParent());
 	}
 
 
@@ -512,7 +560,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		$this->paginator->page = $this->page;
 		$this->paginator->itemCount = count($this->dataSource);
-		
+
 		if ($this->wasRendered && $this->paginator->itemCount < 1 && !empty($this->filters)) {
 			// NOTE: don't use flash messages (because you can't - header already sent)
 			$this->getTemplate()->flashes[] = (object) array(
@@ -547,7 +595,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	protected function applyFiltering()
 	{
 		if (!$this->hasFilters()) return;
-		
+
 		parse_str($this->filters, $list);
 		foreach ($list as $column => $value) {
 			if ($value !== '') {
@@ -563,10 +611,16 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	protected function applyItems()
 	{
-		$this->setItemsPerPage($this->itemsPerPage);
+		$value = (int) $this->itemsPerPage;
+
+		if ($value == 0) {
+			$this->itemsPerPage = $this->paginator->itemsPerPage = count($this->dataSource);
+		} else {
+			$this->itemsPerPage = $this->paginator->itemsPerPage = $value;
+		}
 	}
 
-	
+
 
 	/********************* renderers *********************/
 
@@ -604,7 +658,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		if (!$this->wasRendered) {
 			$this->wasRendered = TRUE;
-			
+
 			if (!$this->hasColumns() || (count($this->getColumns()->getInnerIterator()) == 1 && $this->hasActions())) {
 				// auto-generate columns
 				if ($this->hasActions()) {
@@ -612,27 +666,38 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 					$this->getComponent('columns', TRUE)->removeComponent($actionColumn);
 					$actionColumn->setParent(NULL);
 				}
-				
+
 				$ds = clone $this->dataSource;
 				$row = $ds->select('*')->fetch();
 				$keys = array_keys((array)$row);
 				foreach ($keys as $key) $this->addColumn($key);
-				
+
 				if ($this->hasActions()) {
 					$this['actions'] = $actionColumn;
 				}
 			}
-			
+
+			if ($this->hasActions() || $this->hasOperations()) {
+				if ($this->keyName == NULL) {
+					throw new InvalidStateException("Name of key for operations or actions was not set for DataGrid '" . $this->getName() . "'.");
+				}
+			}
+
 			if (!count($this->dataSource)) {
 				$this->flashMessage($this->translate("Empty datasource given."), 'info');
 			}
-			
+
+			// default ordering
+			if (empty($this->order) && !empty($this->defaultOrder)) {
+				$this->order = $this->defaultOrder;
+			}
+
 			// filter items (must be in this order)
 			$this->applyItems();
 			$this->applyFiltering();
 			$this->applySorting();
 			$this->applyPaging();
-			
+
 			if ($this->isSignalReceiver('submit')) {
 				$this->regenerateFormControls($this->getForm(TRUE));
 			}
@@ -641,11 +706,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		$args = func_get_args();
 		array_unshift($args, $this);
 		$s = call_user_func_array(array($this->getRenderer(), 'render'), $args);
-		
+
 		echo mb_convert_encoding($s, 'HTML-ENTITIES', 'UTF-8');
 	}
-	
-	
+
+
 	/**
 	 * Template factory.
 	 * @return ITemplate
@@ -678,31 +743,30 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				//		because form is created directly by Presenter in signal handling phase
 				//		and this principle is used to detect submit signal
 				if (!$this->wasRendered) {
-					$this->receivedSignals[] = 'submit';
+					$this->receivedSignal = 'submit';
 				}
 
 				$form = new AppForm($this, $name);
 				$form->setTranslator($this->getTranslator());
 				FormControl::$idMask = 'frm-datagrid-' . String::capitalize($this->getName()) . '-%s-%s';
-				
-				$form->addSubmit('filterSubmit', 'Apply filters')
-					->onClick[] = array($this, 'onClickFilterHandler');
-				
+				$form->onSubmit[] = array($this, 'formSubmitHandler');
+
+				$form->addSubmit('resetSubmit', 'Reset state');
+				$form->addSubmit('filterSubmit', 'Apply filters');
+
 				$form->addSelect('operations', 'Selected:', $this->operations);
 				$form->addSubmit('operationSubmit', 'Send')->onClick = $this->onOperationSubmit;
-				
+
 				// page input
 				$form->addText('page', 'Page', 1);
-				$form['page']->setValue($this->paginator->page);
-				$form->addSubmit('pageSubmit', 'Change page')
-					->onClick[] = array($this, 'onClickPageHandler');
-				
+				$form['page']->setValue($this->page);
+				$form->addSubmit('pageSubmit', 'Change page');
+
 				// items per page selector
 				$form->addSelect('items', 'Items per page', array_combine($this->displayedItems, $this->displayedItems));
-				$form['items']->setValue($this->paginator->itemsPerPage);
-				$form->addSubmit('itemsSubmit', 'Change')
-					->onClick[] = array($this, 'onClickItemsHandler');
-				
+				$form['items']->setValue($this->itemsPerPage);
+				$form->addSubmit('itemsSubmit', 'Change');
+
 				// generate filters FormControls
 				if ($this->hasFilters()) {
 					$sub = $form->addContainer('filters');
@@ -712,33 +776,33 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 						$sub->getComponent($filter->getName(), TRUE)->setValue($filter->getValue());
 					}
 				}
-				
+
 				// checker
 				if ($this->hasOperations()) {
-					$primary = $this->getKeyName();
 					$sub = $form->addContainer('checker');
-					
+
 					if ($this->isSignalReceiver('submit')) {
 						$ds = clone $this->dataSource;
+						$this->applyItems();
 						$this->applyFiltering();
 						$this->applySorting();
 						$this->applyPaging();
 					}
-					
+
 					foreach ($this->getRows() as $row) {
-						$sub->addCheckbox($row[$primary], $row[$primary]);
+						$sub->addCheckbox($row[$this->keyName], $row[$this->keyName]);
 					}
-					
+
 					if ($this->isSignalReceiver('submit')) $this->dataSource = $ds;
 				}
-				
+
 				$renderer = $form->getRenderer();
 				$renderer->wrappers['controls']['container'] = NULL;
 				$renderer->wrappers['label']['container'] = NULL;
 				$renderer->wrappers['control']['container'] = NULL;
 				$form->setRenderer($renderer);
 				return;
-				
+
 			default:
 				parent::createComponent($name);
 				return;
@@ -766,26 +830,25 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		// regenerate checker's checkbox controls
 		if ($this->hasOperations()) {
-			$primary = $this->getKeyName();
 			$form->removeComponent($form['checker']);
 			$sub = $form->addContainer('checker');
 			foreach ($this->getRows() as $row) {
-				$sub->addCheckbox($row[$primary], $row[$primary]);
+				$sub->addCheckbox($row[$this->keyName], $row[$this->keyName]);
 			}
 		}
-		
+
 		// for selectbox filter controls update values if was filtered over column
-		if ($this->hasFilters() && $this->isSignalReceiver('filter')) {
+		if ($this->hasFilters()) {
 			foreach ($this->getFilters() as $filter) {
 				if ($filter instanceof SelectboxFilter) {
 					$filter->generateItems();
 				}
 			}
 		}
-		
+
 		// page input & items selectbox
-		$form['page']->setValue($this->paginator->page);
-		$form['items']->setValue($this->paginator->itemsPerPage);
+		$form['page']->setValue($this->paginator->page); // intentionally page from paginator
+		$form['items']->setValue($this->itemsPerPage);
 	}
 
 
@@ -799,9 +862,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public function allowOperations(array $operations, $callback = NULL, $key = NULL)
 	{
 		$this->operations = $operations;
-		
+
 		if ($key != NULL && $this->keyName == NULL) {
-			$this->setKeyName($key);
+			$this->keyName = $key;
 		}
 		if ($callback != NULL && $this->onOperationSubmit == NULL) {
 			 $this->setOnOperationSubmit($callback);
@@ -922,9 +985,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		$this->getComponent('actions', TRUE)->addComponent($action, (string)$count);
 		return $action;
 	}
-	
-	
-	
+
+
+
 	/********************* translator ********************/
 
 
@@ -1014,35 +1077,52 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			$this->getComponent('columns', TRUE)->removeComponent($component);
 		}
 	}
-	
-	
+
+
 	/********************* interface \ISignalReceiver *********************/
 
 
+
 	/**
-	 * Calls signal handler method.
-	 * @param  string
-	 * @return void
-	 */
-	public function signalReceived($signal)
-	{
-		$this->receivedSignals[] = $signal;
-		parent::signalReceived($signal);
-	}
-	
-	
-	/**
-	 * Checks if control received a signal.
+	 * Checks if component is signal receiver.
 	 * @param  string  signal name
 	 * @return bool
 	 */
-	public function isSignalReceiver($signal = NULL)
+	public function isSignalReceiver($signal = TRUE)
 	{
-		if ($signal === NULL) { 
-			return count($this->receivedSignals) > 0;
+		if ($signal == 'submit') {
+			return $this->receivedSignal === 'submit';
 		} else {
-			return in_array($signal, $this->receivedSignals);
+			return $this->getPresenter()->isSignalReceiver($this, $signal);
 		}
+
+		// TODO: zatim musi byt reseno takto protoze nize uvedene reseni neni funkcni
+		// TODO: dokud nebude vyreseno toto tema http://forum.nettephp.com/cs/1813-metoda-issignalreceiver-v-komponentach
+		// TODO: pak odstranit i promennou receivedSignal
+		//return $this->getPresenter()->isSignalReceiver($signal == 'submit' ? $this->getForm() : $this, $signal);
+	}
+
+
+
+	/********************* backend *********************/
+
+
+
+	/**
+	 * @return SessionNamespace
+	 */
+	protected function getStateSession()
+	{
+		return $this->getSession()->getNamespace('Nette.Extras.DataGrid/' . $this->getName() . '/states');
+	}
+
+
+	/**
+	 * @return Session
+	 */
+	protected function getSession()
+	{
+		return Environment::getSession();
 	}
 
 
