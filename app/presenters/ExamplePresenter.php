@@ -19,11 +19,11 @@ class ExamplePresenter extends BasePresenter
 		$this->template->baseGrid = $this->getComponent('baseGrid');
 		$this->template->officesGrid = $this->getComponent('officesGrid');
 		$this->template->customersGrid = $this->getComponent('customersGrid');
-		
+
 		Environment::setVariable('creating', Debug::timer('grids-creating') * 1000);
 	}
-	
-	
+
+
 	/**
 	 * Component factory
 	 * @see Nette/ComponentContainer#createComponent()
@@ -31,11 +31,11 @@ class ExamplePresenter extends BasePresenter
 	protected function createComponent($name)
 	{
 		switch ($name) {
-		case 'baseGrid':			
+		case 'baseGrid':
 			$model = new DatagridModel('customers');
 			$grid = new DataGrid;
 			$grid->bindDataTable($model->getCustomerAndOrderInfo());
-			
+
 			// if no columns are defined, takes all cols from given data source
 			$grid->addColumn('customerName', 'Name');
 			$grid->addColumn('contactLastName', 'Surname');
@@ -47,17 +47,17 @@ class ExamplePresenter extends BasePresenter
 			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y');
 			$grid->addColumn('status', 'Status');
 			$grid->addNumericColumn('creditLimit', 'Size', 0);
-			
+
 			$this->addComponent($grid, $name);
 			return;
-			
-			
+
+
 		case 'officesGrid':
 			$model = new DatagridModel('offices');
 			$grid = new DataGrid;
 			$grid->bindDataTable($model->findAll($model->table)->orderBy('position')->toDataSource()); // binds DibiDataSource
 			$grid->keyName = 'officeCode'; // for actions or operations
-			
+
 			$pos = array('up' => 'Move up', 'down' => 'Move down');
 			$grid->addPositionColumn('position', 'Position', 'positionMove!', $pos)->addFilter();
 			$grid->addColumn('phone', 'Phone')->addFilter();
@@ -65,32 +65,35 @@ class ExamplePresenter extends BasePresenter
 			$grid->addColumn('city', 'City')->addFilter();
 			$grid->addColumn('country', 'Country')->addSelectboxFilter()->translateItems(FALSE);
 			$grid->addColumn('postalCode', 'Postal code')->addFilter();
-			
+
+			$grid->setDefaultOrder($grid['position'], 'asc');
+
 			$grid->addActionColumn('Actions');
 			$icon = Html::el('span');
 			$grid->addAction('New entry', 'Office:new', clone $icon->class('icon icon-add'), FALSE, DataGridAction::WITHOUT_KEY);
 			$grid->addAction('Edit', 'Office:edit', clone $icon->class('icon icon-edit'));
 			$grid->addAction('Delete', 'Office:delete', clone $icon->class('icon icon-del'));
-			
+
 			$this->addComponent($grid, $name);
 			return;
-			
-			
+
+
 		case 'customersGrid':
 			$model = new DatagridModel('customers');
 			$grid = new DataGrid;
-			
+
 			$translator = new Translator(Environment::expand('%templatesDir%/customersGrid.cs.mo'));
 			$grid->setTranslator($translator);
-			
+
 			$renderer = new DataGridRenderer;
 			$renderer->paginatorFormat = '%input%'; // customize format of paginator
 			$grid->setRenderer($renderer);
-			
+
 			$grid->itemsPerPage = 10; // display 10 rows per page
-			$grid->bindDataTable($model->getCustomerAndOrderInfo());			
+			//$grid->rememberState = TRUE;
+			$grid->bindDataTable($model->getCustomerAndOrderInfo());
 			$grid->multiOrder = FALSE; // order by one column only
-			
+
 			$operations = array('delete' => 'delete', 'deal' => 'deal', 'print' => 'print', 'forward' => 'forward'); // define operations
 			// in czech for example: $operations = array('delete' => 'smazat', 'deal' => 'vyřídit', 'print' => 'tisk', 'forward' => 'předat');
 			// or you can left translate values by translator adapter
@@ -99,7 +102,7 @@ class ExamplePresenter extends BasePresenter
 
 
 			/**** add some columns ****/
-			
+
 			$grid->addColumn('customerName', 'Name');
 			$grid->addColumn('contactLastName', 'Surname');
 			$grid->addColumn('addressLine1', 'Address')->getHeaderPrototype()->style('width: 180px');
@@ -111,10 +114,12 @@ class ExamplePresenter extends BasePresenter
 			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y'); // czech format: '%d.%m.%Y'
 			$grid->addColumn('status', 'Status');
 			$grid->addNumericColumn('creditLimit', 'Size', 0);
-			
-			
+
+			$grid->setDefaultOrder($grid['country'], 'asc');
+
+
 			/**** add some filters ****/
-			
+
 			$grid['customerName']->addFilter();
 			$grid['contactLastName']->addFilter();
 			$grid['addressLine1']->addFilter();
@@ -125,44 +130,44 @@ class ExamplePresenter extends BasePresenter
 			$grid['orderDate']->addDateFilter();
 			$grid['status']->addSelectboxFilter();
 			$grid['creditLimit']->addFilter();
-			
-			
+
+
 			/**** column content affecting ****/
-			
+
 			// by css styling
 			$grid['orderDate']->getCellPrototype()->style('text-align: center');
-			
+
 			// by replacement of given pattern
 			$el = Html::el('span')->style('margin: 0 auto');
 			$grid['status']->replacement['Shipped'] = clone $el->class("icon icon-shipped")->title("Shipped");
 			$grid['status']->replacement['Resolved'] = clone $el->class("icon icon-resolved")->title("Resolved");
 			$grid['status']->replacement['Cancelled'] = clone $el->class("icon icon-cancelled")->title("Cancelled");
 			$grid['status']->replacement[''] = clone $el->class("icon icon-no-orders")->title("Without orders");
-			
+
 			// by callback(s)
 			$grid['creditLimit']->formatCallback[] = 'TemplateHelpers::bytes';
-			
-			
+
+
 			/**** add some actions ****/
-			
+
 			$grid->addActionColumn('Actions')->getHeaderPrototype()->style('width: 98px');
 			$icon = Html::el('span');
 			$grid->addAction('Copy', 'Customer:copy', clone $icon->class('icon icon-copy'));
 			$grid->addAction('Detail', 'Customer:detail', clone $icon->class('icon icon-detail'));
 			$grid->addAction('Edit', 'Customer:edit', clone $icon->class('icon icon-edit'));
-			$grid->addAction('Delete', 'Customer:delete', clone $icon->class('icon icon-del'));			
-			
+			$grid->addAction('Delete', 'Customer:delete', clone $icon->class('icon icon-del'));
+
 			$this->addComponent($grid, $name);
 			return;
-			
-			
+
+
 		default:
 			parent::createComponent($name);
 			return;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Custom group operations handler.
 	 * @param  SubmitButton
@@ -173,22 +178,22 @@ class ExamplePresenter extends BasePresenter
 		// how to findout which checkboxes in checker was checked?  $values['checker']['ID'] => bool(TRUE)
 		$form = $button->getParent();
 		$grid = $this->getComponent('customersGrid');
-				
+
 		// was submitted?
 		if ($form->isSubmitted() && $form->isValid()) {
 			$values = $form->getValues();
-			
+
 			if ($button->getName() === 'operationSubmit') {
-				$operation = $values['operations'];				
+				$operation = $values['operations'];
 			} else {
 				throw new InvalidArgumentException("Unknown submit button '" . $button->getName() . "'.");
 			}
-			
+
 			$rows = array();
 			foreach ($values['checker'] as $k => $v) {
-				if ($v) $rows[] = $k; 
+				if ($v) $rows[] = $k;
 			}
-			
+
 			if (count($rows) > 0) {
 				$msg = $grid->translate('Operation %2$s over row %3$s succesfully done.', count($rows), $grid->translate($operation), implode(', ', $rows));
 				$grid->flashMessage($msg, 'success');
@@ -199,12 +204,12 @@ class ExamplePresenter extends BasePresenter
 				$grid->flashMessage($msg, 'warning');
 			}
 		}
-		
+
 		$grid->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
-	
-	
+
+
 	/**
 	 * Custom signal positionMove! handler (given as parameter for PositionColumn).
 	 * @param  string  which item of datagrid
@@ -216,7 +221,7 @@ class ExamplePresenter extends BasePresenter
 		// TODO: write your own more sophisticated handler ;) $model->officePositionMove($key, $dir)
 		$model = new DatagridModel('offices');
 		$model->officePositionMove($key, $dir);
-		
+
 		$this->getComponent('officesGrid')->flashMessage('Succesfully moved.', 'info');
 		$this->getComponent('officesGrid')->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');

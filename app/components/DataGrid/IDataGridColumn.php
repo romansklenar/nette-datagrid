@@ -16,37 +16,37 @@ interface IDataGridColumn
 	 * @return bool
 	 */
 	function isOrderable();
-	
-	
+
+
 	/**
 	 * Gets header link (order signal)
 	 * @return string
 	 */
 	function getLink();
-	
-	
+
+
 	/**
 	 * Has column filter box?
 	 * @return bool
 	 */
 	function hasFilter();
-	
-	
+
+
 	/**
 	 * Returns column's filter.
 	 * @return IDataGridColumnFilter|NULL
 	 */
 	function getFilter();
-	
-	
+
+
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
 	 * @return string
 	 */
 	function formatContent($value);
-	
-	
+
+
 	/**
 	 * Filters data source.
 	 * @param  mixed

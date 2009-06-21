@@ -18,17 +18,17 @@ class SelectboxFilter extends DataGridColumnFilter
 {
 	/** @var array  asociative array of items in selectbox */
 	protected $generatedItems;
-	
+
 	/** @var array  asociative array of items in selectbox */
 	protected $items;
-	
+
 	/** @var bool */
 	protected $translateItems;
-	
+
 	/** @var bool */
 	protected $skipFirst;
-	
-	
+
+
 	/**
 	 * Selectbox filter constructor.
 	 * @param  array   items from which to choose
@@ -43,8 +43,8 @@ class SelectboxFilter extends DataGridColumnFilter
 		$this->translateItems = $translateItems;
 		parent::__construct();
 	}
-	
-	
+
+
 	/**
 	 * Generates selectbox items.
 	 * @return array
@@ -53,9 +53,9 @@ class SelectboxFilter extends DataGridColumnFilter
 	{
 		// NOTE: don't generate if was items given in constructor
 		if (is_array($this->items)) return;
-		
+
 		$dataGrid = $this->lookup('DataGrid', TRUE);
-		
+
 		$columnName = $this->getName();
 		$dataSource = clone $dataGrid->dataSource;
 		$dataSource->applyLimit(NULL);
@@ -63,21 +63,21 @@ class SelectboxFilter extends DataGridColumnFilter
 		$fluent->clause('select', TRUE);
 		$fluent->select();
 		$fluent->distinct($columnName);
-		
+
 		$cond = array();
 		$cond[] = array("[$columnName] NOT LIKE %s", '');
-		
+
 		$fluent->where('%and', $cond)->orderBy($columnName);
 		$items = $fluent->fetchPairs($columnName, $columnName);
-		
+
 		$this->generatedItems = array_merge(array('?' => '?'), $items);
 		$this->skipFirst = TRUE;
-		
+
 		// if was data grid already filtered by this filter don't update with filtred items (keep full list)
 		if (empty($this->element->value)) {
 			$this->element->setItems($this->generatedItems);
 		}
-		
+
 		return $this->items;
 	}
 
@@ -90,26 +90,26 @@ class SelectboxFilter extends DataGridColumnFilter
 	{
 		if ($this->element instanceof FormControl) return $this->element;
 		$this->element = new SelectBox($this->getName(), $this->items);
-		
+
 		// prepare items
 		if ($this->items === NULL) {
 			$this->generateItems();
 		}
-		
+
 		// skip first item?
 		if ($this->skipFirst) {
 			$this->element->skipFirst();
 		}
-		
+
 		// translate items?
 		if (!$this->translateItems) {
 			$this->element->setTranslator(NULL);
 		}
-		
+
 		return $this->element;
 	}
-	
-	
+
+
 	/**
 	 * Translate all items in selectbox?
 	 * @param  bool

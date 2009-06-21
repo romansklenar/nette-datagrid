@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . '/TextColumn.php';
  *
  * @author     Roman Sklenář
  * @copyright  Copyright (c) 2009 Roman Sklenář (http://romansklenar.cz)
- * @license    New BSD License 
+ * @license    New BSD License
  * @example    http://nettephp.com/extras/datagrid
  * @package    Nette\Extras\DataGrid
  * @version    $Id$
@@ -18,8 +18,8 @@ class DateColumn extends TextColumn
 {
 	/** @var string */
 	public $format;
-	
-	
+
+
 	/**
 	 * Date column constructor.
 	 * @param  string  column's textual caption
@@ -32,8 +32,8 @@ class DateColumn extends TextColumn
 		$this->format = $format;
 		$this->getHeaderPrototype()->style('width: 80px');
 	}
-	
-	
+
+
 	/**
 	 * Filters data source.
 	 * @param  mixed
@@ -43,12 +43,12 @@ class DateColumn extends TextColumn
 	{
 		if ($value == NULL || empty($value)) return 'N/A';
 		$value = parent::formatContent($value);
-		
+
 		$value = is_numeric($value) ? (int) $value : ($value instanceof DateTime ? $value->format('U') : strtotime($value));
 		return strftime($this->format, $value);
 	}
-	
-		
+
+
 	/**
 	 * Applies filtering on dataset.
 	 * @param  mixed
@@ -57,7 +57,7 @@ class DateColumn extends TextColumn
 	public function applyFilter($value)
 	{
 		if (!$this->hasFilter()) return;
-		
+
 		$datagrid = $this->getDataGrid(TRUE);
 		$column = $this->getName();
 		$cond = array();

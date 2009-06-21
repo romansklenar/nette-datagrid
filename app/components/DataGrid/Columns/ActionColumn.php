@@ -26,8 +26,8 @@ class ActionColumn extends DataGridColumn
 		parent::__construct($caption);
 		$this->orderable = FALSE;
 	}
-	
-	
+
+
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
@@ -38,8 +38,8 @@ class ActionColumn extends DataGridColumn
 	{
 		throw new InvalidStateException("ActionColumn cannot be formated.");
 	}
-	
-	
+
+
 	/**
 	 * Filters data source.
 	 * @param  mixed

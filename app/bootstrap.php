@@ -48,7 +48,9 @@ $loader->register();
 
 
 /** 2e) load extension methods */
-require_once APP_DIR . '/extensions.php';
+if (is_file(APP_DIR . '/extensions.php')) {
+	include_once APP_DIR . '/extensions.php';
+}
 
 
 /** 2f) enable Profiler and RoutingDebugger */

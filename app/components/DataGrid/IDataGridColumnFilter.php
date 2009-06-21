@@ -16,8 +16,8 @@ interface IDataGridColumnFilter
 	 * @return FormControl
 	 */
 	function getFormControl();
-	
-	
+
+
 	/**
 	 * Gets filter's value, if was filtered.
 	 * @return string

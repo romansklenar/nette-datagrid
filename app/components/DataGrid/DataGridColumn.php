@@ -35,7 +35,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	public $formatCallback = array();
 
 	/** @var bool */
-	public $orderable = TRUE;	
+	public $orderable = TRUE;
 
 	/** @var string */
 	static public $ajaxClass = 'datagrid-ajax';
@@ -67,7 +67,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	{
 		if ($dataGrid instanceof DataGrid) {
 			$this->setParent($dataGrid->getComponent('columns', TRUE));
-			
+
 			if ($this->caption === NULL) {
 				$this->caption = $this->getName();
 			}
@@ -109,8 +109,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	{
 		return $this->cell;
 	}
-	
-	
+
+
 	/**
 	 * Setter / property method.
 	 * @return string

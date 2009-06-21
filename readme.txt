@@ -1,5 +1,5 @@
-DataGrid
---------
+DataGrid example application
+----------------------------
 
 Instalation:
 	- [optional] run script 'app/models/birt.mysql.sql' on your MySQL database.

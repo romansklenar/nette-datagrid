@@ -18,20 +18,20 @@ class PositionColumn extends NumericColumn
 {
 	/** @var array */
 	public $moves = array();
-	
+
 	/** @var string  signal handler of move action */
 	public $destination;
-	
+
 	/** @var bool */
 	public $useAjax;
-	
+
 	/** @var int */
 	protected $min;
-	
+
 	/** @var int */
 	protected $max;
-	
-	
+
+
 	/**
 	 * Checkbox column constructor.
 	 * @param  string  column's textual caption
@@ -43,27 +43,27 @@ class PositionColumn extends NumericColumn
 	public function __construct($caption = NULL, $destination = NULL, array $moves = NULL, $useAjax = TRUE)
 	{
 		parent::__construct($caption, 0);
-		
+
 		$this->useAjax = $useAjax;
-		
+
 		if ($moves === NULL) {
 			$this->moves['up'] = 'Move up';
 			$this->moves['down'] = 'Move down';
 		} else {
 			$this->moves = $moves;
 		}
-		
+
 		// try set handler if is not set
 		if ($destination === NULL) {
 			$this->destination = $this->getName . 'Move!';
 		} else {
 			$this->destination = $destination;
 		}
-		
+
 		$this->monitor('DataGrid');
 	}
-	
-	
+
+
 	/**
 	 * This method will be called when the component (or component's parent)
 	 * becomes attached to a monitored object. Do not call this method yourself.
@@ -78,11 +78,11 @@ class PositionColumn extends NumericColumn
 			$this->min = (int) $dataSource->select($this->getName())->orderBy($this->getName(), 'ASC')->fetchSingle();
 			$this->max = (int) $dataSource->select($this->getName())->orderBy($this->getName(), 'DESC')->fetchSingle();
 		}
-		
+
 		parent::attached($dataGrid);
 	}
-	
-	
+
+
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
@@ -93,15 +93,15 @@ class PositionColumn extends NumericColumn
 		$presenter = $this->lookup('Nette\Aplication\Presenter', TRUE);
 		$uplink = $presenter->link($this->destination, array('key' => $value, 'dir' => 'up'));
 		$downlink = $presenter->link($this->destination, array('key' => $value, 'dir' => 'down'));
-		
+
 		$up = Html::el('a')->title($this->moves['up'])->href($uplink)->add(Html::el('span')->class('up'));
 		$down = Html::el('a')->title($this->moves['down'])->href($downlink)->add(Html::el('span')->class('down'));
-		
+
 		if ($this->useAjax) {
 			$up->class(self::$ajaxClass);
 			$down->class(self::$ajaxClass);
 		}
-		
+
 		// disable top up & top bottom links
 		if ($value == $this->min) {
 			$up->href(NULL);
@@ -111,7 +111,7 @@ class PositionColumn extends NumericColumn
 			$down->href(NULL);
 			$down->class('inactive');
 		}
-		
+
 		$positioner = Html::el('span')->class('positioner')->add($up)->add($down);
 		return $positioner . $value;
 	}

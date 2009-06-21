@@ -6,7 +6,7 @@
  * @author     Roman Sklenář
  * @package    DataGrid\Example
  */
-class Services extends Object
+class Services
 {
 	/**
 	 * Static class - cannot be instantiated.
@@ -15,7 +15,7 @@ class Services extends Object
 	{
 		throw new LogicException("Cannot instantiate static class " . get_class($this));
 	}
-	
+
 	/**
 	 * Services initializator
 	 * @return void

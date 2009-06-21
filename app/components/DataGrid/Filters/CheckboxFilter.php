@@ -24,7 +24,7 @@ class CheckboxFilter extends DataGridColumnFilter
 	{
 		if ($this->element instanceof FormControl) return $this->element;
 		$element = new Checkbox($this->getName());
-		
+
 		return $this->element = $element;
 	}
 }

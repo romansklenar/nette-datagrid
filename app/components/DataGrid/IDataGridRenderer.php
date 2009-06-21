@@ -17,5 +17,5 @@ interface IDataGridRenderer
 	 * @return string
 	 */
 	function render(DataGrid $dataGrid);
-	
+
 }

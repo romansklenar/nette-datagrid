@@ -23,7 +23,7 @@ class TextFilter extends DataGridColumnFilter
 	public function getFormControl()
 	{
 		if ($this->element instanceof FormControl) return $this->element;
-		
+
 		$this->element = new TextInput($this->getName(), 5);
 		return $this->element;
 	}

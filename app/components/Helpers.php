@@ -2,11 +2,11 @@
 
 /**
  * Common helpers.
- * 
+ *
  * @author     David Grudl
  * @package    Nette\Extras
  */
-class Helpers extends Object
+class Helpers
 {
 	/**
 	 * Static class - cannot be instantiated.

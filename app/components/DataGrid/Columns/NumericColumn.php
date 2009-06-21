@@ -18,8 +18,8 @@ class NumericColumn extends DataGridColumn
 {
 	/** @var int */
 	public $precision;
-	
-	
+
+
 	/**
 	 * Checkbox column constructor.
 	 * @param  string  column's textual caption
@@ -31,8 +31,8 @@ class NumericColumn extends DataGridColumn
 		parent::__construct($caption);
 		$this->precision = $precision;
 	}
-	
-	
+
+
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
@@ -46,7 +46,7 @@ class NumericColumn extends DataGridColumn
 			}
 		}
 		$value = round($value, $this->precision);
-		
+
 		foreach ($this->formatCallback as $callback) {
 			if (is_callable($callback)) {
 				$value = call_user_func($callback, $value);
@@ -54,7 +54,7 @@ class NumericColumn extends DataGridColumn
 		}
 		return $value;
 	}
-	
+
 	/**
 	 * Filters data source.
 	 * @param  mixed
@@ -63,11 +63,11 @@ class NumericColumn extends DataGridColumn
 	public function applyFilter($value)
 	{
 		if (!$this->hasFilter()) return;
-		
+
 		$column = $this->getName();
 		$cond = array();
 		$operator = '=';
-		
+
 		$v = str_replace(',', '.', $value);
 		if (preg_match('/^(?<operator>\>|\>\=|\<|\<\=|\=|\<\>)?(?<value>[\.|\d]+)$/', $v, $matches)) {
 			if (isset($matches['operator']) && !empty($matches['operator'])) {
@@ -76,7 +76,7 @@ class NumericColumn extends DataGridColumn
 			$value = $matches['value'];
 		}
 		$cond[] = array("[$column] $operator %f", $value);
-		
+
 		$datagrid = $this->getDataGrid(TRUE);
 		$datagrid->dataSource->where('%and', $cond);
 	}

@@ -23,7 +23,7 @@ class DataGridAction extends Component implements IDataGridAction
 
 	/** @var Html  action element template */
 	protected $html;
-	
+
 	/** @var string */
 	static public $ajaxClass = 'datagrid-ajax';
 
@@ -36,9 +36,9 @@ class DataGridAction extends Component implements IDataGridAction
 
 	/**
 	 * Data grid action constructor.
-	 * @note   for full ajax support, destination should not change module, 
+	 * @note   for full ajax support, destination should not change module,
 	 * @note   presenter or action and must be ended with exclamation mark (!)
-	 * 
+	 *
 	 * @param  string  textual title
 	 * @param  string  textual link destination
 	 * @param  Html    element which is added to a generated link
@@ -51,10 +51,10 @@ class DataGridAction extends Component implements IDataGridAction
 		parent::__construct();
 		$this->type = $type;
 		$this->destination = $destination;
-		
+
 		$a = Html::el('a')->title($title);
 		if ($useAjax) $a->addClass(self::$ajaxClass);
-		
+
 		if ($icon !== NULL && $icon instanceof Html) {
 			$a->add($icon);
 		} else {
@@ -66,7 +66,7 @@ class DataGridAction extends Component implements IDataGridAction
 
 	/**
 	 * Generates action's link. (use before data grid is going to be rendered)
-	 * @return void 
+	 * @return void
 	 */
 	public function generateLink(array $args = NULL)
 	{
@@ -76,7 +76,7 @@ class DataGridAction extends Component implements IDataGridAction
 			case self::WITH_KEY: $link = $control->link($this->destination, $args); break;
 			default: throw new InvalidArgumentException("Invalid type of action.");
 		}
-		
+
 		$this->html->href($link);
 	}
 
@@ -105,5 +105,5 @@ class DataGridAction extends Component implements IDataGridAction
 	{
 		return $this->html;
 	}
-	
+
 }

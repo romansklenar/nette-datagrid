@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . '/NumericColumn.php';
  *
  * @author     Roman Sklenář
  * @copyright  Copyright (c) 2009 Roman Sklenář (http://romansklenar.cz)
- * @license    New BSD License 
+ * @license    New BSD License
  * @example    http://nettephp.com/extras/datagrid
  * @package    Nette\Extras\DataGrid
  * @version    $Id$
@@ -26,8 +26,8 @@ class CheckboxColumn extends NumericColumn
 		parent::__construct($caption, 0);
 		$this->getCellPrototype()->style('text-align: center');
 	}
-	
-	
+
+
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
@@ -39,8 +39,8 @@ class CheckboxColumn extends NumericColumn
 		if ($value) $checkbox->checked = TRUE;
 		return (string) $checkbox;
 	}
-	
-	
+
+
 	/**
 	 * Filters data source.
 	 * @param  mixed
@@ -49,7 +49,7 @@ class CheckboxColumn extends NumericColumn
 	public function applyFilter($value)
 	{
 		if (!$this->hasFilter()) return;
-		
+
 		$datagrid = $this->getDataGrid(TRUE);
 		$column = $this->getName();
 		$value = (int)(bool)$value;

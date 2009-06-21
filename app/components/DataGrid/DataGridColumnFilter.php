@@ -22,7 +22,7 @@ abstract class DataGridColumnFilter extends Component implements IDataGridColumn
 	/** @var string  value of filter (if was filtered) */
 	public $value;
 
-	
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -50,7 +50,7 @@ abstract class DataGridColumnFilter extends Component implements IDataGridColumn
 	public function getValue()
 	{
 		$dataGrid = $this->lookup('DataGrid', TRUE);
-		
+
 		// set value if was data grid filtered yet
 		parse_str($dataGrid->filters, $list);
 		foreach ($list as $key => $value) {

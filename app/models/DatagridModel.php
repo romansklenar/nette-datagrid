@@ -17,7 +17,7 @@ class DatagridModel extends BaseModel
 	public function __construct($table = NULL, $primary = NULL)
 	{
 		parent::__construct($table, $primary);
-		
+
 		if (!isset($this->primary) && isset($this->table)) {
 			try {
 				$dbInfo = $this->connection->getDatabaseInfo();
@@ -27,13 +27,13 @@ class DatagridModel extends BaseModel
 				throw new InvalidArgumentException("Model must have one primary key.");
 			}
 		}
-		
+
 		if ($this->connection->profiler) {
 			$this->connection->getProfiler()->setFile(Environment::expand('%logDir%') . '/sql.log');
 		}
 	}
-	
-	
+
+
     /**
      * @return DibiConnection
      */
@@ -61,7 +61,7 @@ class DatagridModel extends BaseModel
 		return $this->connection->dataSource('SELECT * FROM %n', $table);
 	}
 
-	
+
 	/**
 	 * @return DibiDataSource
 	 */
@@ -70,12 +70,12 @@ class DatagridModel extends BaseModel
 		return $this->connection->dataSource(
 			'SELECT c.*, count(o.orderNumber) AS orders, o.orderDate, o.status
 			FROM customers AS c
-				LEFT JOIN orders AS o ON c.customerNumber = o.customerNumber 
+				LEFT JOIN orders AS o ON c.customerNumber = o.customerNumber
 			GROUP BY c.customerNumber'
 		);
 	}
-	
-	
+
+
 	/**
 	 * Position moving routine (only for table Offices).
 	 * @param  string  which item of datagrid (position value)
@@ -87,13 +87,13 @@ class DatagridModel extends BaseModel
 		// TODO: write your own more sophisticated handler ;)
 		$this->table = 'offices';
 		$this->primary = 'officeCode';
-		
+
 		if ($dir == 'down') {
 			$old = $this->findAll()->where('[position] = %i', $key)->fetch();
 			$new = $this->findAll()->where('[position] = %i', $key + 1)->fetch();
 			$this->update($old->officeCode, array('position' => $key + 1));
 			$this->update($new->officeCode, array('position' => $key));
-			
+
 		} else {
 			$old = $this->findAll()->where('[position] = %i', $key)->fetch();
 			$new = $this->findAll()->where('[position] = %i', $key - 1)->fetch();
@@ -101,8 +101,8 @@ class DatagridModel extends BaseModel
 			$this->update($new->officeCode, array('position' => $key));
 		}
 	}
-	
-	
+
+
 	/**
 	 * @return DibiFluent
 	 */
@@ -111,7 +111,7 @@ class DatagridModel extends BaseModel
 		return $this->connection->select('*')->from($this->table);
 	}
 
-	
+
 	/**
 	 * @return DibiFluent
 	 */
@@ -120,7 +120,7 @@ class DatagridModel extends BaseModel
 		return $this->findAll()->where("$this->primary=%i", $id);
 	}
 
-	
+
 	/**
 	 * @return DibiFluent
 	 */
@@ -129,7 +129,7 @@ class DatagridModel extends BaseModel
 		return $this->connection->update($this->table, $data)->where("$this->primary=%i", $id)->execute();
 	}
 
-	
+
 	/**
 	 * @return DibiFluent
 	 */
@@ -138,7 +138,7 @@ class DatagridModel extends BaseModel
 		return $this->connection->insert($this->table, $data)->execute(dibi::IDENTIFIER);
 	}
 
-	
+
 	/**
 	 * @return DibiFluent
 	 */

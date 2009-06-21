@@ -15,21 +15,21 @@ class Translator extends Object implements ITranslator
 {
 	/** @var string */
 	public $locale;
-	
+
 	/** @var bool */
 	private $endian = FALSE;
-	
+
 	/** @var string|stream  MO gettext file */
 	protected $file = FALSE;
-	
+
 	/** @var array  translation table */
 	protected $dictionary = array();
-	
+
 	/** @var array */
 	protected $meta;
-	
-	
-	
+
+
+
 	/**
 	 * Translator contructor.
 	 * @param string
@@ -41,8 +41,8 @@ class Translator extends Object implements ITranslator
 		$this->locale = $locale;
 		$this->buildDictionary($filename);
 	}
-	
-	
+
+
 	/**
 	 * Translates the given string.
 	 * @param  string	translation string
@@ -54,12 +54,12 @@ class Translator extends Object implements ITranslator
 		$message = (string) $message;
 		if (!empty($message) && isset($this->dictionary[$message])) {
 			$word = $this->dictionary[$message];
-			
+
 			$s = preg_replace('/([a-z]+)/', '$$1', "n=$count;" . $this->meta['Plural-Forms']);
 			eval($s);
 			$message = $word->translate($plural);
 		}
-		
+
 		$args = func_get_args();
 		if (count($args) > 1) {
 			array_shift($args);
@@ -67,8 +67,8 @@ class Translator extends Object implements ITranslator
 		}
 		return $message;
 	}
-	
-	
+
+
 	/**
 	 * Load translation data (MO file reader) and builds the dictionary.
 	 * @param  string  $filename  MO file to add, full path must be given for access
@@ -131,15 +131,15 @@ class Translator extends Object implements ITranslator
 					$this->generateMeta($tr);
 					continue;
 				}
-				
+
 				$word = new Word(explode(String::chr(0x00), $original), explode(String::chr(0x00), $tr));
 				$this->dictionary[$word->message] = $word;
 			}
 		}
 		return $this->dictionary;
 	}
-	
-	
+
+
 	/**
 	 * Read values from the MO file.
 	 * @param  string
@@ -149,8 +149,8 @@ class Translator extends Object implements ITranslator
 		$data = fread($this->file, 4 * $bytes);
 		return $this->endian === FALSE ? unpack('V' . $bytes, $data) : unpack('N' . $bytes, $data);
 	}
-	
-	
+
+
 	/**
 	 * Generates meta information about distionary.
 	 * @return void
@@ -158,7 +158,7 @@ class Translator extends Object implements ITranslator
 	private function generateMeta($s)
 	{
 		$s = trim($s);
-		
+
 		$s = preg_split('/[\n,]+/', $s);
 		foreach ($s as $meta) {
 			$pattern = ': ';
@@ -171,7 +171,7 @@ class Translator extends Object implements ITranslator
 
 /**
  * Class that represents translatable word.
- * 
+ *
  * @author     Roman Sklenář
  * @copyright  Copyright (c) 2009 Roman Sklenář
  * @license    New BSD License
@@ -183,10 +183,10 @@ class Word extends Object
 {
 	/** @var string|array */
 	protected $message;
-	
+
 	/** @var string|array */
 	protected $translation;
-	
+
 	/**
 	 * Word constructor.
 	 * @param string|array
@@ -198,8 +198,8 @@ class Word extends Object
 		$this->message = $message;
 		$this->translation = $translation;
 	}
-	
-	
+
+
 	/**
 	 * @return string
 	 */
@@ -207,8 +207,8 @@ class Word extends Object
 	{
 		return is_array($this->translation) ? $this->translation[$form] : $this->translation;
 	}
-	
-	
+
+
 	/**
 	 * @return string
 	 */
@@ -216,8 +216,8 @@ class Word extends Object
 	{
 		return is_array($this->message) ? $this->message[$form] : $this->message;
 	}
-	
-	
+
+
 	/**
 	 * Translates a word.
 	 * @param  string  translation string

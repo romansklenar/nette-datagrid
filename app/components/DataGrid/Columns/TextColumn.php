@@ -37,7 +37,7 @@ class TextColumn extends DataGridColumn
 		} else {
 			$value = String::truncate($this->dataGrid->translate($value), $this->maxLength);
 		}
-		
+
 		foreach ($this->formatCallback as $callback) {
 			if (is_callable($callback)) {
 				$value = call_user_func($callback, $value);
@@ -45,8 +45,8 @@ class TextColumn extends DataGridColumn
 		}
 		return $value;
 	}
-	
-	
+
+
 	/**
 	 * Filters data source.
 	 * @param  mixed
@@ -55,7 +55,7 @@ class TextColumn extends DataGridColumn
 	public function applyFilter($value)
 	{
 		if (!$this->hasFilter()) return;
-		
+
 		$datagrid = $this->getDataGrid(TRUE);
 		$column = $this->getName();
 		$cond = array();
@@ -69,7 +69,7 @@ class TextColumn extends DataGridColumn
 			elseif ($l == '*' && $f != '^') $value = "^$value";
 			$value = str_replace('.*', '*', $value);
 			$value = str_replace('*', '.*', $value);
-			
+
 			// NOTE: sqlite2 does not have REGEXP statement, you must register your own function
 			$driver = $datagrid->dataSource->getConnection()->getConfig('driver');
 			if ($driver == 'sqlite' && (int) sqlite_libversion() == 2) {
@@ -81,7 +81,7 @@ class TextColumn extends DataGridColumn
 		} else {
 			$cond[] = array("[$column] LIKE '%$value%'");
 		}
-		
+
 		$datagrid->dataSource->where('%and', $cond);
 	}
 }
