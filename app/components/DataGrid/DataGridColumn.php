@@ -165,13 +165,9 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	 * @param  bool   throw exception if component doesn't exist?
 	 * @return IDataGridColumnFilter|NULL
 	 */
-	public function getFilter()
+	public function getFilter($need = TRUE)
 	{
-		if ($this->hasFilter()) {
-			return $this->getDataGrid(TRUE)->getComponent('filters', TRUE)->getComponent($this->getName(), TRUE);
-		} else {
-			return NULL;
-		}
+		return $this->getDataGrid(TRUE)->getComponent('filters', TRUE)->getComponent($this->getName(), $need);
 	}
 
 

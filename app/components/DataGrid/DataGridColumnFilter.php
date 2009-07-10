@@ -20,7 +20,7 @@ abstract class DataGridColumnFilter extends Component implements IDataGridColumn
 	protected $element;
 
 	/** @var string  value of filter (if was filtered) */
-	public $value;
+	protected $value;
 
 
 	public function __construct()
@@ -60,5 +60,16 @@ abstract class DataGridColumnFilter extends Component implements IDataGridColumn
 		}
 		return $this->value;
 	}
-
+	
+	
+	/**
+	 * Sets filter's value.
+	 * @param string
+	 * @return void
+	 */
+	public function setValue($value)
+	{
+		$control = $this->getFormControl();
+		$control->value = $this->value = $value;
+	}
 }

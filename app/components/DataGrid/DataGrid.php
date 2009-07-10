@@ -368,7 +368,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 			// backup component's state
 			if (!isset($session->initState)) {
-				$session->initState = $params;
+				$session->initState = array(
+					'page' => $this->page,
+					'order' => $this->order,
+					'filters' => $this->filters,
+					'itemsPerPage' => $this->itemsPerPage,
+				);
 			}
 
 			// save component's state into session
@@ -534,11 +539,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				$this->handleReset();
 
 			} elseif ($form['operationSubmit']->isSubmittedBy()) {
-				trigger_error('No user defined handler for operations; assign valid callback to operations handler into DataGrid::$operationsHandler variable.', E_USER_WARNING);
-				return;
+				if (!is_array($this->onOperationSubmit)) {
+					throw new InvalidStateException('No user defined handler for operations; assign valid callback to operations handler into DataGrid::$operationsHandler variable.');
+				}
 
 			} else {
-				// unknown submit button
 				throw new InvalidStateException("Unknown submit button.");
 			}
 
@@ -691,6 +696,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			if (empty($this->order) && !empty($this->defaultOrder)) {
 				$this->order = $this->defaultOrder;
 			}
+			
+			// TODO: defaul filtering
+			if (empty($this->filters) && !empty($this->defaultFilters)) {
+				// $this->filters = $this->defaultFilters;
+			}
 
 			// filter items (must be in this order)
 			$this->applyItems();
@@ -698,8 +708,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			$this->applySorting();
 			$this->applyPaging();
 
+			// TODO: na r20 funguje i: $this->getForm()->isSubmitted()
 			if ($this->isSignalReceiver('submit')) {
-				$this->regenerateFormControls($this->getForm(TRUE));
+				$this->regenerateFormControls();
 			}
 		}
 
@@ -826,8 +837,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  AppForm
 	 * @return void
 	 */
-	protected function regenerateFormControls(AppForm $form)
+	protected function regenerateFormControls()
 	{
+		$form = $this->getForm();
+		
 		// regenerate checker's checkbox controls
 		if ($this->hasOperations()) {
 			$form->removeComponent($form['checker']);
@@ -839,9 +852,15 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 		// for selectbox filter controls update values if was filtered over column
 		if ($this->hasFilters()) {
+			parse_str($this->filters, $list);
+			
 			foreach ($this->getFilters() as $filter) {
 				if ($filter instanceof SelectboxFilter) {
 					$filter->generateItems();
+				} 
+				
+				if (empty($list) && ($filter->value !== NULL || $filter->value !== '')) {
+					$filter->value = NULL;
 				}
 			}
 		}

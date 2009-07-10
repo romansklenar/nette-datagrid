@@ -1,6 +1,5 @@
 TODO
 ====
-
 ? našeptávání - http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete
 - razeni u sloupcu - zobrazení obou šipek u každého sloupce
 	Kliknutím na samotný název sloupce se setřídí jenom podle něj (poprvé
@@ -8,6 +7,22 @@ TODO
 	navíc zobrazí dvě ikony pro vzestupné a sestupné třídění. Kliknutím na
 	tyto ikony se sloupec přidá ke stávajícímu řazení (pokud tam ještě není).
 
+- defaultni hodnoty u filtru http://forum.nettephp.com/cs/1830-page-extras-datagrid-datagrid?pid=12648#p12648
+
+- ImageColumn
+	- potřeba zajistit, aby načítání obrázku fungovalo jak z DB tak z FS
+	- přidat do ImageColumnu metodu (nebo spíše možná uživatelský callback), která vrátí cestu k obrázku / obrázek, pak už jen dále ověřovat přes is_file()
+
+
+BUGS
+====
+- filtrovani nefunguje pokud neni pridano addActionColumn('Actions') - neni totiz vykresleno odesilaci tlacitko
+- DataGrid - onOperationSubmit bug nefunguje spolehlive - hlaska "Nebyly vybrany zadne radky"
+- restore state a pamatovani stavu nefunguje bez ajaxu 
+
+
+NOTES
+=====
 - optimalizace SelectboxFilter::generateItems()
 	az bude umet DibiDataSource DISTINCT prepsat, prozatimni reseni: prevedeno na fluent a na nem aplikovan DISTINCT 
 	(testovano na 50000 radkove tabulce - nativni DDS s DISTINCT je o 1/3 rychlejsi nez prevod z DSS na fluent a pak DISTINCT)

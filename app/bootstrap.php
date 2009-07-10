@@ -38,6 +38,7 @@ if (!is_writable(Environment::getVariable('logDir'))) {
 $mode = (Environment::isDebugging() && !Environment::getHttpRequest()->isAjax()) ? Debug::DEVELOPMENT : Debug::PRODUCTION;
 Debug::enable($mode, NULL);
 Debug::$strictMode = TRUE;
+Debug::$showLocation = TRUE;
 
 
 /** 2d) enable RobotLoader - this allows load all classes automatically */
