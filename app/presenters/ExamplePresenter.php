@@ -66,8 +66,6 @@ class ExamplePresenter extends BasePresenter
 			$grid->addColumn('country', 'Country')->addSelectboxFilter()->translateItems(FALSE);
 			$grid->addColumn('postalCode', 'Postal code')->addFilter();
 
-			$grid->setDefaultOrder($grid['position'], 'asc');
-
 			$grid->addActionColumn('Actions');
 			$icon = Html::el('span');
 			$grid->addAction('New entry', 'Office:new', clone $icon->class('icon icon-add'), FALSE, DataGridAction::WITHOUT_KEY);
@@ -136,9 +134,6 @@ class ExamplePresenter extends BasePresenter
 			$grid['contactLastName']->addDefaultSorting('asc');
 			$grid['orders']->addDefaultFiltering(TRUE);
 			$grid['country']->addDefaultFiltering('USA');
-			
-			$grid['contactLastName']->removeDefaultSorting();
-			$grid['country']->removeDefaultFiltering();
 
 			/**** column content affecting ****/
 
