@@ -195,7 +195,76 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	}
 
 
+	
+	/********************* Default sorting and filtering *********************/
 
+
+
+	/**
+	 * Adds default sorting to data grid.
+	 * @param string
+	 * @return DataGridColumn  provides a fluent interface
+	 */
+	public function addDefaultSorting($order = 'ASC')
+	{
+		$orders = array('ACS', 'DESC', 'asc', 'desc');
+		if (!in_array($order, $orders)) {
+			throw new InvalidArgumentException("Order must be in '" . implode(', ', $orders) . "', '$order' given.");
+		}
+
+		parse_str($this->getDataGrid()->defaultOrder, $list);
+		$list[$this->getName()] = strtolower($order[0]);
+		$this->getDataGrid()->defaultOrder = http_build_query($list, '', '&');
+		
+		return $this;
+	}
+	
+	
+	/**
+	 * Adds default filtering to data grid.
+	 * @param string
+	 * @return DataGridColumn  provides a fluent interface
+	 */
+	public function addDefaultFiltering($value)
+	{
+		parse_str($this->getDataGrid()->defaultFilters, $list);
+		$list[$this->getName()] = $value;
+		$this->getDataGrid()->defaultFilters = http_build_query($list, '', '&');
+		
+		return $this;
+	}
+	
+	
+	/**
+	 * Removes data grid's default sorting.
+	 * @return DataGridColumn  provides a fluent interface
+	 */
+	public function removeDefaultSorting()
+	{
+		parse_str($this->getDataGrid()->defaultOrder, $list);
+		if (isset($list[$this->getName()])) unset($list[$this->getName()]);
+		$this->getDataGrid()->defaultOrder = http_build_query($list, '', '&');
+		
+		return $this;
+	}
+	
+	
+	/**
+	 * Removes data grid's default filtering.
+	 * @return DataGridColumn  provides a fluent interface
+	 */
+	public function removeDefaultFiltering()
+	{
+		parse_str($this->getDataGrid()->defaultFilters, $list);
+		if (isset($list[$this->getName()])) unset($list[$this->getName()]);
+		$this->getDataGrid()->defaultFilters = http_build_query($list, '', '&');
+		
+		return $this;
+	}
+
+
+
+	
 	/********************* filter factories *********************/
 
 

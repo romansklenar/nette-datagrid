@@ -90,7 +90,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->setRenderer($renderer);
 
 			$grid->itemsPerPage = 10; // display 10 rows per page
-			//$grid->rememberState = TRUE;
+			$grid->rememberState = TRUE;
 			$grid->bindDataTable($model->getCustomerAndOrderInfo());
 			$grid->multiOrder = FALSE; // order by one column only
 
@@ -115,8 +115,6 @@ class ExamplePresenter extends BasePresenter
 			$grid->addColumn('status', 'Status');
 			$grid->addNumericColumn('creditLimit', 'Size', 0);
 
-			$grid->setDefaultOrder($grid['country'], 'asc');
-
 
 			/**** add some filters ****/
 
@@ -130,7 +128,17 @@ class ExamplePresenter extends BasePresenter
 			$grid['orderDate']->addDateFilter();
 			$grid['status']->addSelectboxFilter();
 			$grid['creditLimit']->addFilter();
-
+			
+			
+			/**** default sorting and filtering ****/
+			
+			$grid['city']->addDefaultSorting('asc');
+			$grid['contactLastName']->addDefaultSorting('asc');
+			$grid['orders']->addDefaultFiltering(TRUE);
+			$grid['country']->addDefaultFiltering('USA');
+			
+			$grid['contactLastName']->removeDefaultSorting();
+			$grid['country']->removeDefaultFiltering();
 
 			/**** column content affecting ****/
 
@@ -156,6 +164,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->addAction('Detail', 'Customer:detail', clone $icon->class('icon icon-detail'));
 			$grid->addAction('Edit', 'Customer:edit', clone $icon->class('icon icon-edit'));
 			$grid->addAction('Delete', 'Customer:delete', clone $icon->class('icon icon-del'));
+
 
 			$this->addComponent($grid, $name);
 			return;

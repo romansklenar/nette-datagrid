@@ -442,6 +442,10 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	{
 		$row = $this->getWrapper('row.filter container');
 		$form = $this->dataGrid->getForm(TRUE);
+		
+		$submitControl = $form['filterSubmit']->control;
+		$submitControl->addClass($this->getValue('row.filter control .submit'));
+		$submitControl->title = $submitControl->value;
 
 		foreach ($this->dataGrid->getColumns() as $column) {
 			$cell = $this->getWrapper('row.filter cell container');
@@ -450,10 +454,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$cell->attrs = $column->getCellPrototype()->attrs;
 
 			if ($column instanceof ActionColumn) {
-				$control = $form['filterSubmit']->control;
-				$control->addClass($this->getValue('row.filter control .submit'));
-				$control->title = $control->value;
-				$value = (string) $control;
+				$value = (string) $submitControl;
 				$cell->addClass('actions');
 
 			} else {
@@ -475,6 +476,12 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$cell->setHtml($value);
 			$row->add($cell);
 		}
+		
+		if (!$this->dataGrid->hasActions()) {
+			$submitControl->addStyle('display: none');
+			$row->add($submitControl);
+		}
+		
 		return $row;
 	}
 

@@ -55,7 +55,8 @@ abstract class DataGridColumnFilter extends Component implements IDataGridColumn
 		parse_str($dataGrid->filters, $list);
 		foreach ($list as $key => $value) {
 			if ($key == $this->getName()) {
-				return $this->value = $value;
+				$this->setValue($value);
+				break;
 			}
 		}
 		return $this->value;

@@ -113,11 +113,11 @@ class SelectboxFilter extends DataGridColumnFilter
 	/**
 	 * Translate all items in selectbox?
 	 * @param  bool
-	 * @return FormControl  provides a fluent interface
+	 * @return SelectboxFilter  provides a fluent interface
 	 */
 	public function translateItems($translate)
 	{
 		$this->translateItems = (bool) $translate;
-		return $this->getFormControl();
+		return $this;
 	}
 }

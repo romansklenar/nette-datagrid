@@ -6,19 +6,11 @@ TODO
 	vzestupně, podruhé sestupně). Při najetí myší nad název sloupce se
 	navíc zobrazí dvě ikony pro vzestupné a sestupné třídění. Kliknutím na
 	tyto ikony se sloupec přidá ke stávajícímu řazení (pokud tam ještě není).
-
-- defaultni hodnoty u filtru http://forum.nettephp.com/cs/1830-page-extras-datagrid-datagrid?pid=12648#p12648
+? mit moznost v cele komponente zakazat razeni podle sloupcu?
 
 - ImageColumn
 	- potřeba zajistit, aby načítání obrázku fungovalo jak z DB tak z FS
 	- přidat do ImageColumnu metodu (nebo spíše možná uživatelský callback), která vrátí cestu k obrázku / obrázek, pak už jen dále ověřovat přes is_file()
-
-
-BUGS
-====
-- filtrovani nefunguje pokud neni pridano addActionColumn('Actions') - neni totiz vykresleno odesilaci tlacitko
-- DataGrid - onOperationSubmit bug nefunguje spolehlive - hlaska "Nebyly vybrany zadne radky"
-- restore state a pamatovani stavu nefunguje bez ajaxu 
 
 
 NOTES

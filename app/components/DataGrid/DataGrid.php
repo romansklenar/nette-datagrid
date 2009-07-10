@@ -58,7 +58,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public $multiOrder = TRUE;
 
 	/** @var string */
-	protected $defaultOrder = '';
+	public $defaultOrder;
+
+	/** @var string */
+	public $defaultFilters;
 
 	/** @var array */
 	public $operations = array();
@@ -133,17 +136,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public function getDataSource()
 	{
 		return $this->dataSource;
-	}
-
-
-	public function setDefaultOrder(IDataGridColumn $column, $order = 'ASC')
-	{
-		$orders = array('ACS', 'DESC', 'asc', 'desc');
-		if (!in_array($order, $orders)) {
-			throw new InvalidArgumentException("Order must be in '" . implode(', ', $orders) . "', '$order' given.");
-		}
-
-		$this->defaultOrder = $column->getName() . '=' . strtolower($order[0]);
 	}
 
 
@@ -432,7 +424,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		// default ordering
 		if (empty($this->order) && !empty($this->defaultOrder)) {
-			if (preg_match("~$by~", "~$this->defaultOrder~")) $this->order = $this->defaultOrder;
+			parse_str($this->defaultOrder, $list);
+			if (isset($list[$by])) $this->order = $this->defaultOrder;
+			unset($list);
 		}
 
 		parse_str($this->order, $list);
@@ -472,6 +466,14 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			if ($value !== '') $filters[$key] = $value;
 		}
 		$this->filters = http_build_query($filters, '', '&');
+		
+		// default filtering
+		if (empty($this->filters) && !empty($this->defaultFilters)) {
+			parse_str($this->defaultFilters, $list);
+			if (isset($list[$by])) $this->filters = $this->defaultFilters;
+			unset($list);
+		}
+		
 		$this->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->redirect('this');
 	}
@@ -556,7 +558,46 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/********************* applycators (call before rendering only) *********************/
 
 
-
+	/**
+	 * Aplycators caller - filters data grid items.
+	 * @return void
+	 */
+	protected function filterItems()
+	{
+		// must be in this order
+		$this->applyDefaultFiltering();
+		$this->applyDefaultSorting();
+		$this->applyItems();
+		$this->applyFiltering();
+		$this->applySorting();
+		$this->applyPaging();
+	}
+	
+	
+	/**
+	 * Applies default sorting on data grid.
+	 * @return void
+	 */
+	protected function applyDefaultSorting()
+	{
+		if (empty($this->order) && !empty($this->defaultOrder)) {
+			$this->order = $this->defaultOrder;
+		}
+	}
+	
+	
+	/**
+	 * Applies default filtering on data grid.
+	 * @return void
+	 */
+	protected function applyDefaultFiltering()
+	{
+		if (empty($this->filters) && !empty($this->defaultFilters)) {
+			$this->filters = $this->defaultFilters;
+		}
+	}
+	
+	
 	/**
 	 * Applies paging on data grid.
 	 * @return void
@@ -692,21 +733,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				$this->flashMessage($this->translate("Empty datasource given."), 'info');
 			}
 
-			// default ordering
-			if (empty($this->order) && !empty($this->defaultOrder)) {
-				$this->order = $this->defaultOrder;
-			}
-			
-			// TODO: defaul filtering
-			if (empty($this->filters) && !empty($this->defaultFilters)) {
-				// $this->filters = $this->defaultFilters;
-			}
-
-			// filter items (must be in this order)
-			$this->applyItems();
-			$this->applyFiltering();
-			$this->applySorting();
-			$this->applyPaging();
+			// NOTE: important!
+			$this->filterItems();
 
 			// TODO: na r20 funguje i: $this->getForm()->isSubmitted()
 			if ($this->isSignalReceiver('submit')) {
@@ -793,11 +821,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 					$sub = $form->addContainer('checker');
 
 					if ($this->isSignalReceiver('submit')) {
+						// NOTE: important!
 						$ds = clone $this->dataSource;
-						$this->applyItems();
-						$this->applyFiltering();
-						$this->applySorting();
-						$this->applyPaging();
+						$this->filterItems();
 					}
 
 					foreach ($this->getRows() as $row) {
@@ -859,8 +885,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 					$filter->generateItems();
 				} 
 				
-				if (empty($list) && ($filter->value !== NULL || $filter->value !== '')) {
-					$filter->value = NULL;
+				if ($this->filters === $this->defaultFilters && ($filter->value !== NULL || $filter->value !== '')) {
+					if (!in_array($filter->getName(), array_keys($list))) $filter->value = NULL;
 				}
 			}
 		}
