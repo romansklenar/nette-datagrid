@@ -142,11 +142,12 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 
 	/**
 	 * Gets header link (order signal)
+	 * @param  string  direction of sorting (a|d|NULL)
 	 * @return string
 	 */
-	public function getLink()
+	public function getOrderLink($dir = NULL)
 	{
-		return $this->getDataGrid(TRUE)->link('order', $this->getName());
+		return $this->getDataGrid(TRUE)->link('order', array('by' => $this->getName(), 'dir' => $dir));
 	}
 
 
@@ -207,7 +208,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	 */
 	public function addDefaultSorting($order = 'ASC')
 	{
-		$orders = array('ACS', 'DESC', 'asc', 'desc');
+		$orders = array('ASC', 'DESC', 'asc', 'desc', 'A', 'D', 'a', 'd');
 		if (!in_array($order, $orders)) {
 			throw new InvalidArgumentException("Order must be in '" . implode(', ', $orders) . "', '$order' given.");
 		}

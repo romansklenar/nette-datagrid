@@ -418,9 +418,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/**
 	 * Changes column sorting order.
 	 * @param  string
+	 * @param  string
 	 * @return void
 	 */
-	public function handleOrder($by)
+	public function handleOrder($by, $dir)
 	{
 		// default ordering
 		if (empty($this->order) && !empty($this->defaultOrder)) {
@@ -428,24 +429,25 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			if (isset($list[$by])) $this->order = $this->defaultOrder;
 			unset($list);
 		}
-
+		
 		parse_str($this->order, $list);
-
-		if (!isset($list[$by])) {
-			if (!$this->multiOrder) {
-				$list = array();
-			}
-			$list[$by] = 'a';
-
-		} elseif ($list[$by] === 'd') {
-			if ($this->multiOrder) {
-				unset($list[$by]);
-			} else {
+		
+		if ($dir == NULL) {
+			if (!isset($list[$by])) {
+				if (!$this->multiOrder) $list = array();
 				$list[$by] = 'a';
+
+			} elseif ($list[$by] === 'd') {
+				if ($this->multiOrder) unset($list[$by]);
+				else $list[$by] = 'a';
+
+			} else {
+				$list[$by] = 'd';
 			}
 
 		} else {
-			$list[$by] = 'd';
+			if (!$this->multiOrder) $list = array();
+			$list[$by] = $dir;
 		}
 
 		$this->order = http_build_query($list, '', '&');
@@ -830,7 +832,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 						$sub->addCheckbox($row[$this->keyName], $row[$this->keyName]);
 					}
 
-					if ($this->isSignalReceiver('submit')) $this->dataSource = $ds;
+					if (isset($ds)) $this->dataSource = $ds;
 				}
 
 				$renderer = $form->getRenderer();

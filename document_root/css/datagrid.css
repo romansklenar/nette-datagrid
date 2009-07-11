@@ -47,6 +47,7 @@ table.datagrid input[type=submit] {
 	font-family: Arial,sans-serif;
 	cursor: pointer;
 	padding-right: 18px;
+	=padding-right: 10px;
 	background: transparent no-repeat right center;
 }
 table.datagrid input[name=filterSubmit] {
@@ -93,17 +94,8 @@ table.datagrid tr.header th span.link {
 table.datagrid th a, table.datagrid tr.filters a.filter {
 	color: #165CA3;
 	text-decoration: none;
-	padding-right: 20px;
 	line-height: 30px;
-}
-table.datagrid th .asc, table.datagrid th a:hover {
-	background: url('../images/asc.gif') no-repeat right center;
-}
-table.datagrid th .desc, table.datagrid th .asc:hover {
-	background: url('../images/desc.gif') no-repeat right center;
-}
-table.datagrid th .desc:hover {
-	background: none;
+	float: left;
 }
 table.datagrid tr.filters a.filter {
 	background: url('../images/icons/find.png') no-repeat right center;
@@ -126,14 +118,20 @@ table.datagrid tr.footer td {
 	font-weight: bold;
 	line-height: 1em;
 }
-table.datagrid td span.positioner {
+table.datagrid span.positioner {
 	width: 22px;
 	height: 16px;
 	display: block;
 	float: left;
 	margin-right: 2px;
 }
-table.datagrid td span.positioner a span {
+table.datagrid th span.positioner {
+	padding-top: 7px;
+}
+table.datagrid span.positioner a {
+	line-height: 0px;
+}
+table.datagrid span.positioner a span {
 	border: none;
 	display: block;
 	float: left;
@@ -142,19 +140,24 @@ table.datagrid td span.positioner a span {
 	height: 4px;
 	opacity: 0.40;
 	=filter: alpha(opacity=40);
+	padding-left: 0px !important;
 }
-table.datagrid td span.positioner a span.up {
+table.datagrid span.positioner a span.up {
 	background: url('../images/asc.gif') no-repeat right center;
 }
-table.datagrid td span.positioner a span.down {
+table.datagrid span.positioner a span.down {
 	background: url('../images/desc.gif') no-repeat right center;
 }
-table.datagrid td span.positioner a span.down:hover, 
-table.datagrid td span.positioner a span.up:hover {
+table.datagrid span.positioner a span.down:hover, table.datagrid span.positioner a span.up:hover {
 	opacity: 1;
 	=filter: alpha(opacity=100);
 }
-table.datagrid td span.positioner a.inactive span, table.datagrid td span.positioner a.inactive span:hover {
+table.datagrid span.positioner a.active span, table.datagrid span.positioner a.active span:hover {
+	opacity: 1;
+	=filter: alpha(opacity=100);
+	cursor: default;
+}
+table.datagrid span.positioner a.inactive span, table.datagrid span.positioner a.inactive span:hover {
 	background: none !important;
 	cursor: default;
 }

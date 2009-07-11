@@ -411,16 +411,23 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 					$list[$field] = array($dir, $i++);
 				}
 
-				$class = DataGridColumn::$ajaxClass;
 				if (isset($list[$column->getName()])) {
-					$class .= ' ' . ($list[$column->getName()][0] === 'a' ? 'asc' : 'desc');
+					$a = $list[$column->getName()][0] === 'a';
+					$d = $list[$column->getName()][0] === 'd';
+				} else {
+					$a = $d = FALSE;
 				}
 
 				if (count($list) > 1 && isset($list[$column->getName()])) {
 					$text .= Html::el('span')->setHtml($list[$column->getName()][1]);
 				}
+				
+				$up = clone $down = Html::el('a')->addClass(DataGridColumn::$ajaxClass);
+				$up->addClass($a ? 'active' : '')->href($column->getOrderLink('a'))->add(Html::el('span')->class('up'));
+				$down->addClass($d ? 'active' : '')->href($column->getOrderLink('d'))->add(Html::el('span')->class('down'));
+				$positioner = Html::el('span')->class('positioner')->add($up)->add($down);
 
-				$value = (string) Html::el('a')->href($column->getLink())->class($class)->setHtml($text);
+				$value = (string) Html::el('a')->href($column->getOrderLink())->class(DataGridColumn::$ajaxClass)->setHtml($text) . $positioner;
 			}
 
 			$cell = $this->getWrapper('row.header cell container')->setHtml($value);

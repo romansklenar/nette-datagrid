@@ -20,9 +20,10 @@ interface IDataGridColumn
 
 	/**
 	 * Gets header link (order signal)
+	 * @param  string
 	 * @return string
 	 */
-	function getLink();
+	function getOrderLink($dir = NULL);
 
 
 	/**
