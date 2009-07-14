@@ -105,6 +105,11 @@ table.datagrid tr.filters a.filter {
 	text-align: left !important;
 	line-height: 10px !important;
 }
+table.datagrid th p {
+	text-decoration: none;
+	line-height: 30px;
+	float: left;
+}
 table.datagrid tr.filters td.actions {
 	text-align: left;
 	*padding: 6px !important;

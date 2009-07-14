@@ -57,6 +57,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/** @var bool  multi column order */
 	public $multiOrder = TRUE;
 
+	/** @var bool  disables ordering for all columns */
+	public $disableOrder = FALSE;
+
 	/** @var string */
 	public $defaultOrder;
 
@@ -722,6 +725,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 				if ($this->hasActions()) {
 					$this['actions'] = $actionColumn;
+				}
+			}
+			
+			if ($this->disableOrder) {
+				foreach ($this->getColumns() as $column) {
+					$column->orderable = FALSE;
 				}
 			}
 

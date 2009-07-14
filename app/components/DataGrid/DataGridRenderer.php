@@ -434,6 +434,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				$positioner = Html::el('span')->class('positioner')->add($up)->add($down);
 
 				$value = (string) Html::el('a')->href($column->getOrderLink())->class(DataGridColumn::$ajaxClass)->setHtml($text) . $positioner;
+			} else {
+				$value = (string) Html::el('p')->setText($value);
 			}
 
 			$cell = $this->getWrapper('row.header cell container')->setHtml($value);

@@ -57,6 +57,7 @@ class ExamplePresenter extends BasePresenter
 			$grid = new DataGrid;
 			$grid->bindDataTable($model->findAll($model->table)->orderBy('position')->toDataSource()); // binds DibiDataSource
 			$grid->keyName = 'officeCode'; // for actions or operations
+			$grid->disableOrder = TRUE;
 
 			$pos = array('up' => 'Move up', 'down' => 'Move down');
 			$grid->addPositionColumn('position', 'Position', 'positionMove!', $pos)->addFilter();

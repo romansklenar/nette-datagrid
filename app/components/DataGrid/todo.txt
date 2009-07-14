@@ -1,12 +1,7 @@
 TODO
 ====
 ? našeptávání - http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete
-- razeni u sloupcu - zobrazení obou šipek u každého sloupce
-	Kliknutím na samotný název sloupce se setřídí jenom podle něj (poprvé
-	vzestupně, podruhé sestupně). Při najetí myší nad název sloupce se
-	navíc zobrazí dvě ikony pro vzestupné a sestupné třídění. Kliknutím na
-	tyto ikony se sloupec přidá ke stávajícímu řazení (pokud tam ještě není).
-? mit moznost v cele komponente zakazat razeni podle sloupcu?
+- skrývání sloupců (pouze s JS)
 
 - ImageColumn
 	- potřeba zajistit, aby načítání obrázku fungovalo jak z DB tak z FS
