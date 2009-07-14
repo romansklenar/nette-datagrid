@@ -72,8 +72,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/** @var bool  can datagrid save his state into session? */
 	public $rememberState = FALSE;
 
-	/** @var int|string  session timeout */
-	public $timeout = '+ 30 days';
+	/** @var int|string  session timeout (default: until is browser closed) */
+	public $timeout = 0;
 
 	/** @var IDataGridRenderer */
 	protected $renderer;
@@ -164,7 +164,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * Setter / property method.
+	 * Getter / property method.
 	 * @return Paginator
 	 */
 	public function getPaginator()

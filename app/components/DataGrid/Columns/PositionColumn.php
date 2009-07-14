@@ -86,11 +86,12 @@ class PositionColumn extends NumericColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
+	 * @param  DibiRow|array
 	 * @return string
 	 */
-	public function formatContent($value)
+	public function formatContent($value, $data = NULL)
 	{
-		$presenter = $this->lookup('Nette\Aplication\Presenter', TRUE);
+		$presenter = $this->lookup('Nette\Aplication\Presenter', TRUE); // intentionally presenter
 		$uplink = $presenter->link($this->destination, array('key' => $value, 'dir' => 'up'));
 		$downlink = $presenter->link($this->destination, array('key' => $value, 'dir' => 'down'));
 

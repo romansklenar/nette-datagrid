@@ -31,9 +31,10 @@ class CheckboxColumn extends NumericColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
+	 * @param  DibiRow|array
 	 * @return string
 	 */
-	public function formatContent($value)
+	public function formatContent($value, $data = NULL)
 	{
 		$checkbox = Html::el('input')->type('checkbox')->disabled('disabled');
 		if ($value) $checkbox->checked = TRUE;

@@ -123,8 +123,8 @@ msgstr "Datum"
 msgid "Status"
 msgstr "Stav"
 
-msgid "Size"
-msgstr "Velikost"
+msgid "Credit"
+msgstr "Kredit"
 
 msgid "Actions"
 msgstr "Akce"

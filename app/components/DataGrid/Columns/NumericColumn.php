@@ -36,9 +36,10 @@ class NumericColumn extends DataGridColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
+	 * @param  DibiRow|array
 	 * @return string
 	 */
-	public function formatContent($value)
+	public function formatContent($value, $data = NULL)
 	{
 		if (is_array($this->replacement) && !empty($this->replacement)) {
 			if (in_array($value, array_keys($this->replacement))) {
@@ -49,7 +50,7 @@ class NumericColumn extends DataGridColumn
 
 		foreach ($this->formatCallback as $callback) {
 			if (is_callable($callback)) {
-				$value = call_user_func($callback, $value);
+				$value = call_user_func($callback, $value, $data);
 			}
 		}
 		return $value;

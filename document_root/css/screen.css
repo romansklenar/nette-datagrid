@@ -299,3 +299,12 @@ span.icon {
 .icon-no-orders {
 	background-image: url('../images/icons/box.png');
 }
+
+
+
+.money-low {
+	background: papayawhip !important;
+}
+.money-high {
+	background: #E4F6D2 !important;
+}

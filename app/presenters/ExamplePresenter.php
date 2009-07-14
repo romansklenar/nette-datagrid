@@ -46,7 +46,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->addCheckboxColumn('orders', 'Has orders');
 			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y');
 			$grid->addColumn('status', 'Status');
-			$grid->addNumericColumn('creditLimit', 'Size', 0);
+			$grid->addNumericColumn('creditLimit', 'Credit', 0);
 
 			$this->addComponent($grid, $name);
 			return;
@@ -85,10 +85,13 @@ class ExamplePresenter extends BasePresenter
 
 			$renderer = new DataGridRenderer;
 			$renderer->paginatorFormat = '%input%'; // customize format of paginator
+			$renderer->onCellRender[] = array($this, 'customersGridOnCellRendered');
 			$grid->setRenderer($renderer);
 
 			$grid->itemsPerPage = 10; // display 10 rows per page
+			$grid->displayedItems = array('all', 10, 20, 50); // items per page selectbox items
 			$grid->rememberState = TRUE;
+			$grid->timeout = '+ 7 days'; // change session expiration after 7 days
 			$grid->bindDataTable($model->getCustomerAndOrderInfo());
 			$grid->multiOrder = FALSE; // order by one column only
 
@@ -111,7 +114,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->addCheckboxColumn('orders', $caption)->getHeaderPrototype()->style('text-align: center');
 			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y'); // czech format: '%d.%m.%Y'
 			$grid->addColumn('status', 'Status');
-			$grid->addNumericColumn('creditLimit', 'Size', 0);
+			$grid->addNumericColumn('creditLimit', 'Credit', 0);
 
 
 			/**** add some filters ****/
@@ -148,7 +151,7 @@ class ExamplePresenter extends BasePresenter
 			$grid['status']->replacement[''] = clone $el->class("icon icon-no-orders")->title("Without orders");
 
 			// by callback(s)
-			$grid['creditLimit']->formatCallback[] = 'TemplateHelpers::bytes';
+			$grid['creditLimit']->formatCallback[] = 'Helpers::currency';
 
 
 			/**** add some actions ****/
@@ -211,6 +214,23 @@ class ExamplePresenter extends BasePresenter
 
 		$grid->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
+	}
+	
+	
+	/**
+	 * 'customersGrid' onCellRender event.
+	 * @param  Html
+	 * @param  string
+	 * @param  mixed
+	 * @return Html
+	 */
+	public function customersGridOnCellRendered(Html $cell, $column, $value)
+	{
+		if ($column === 'creditLimit') {
+			if ($value < 30000) $cell->addClass('money-low');
+			elseif ($value >= 100000) $cell->addClass('money-high');
+		}
+		return $cell;
 	}
 
 

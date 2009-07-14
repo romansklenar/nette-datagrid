@@ -17,10 +17,10 @@ abstract class BaseModel extends Object implements IModel
 	/** @var string|array  primary key column name */
 	protected $primary = 'id';
 
-	/** @var array of function(IModel $sender) */
+	/** @var array  of function(IModel $sender) */
 	public $onStartup;
 
-	/** @var array of function(IModel $sender) */
+	/** @var array  of function(IModel $sender) */
 	public $onShutdown;
 
 

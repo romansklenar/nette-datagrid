@@ -175,9 +175,10 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
+	 * @param  DibiRow|array
 	 * @return string
 	 */
-	public function formatContent($value)
+	public function formatContent($value, $data = NULL)
 	{
 		trigger_error('DataGridColumn::formatContent should not be called; Overload this method by your implementation in descendant.', E_USER_WARNING);
 		return (string) $value;

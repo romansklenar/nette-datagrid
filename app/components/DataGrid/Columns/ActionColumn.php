@@ -31,10 +31,11 @@ class ActionColumn extends DataGridColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
+	 * @param  DibiRow|array
+	 * @return string
 	 * @throws InvalidStateException
-	 * @return void
 	 */
-	public function formatContent($value)
+	public function formatContent($value, $data = NULL)
 	{
 		throw new InvalidStateException("ActionColumn cannot be formated.");
 	}

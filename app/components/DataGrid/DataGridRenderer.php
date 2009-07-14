@@ -101,6 +101,12 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 	/** @var DataGrid */
 	protected $dataGrid;
+	
+	/** @var array  of function(Html $row, DibiRow $data) */
+	public $onRowRender;
+
+	/** @var array  of function(Html $cell, string $column, mixed $value) */
+	public $onCellRender;
 
 
 
@@ -534,13 +540,15 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				$cell->addClass('actions');
 
 			} else {
-				$value = $column->formatContent($data[$column->getName()]);
+				$value = $column->formatContent($data[$column->getName()], $data);
 			}
 
 			$cell->setHtml((string)$value);
+			$this->onCellRender($cell, $column->getName(), !($column instanceof ActionColumn) ? $data[$column->getName()] : NULL);
 			$row->add($cell);
 		}
 		unset($form, $primary, $cell, $value, $action);
+		$this->onRowRender($row, $data);
 		return $row;
 	}
 

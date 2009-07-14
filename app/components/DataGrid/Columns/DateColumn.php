@@ -35,14 +35,15 @@ class DateColumn extends TextColumn
 
 
 	/**
-	 * Filters data source.
+	 * Formats cell's content.
 	 * @param  mixed
-	 * @return void
+	 * @param  DibiRow|array
+	 * @return string
 	 */
-	public function formatContent($value)
+	public function formatContent($value, $data = NULL)
 	{
 		if ($value == NULL || empty($value)) return 'N/A';
-		$value = parent::formatContent($value);
+		$value = parent::formatContent($value, $data);
 
 		$value = is_numeric($value) ? (int) $value : ($value instanceof DateTime ? $value->format('U') : strtotime($value));
 		return strftime($this->format, $value);
