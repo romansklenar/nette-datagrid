@@ -565,7 +565,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$paginator = $this->dataGrid->paginator;
 		$row = $this->getWrapper('row.footer container');
 
-		$count = count($this->dataGrid->getColumns()->getInnerIterator());
+		$count = count($this->dataGrid->getColumns());
 		if ($this->dataGrid->hasOperations()) $count++;
 
 		$cell = $this->getWrapper('row.footer cell container');

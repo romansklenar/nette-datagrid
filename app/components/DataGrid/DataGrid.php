@@ -92,6 +92,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/** @var string */
 	protected $receivedSignal;
+	
+	/** @var ActionColumn */
+	protected $currentActionColumn;
 
 	/** @var bool  was method render() called? */
 	protected $wasRendered = FALSE;
@@ -108,9 +111,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		parent::__construct(); // intentionally without any arguments (because of session loadState)
 		$this->paginator = new Paginator;
-		$this->addComponent(new ComponentContainer, 'columns');
-		$this->addComponent(new ComponentContainer, 'filters');
-		$this->addComponent(new ComponentContainer, 'actions');
 
 		$session = $this->getSession();
 		if (!$session->isStarted()) {
@@ -220,35 +220,62 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * Iterates over all datagrid columns.
+	 * Iterates over datagrid columns.
+	 * @param  string
 	 * @throws InvalidArgumentException
 	 * @return ArrayIterator
 	 */
-	public function getColumns()
+	public function getColumns($type = 'IDataGridColumn')
 	{
-		return $this->getComponent('columns', TRUE)->getComponents(FALSE, 'IDataGridColumn');
+		$columns = new ArrayObject();
+		foreach ($this->getComponents(FALSE, $type) as $column) {
+			$columns->append($column);
+		}
+		return $columns->getIterator();
 	}
 
 
 	/**
-	 * Iterates over all datagrid filters.
+	 * Iterates over datagrid filters.
+	 * @param  string
 	 * @throws InvalidArgumentException
 	 * @return ArrayIterator
 	 */
-	public function getFilters()
+	public function getFilters($type = 'IDataGridColumnFilter')
 	{
-		return $this->getComponent('filters', TRUE)->getComponents(FALSE, 'IDataGridColumnFilter');
+		$filters = new ArrayObject();
+		foreach ($this->getColumns() as $column) {
+			if ($column->hasFilter()) {
+				$filter = $column->getFilter();
+				if ($filter instanceof $type) {
+					$filters->append($column->getFilter());
+				}
+			}
+		}
+		return $filters->getIterator();
 	}
 
 
 	/**
+	 * TODO: throw new DeprecatedException
 	 * Iterates over all datagrid actions.
+	 * @param  string
 	 * @throws InvalidArgumentException
 	 * @return ArrayIterator
 	 */
-	public function getActions()
+	public function getActions($type = 'IDataGridAction')
 	{
-		return $this->getComponent('actions', TRUE)->getComponents(FALSE, 'IDataGridAction');
+		$actions = new ArrayObject();
+		foreach ($this->getColumns('ActionColumn') as $column) {
+			if ($column->hasAction()) {
+				foreach ($column->getActions() as $action) {
+					if ($action instanceof $type) {
+						$actions->append($action);
+					}
+				}
+			}
+		}
+		return $actions->getIterator();
 	}
 
 
@@ -269,31 +296,34 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Does data grid has any column?
+	 * @param  string
 	 * @return bool
 	 */
-	public function hasColumns()
+	public function hasColumns($type = NULL)
 	{
-		return count($this->getColumns()->getInnerIterator()) > 0;
+		return count($type == NULL ? $this->getColumns() : $this->getColumns($type)) > 0;
 	}
 
 
 	/**
 	 * Does any of datagrid columns has a filter?
+	 * @param  string
 	 * @return bool
 	 */
-	public function hasFilters()
+	public function hasFilters($type = NULL)
 	{
-		return count($this->getFilters()->getInnerIterator()) > 0;
+		return count($type == NULL ? $this->getFilters() : $this->getFilters($type)) > 0;
 	}
 
 
 	/**
 	 * Does datagrid has any action?
+	 * @param  string
 	 * @return bool
 	 */
-	public function hasActions()
+	public function hasActions($type = NULL)
 	{
-		return count($this->getActions()->getInnerIterator()) > 0;
+		return count($type == NULL ? $this->getActions() : $this->getActions($type)) > 0;
 	}
 
 
@@ -650,7 +680,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		parse_str($this->filters, $list);
 		foreach ($list as $column => $value) {
 			if ($value !== '') {
-				$this->getComponent('columns', TRUE)->getComponent($column, TRUE)->applyFilter($value);
+				$this[$column]->applyFilter($value);
 			}
 		}
 	}
@@ -709,13 +739,14 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		if (!$this->wasRendered) {
 			$this->wasRendered = TRUE;
-
-			if (!$this->hasColumns() || (count($this->getColumns()->getInnerIterator()) == 1 && $this->hasActions())) {
+			
+			if (!$this->hasColumns() || (count($this->getColumns('ActionColumn')) == count($this->getColumns()))) {
 				// auto-generate columns
-				if ($this->hasActions()) {
-					$actionColumn = $this->getComponent('columns', TRUE)->getComponent('actions');
-					$this->getComponent('columns', TRUE)->removeComponent($actionColumn);
-					$actionColumn->setParent(NULL);
+				if ($this->hasColumns('ActionColumn')) {
+					$columns = $this->getColumns('ActionColumn');
+					foreach ($columns as $column) {
+						unset($this[$column->getName()]);
+					}
 				}
 
 				$ds = clone $this->dataSource;
@@ -723,8 +754,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				$keys = array_keys((array)$row);
 				foreach ($keys as $key) $this->addColumn($key);
 
-				if ($this->hasActions()) {
-					$this['actions'] = $actionColumn;
+				if (isset($columns)) {
+					foreach ($columns as $column) {
+						$this[$column->getName()] = $column;
+						$this->setCurrentActionColumn($column);
+					}
 				}
 			}
 			
@@ -1013,12 +1047,29 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Adds column which represents logic container for data grid actions.
+	 * @param  string  control name
 	 * @param  string  column label
+	 * @param  bool
 	 * @return ActionColumn
 	 */
-	public function addActionColumn($caption)
+	public function addActionColumn($name, $caption = NULL, $setAsCurrent = TRUE)
 	{
-		return $this['actions'] = new ActionColumn($caption);
+		$column = new ActionColumn($caption);
+
+		if ($setAsCurrent) {
+			$this->setCurrentActionColumn($column);
+		}
+		return $this[$name] = $column;
+	}
+	
+	
+	/**
+	 * @param  ActionColumn
+	 * @return void
+	 */
+	public function setCurrentActionColumn(ActionColumn $column)
+	{
+		$this->currentActionColumn = $column;
 	}
 
 
@@ -1033,13 +1084,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function addAction($title, $signal, $icon = NULL, $useAjax = FALSE, $type = DataGridAction::WITH_KEY)
 	{
-		if (!$this->getComponent('columns', TRUE)->getComponent('actions', FALSE)) {
-			trigger_error('Use DataGrid::addActionColumn before you add actions.', E_USER_WARNING);
+		if (!$this->hasColumns('ActionColumn')) {
+			throw new InvalidStateException('No ActionColumn defined. Use DataGrid::addActionColumn before you add actions.');
 		}
-		$count = $this->hasActions() ? count($this->getActions()->getInnerIterator()) : 0;
-		$action = new DataGridAction($title, $signal, $icon, $useAjax, $type);
-		$this->getComponent('actions', TRUE)->addComponent($action, (string)$count);
-		return $action;
+		
+		return $this->currentActionColumn->addAction($title, $signal, $icon, $useAjax, $type);
 	}
 
 
@@ -1080,60 +1129,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		return $this->translator === NULL ? $s : call_user_func_array(array($this->getTranslator(), 'translate'), $args);
 	}
 
-
-
-	/********************* interface \ArrayAccess *********************/
-
-
-
-	/**
-	 * Adds the component to the container.
-	 * @param  string  component name
-	 * @param  IComponent
-	 * @return void.
-	 */
-	final public function offsetSet($name, $component)
-	{
-		$this->getComponent('columns', TRUE)->addComponent($component, $name);
-	}
-
-
-	/**
-	 * Returns component specified by name. Throws exception if component doesn't exist.
-	 * @param  string  component name
-	 * @return IComponent
-	 * @throws InvalidArgumentException
-	 */
-	final public function offsetGet($name)
-	{
-		return $this->getComponent('columns', TRUE)->getComponent($name, TRUE);
-	}
-
-
-	/**
-	 * Does component specified by name exists?
-	 * @param  string  component name
-	 * @return bool
-	 */
-	final public function offsetExists($name)
-	{
-		return $this->getComponent('columns', TRUE)->getComponent($name, FALSE) !== NULL;
-	}
-
-
-	/**
-	 * Removes component from the container. Throws exception if component doesn't exist.
-	 * @param  string  component name
-	 * @return void
-	 */
-	final public function offsetUnset($name)
-	{
-		$component = $this->getComponent('columns', TRUE)->getComponent($name, FALSE);
-		if ($component !== NULL) {
-			$this->getComponent('columns', TRUE)->removeComponent($component);
-		}
-	}
-
+	
 
 	/********************* interface \ISignalReceiver *********************/
 

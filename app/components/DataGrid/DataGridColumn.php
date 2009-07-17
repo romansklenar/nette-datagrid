@@ -14,7 +14,7 @@ require_once dirname(__FILE__) . '/IDataGridColumn.php';
  * @package    Nette\Extras\DataGrid
  * @version    $Id$
  */
-abstract class DataGridColumn extends Component implements IDataGridColumn
+abstract class DataGridColumn extends ComponentContainer implements IDataGridColumn
 {
 	/** @var Html  table header element template */
 	protected $header;
@@ -38,7 +38,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	public $orderable = TRUE;
 
 	/** @var string */
-	static public $ajaxClass = 'datagrid-ajax';
+	public static $ajaxClass = 'datagrid-ajax';
 
 
 	/**
@@ -49,6 +49,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	public function __construct($caption = NULL, $maxLength = NULL)
 	{
 		parent::__construct();
+		$this->addComponent(new ComponentContainer, 'filters');
 		$this->header = Html::el();
 		$this->cell = Html::el();
 		$this->caption = $caption;
@@ -63,10 +64,10 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	 * @param  IComponent
 	 * @return void
 	 */
-	protected function attached($dataGrid)
+	protected function attached($component)
 	{
-		if ($dataGrid instanceof DataGrid) {
-			$this->setParent($dataGrid->getComponent('columns', TRUE));
+		if ($component instanceof DataGrid) {
+			$this->setParent($component);
 
 			if ($this->caption === NULL) {
 				$this->caption = $this->getName();
@@ -157,7 +158,7 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	 */
 	public function hasFilter()
 	{
-		return $this->getDataGrid(TRUE)->getComponent('filters', TRUE)->getComponent($this->getName(), FALSE) instanceof IDataGridColumnFilter;
+		return $this->getFilter(FALSE) instanceof IDataGridColumnFilter;
 	}
 
 
@@ -168,31 +169,29 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	 */
 	public function getFilter($need = TRUE)
 	{
-		return $this->getDataGrid(TRUE)->getComponent('filters', TRUE)->getComponent($this->getName(), $need);
+		return $this->getComponent('filters')->getComponent($this->getName(), $need);
 	}
 
 
 	/**
-	 * Formats cell's content.
+	 * Formats cell's content. Descendant can override this method to customize formating.
 	 * @param  mixed
 	 * @param  DibiRow|array
 	 * @return string
 	 */
 	public function formatContent($value, $data = NULL)
 	{
-		trigger_error('DataGridColumn::formatContent should not be called; Overload this method by your implementation in descendant.', E_USER_WARNING);
 		return (string) $value;
 	}
 
 
 	/**
-	 * Filters data source.
+	 * Filters data source. Descendant can override this method to customize filtering.
 	 * @param  mixed
 	 * @return void
 	 */
 	public function applyFilter($value)
 	{
-		trigger_error('DataGridColumn::applyFilter should not be called; Overload this method by your implementation in descendant.', E_USER_WARNING);
 		return;
 	}
 
@@ -288,9 +287,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	 */
 	public function addTextFilter()
 	{
-		$filter = new TextFilter();
-		$this->getDataGrid(TRUE)->getComponent('filters', TRUE)->addComponent($filter, $this->getName());
-		return $filter;
+		$this->_addFilter(new TextFilter);
+		return $this->getFilter();
 	}
 
 
@@ -302,9 +300,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	 */
 	public function addDateFilter()
 	{
-		$filter = new DateFilter();
-		$this->getDataGrid(TRUE)->getComponent('filters', TRUE)->addComponent($filter, $this->getName());
-		return $filter;
+		$this->_addFilter(new DateFilter);
+		return $this->getFilter();
 	}
 
 
@@ -315,9 +312,8 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	 */
 	public function addCheckboxFilter()
 	{
-		$filter = new CheckboxFilter();
-		$this->getDataGrid(TRUE)->getComponent('filters', TRUE)->addComponent($filter, $this->getName());
-		return $filter;
+		$this->_addFilter(new CheckboxFilter);
+		return $this->getFilter();
 	}
 
 
@@ -331,8 +327,21 @@ abstract class DataGridColumn extends Component implements IDataGridColumn
 	 */
 	public function addSelectboxFilter($items = NULL, $skipFirst = NULL, $translateItems = TRUE)
 	{
-		$filter = new SelectboxFilter($items, $skipFirst);
-		$this->getDataGrid(TRUE)->getComponent('filters', TRUE)->addComponent($filter, $this->getName());
-		return $filter;
+		$this->_addFilter(new SelectboxFilter($items, $skipFirst));
+		return $this->getFilter();
+	}
+	
+	
+	/**
+	 * Internal filter adding routine.
+	 * @param  IDataGridColumnFilter $filter
+	 * @return void
+	 */
+	private function _addFilter(IDataGridColumnFilter $filter)
+	{
+		if ($this->hasFilter()) {
+			$this->getComponent('filters')->removeComponent($this->getFilter());
+		}
+		$this->getComponent('filters')->addComponent($filter, $this->getName());
 	}
 }

@@ -70,7 +70,7 @@ class DataGridAction extends Component implements IDataGridAction
 	 */
 	public function generateLink(array $args = NULL)
 	{
-		$control = $this->dataGrid->lookup('Nette\Application\Control', TRUE);
+		$control = $this->lookup('DataGrid', TRUE)->lookup('Nette\Application\Control', TRUE);
 		switch ($this->type) {
 			case self::WITHOUT_KEY: $link = $control->link($this->destination); break;
 			case self::WITH_KEY: $link = $control->link($this->destination, $args); break;
@@ -78,17 +78,6 @@ class DataGridAction extends Component implements IDataGridAction
 		}
 
 		$this->html->href($link);
-	}
-
-
-	/**
-	 * Returns data grid.
-	 * @param  bool   throw exception if form doesn't exist?
-	 * @return Form
-	 */
-	public function getDataGrid($need = TRUE)
-	{
-		return $this->lookup('DataGrid', $need);
 	}
 
 
