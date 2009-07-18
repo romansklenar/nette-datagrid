@@ -530,7 +530,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		foreach ($this->dataGrid->getColumns() as $column) {
 			$cell = $this->getWrapper('row.content cell container');
 			$cell->attrs = $column->getCellPrototype()->attrs;
-
+			
 			if ($column instanceof ActionColumn) {
 				$value = '';
 				foreach ($this->dataGrid->getActions() as $action) {
@@ -542,6 +542,9 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				$cell->addClass('actions');
 
 			} else {
+				if (!isset($data[$column->getName()])) {
+					throw new InvalidArgumentException("Non-existing column '" . $column->getName() . "' in datagrid '" . $this->dataGrid->getName() . "'");
+				}
 				$value = $column->formatContent($data[$column->getName()], $data);
 			}
 
