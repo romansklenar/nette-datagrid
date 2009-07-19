@@ -428,6 +428,17 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 		$session->remove();
 	}
+	
+	
+	/**
+	 * Returns array of classes persistent parameters.
+	 * @param  string  class name
+	 * @return array 
+	 */
+	public static function getPersistentParams()
+	{
+		return array('page', 'order', 'filters', 'itemsPerPage');
+	}
 
 
 
