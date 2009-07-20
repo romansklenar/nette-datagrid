@@ -46,7 +46,7 @@ class PositionColumn extends NumericColumn
 
 		$this->useAjax = $useAjax;
 
-		if ($moves === NULL) {
+		if (empty($moves)) {
 			$this->moves['up'] = 'Move up';
 			$this->moves['down'] = 'Move down';
 		} else {

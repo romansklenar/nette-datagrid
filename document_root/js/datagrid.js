@@ -13,10 +13,15 @@ $(function () {
 
 // prolínací efekt při updatu snippetu
 jQuery.extend({
-	updateSnippet: function (id, html) {
-		$("#" + id).fadeTo("fast", 0.3, function () {
-			$(this).html(html).fadeTo("fast", 1);
-		});
+	nette: {
+		updateSnippet: function (id, html) {
+			$("#" + id).fadeTo("fast", 0.3, function () {
+				$(this).html(html).fadeTo("fast", 1);
+				$.nette.registerAfterUpdate();
+			});
+		},
+	
+		registerAfterUpdate: function() { }
 	}
 });
 

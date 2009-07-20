@@ -137,7 +137,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		}
 
 		if ($mode !== NULL) {
-			return call_user_func_array(array($this, 'render' . $mode), NULL);
+			return call_user_func_array(array($this, 'render' . $mode), array());
 		}
 
 		$template = $this->dataGrid->getTemplate();
@@ -513,7 +513,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 		if ($this->dataGrid->hasOperations() || $this->dataGrid->hasActions()) {
 			$primary = $this->dataGrid->keyName;
-			if (!array_key_exists($primary, $data)) {
+			if (!isset($data[$primary])) {
 				throw new InvalidArgumentException("Invalid name of key for group operations or actions. Column '" . $primary . "' does not exist in data source.");
 			}
 		}

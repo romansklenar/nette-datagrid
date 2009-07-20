@@ -28,10 +28,10 @@ class DataGridAction extends Component implements IDataGridAction
 	static public $ajaxClass = 'datagrid-ajax';
 
 	/** @var string */
-	public $type;
-
-	/** @var string */
 	public $destination;
+	
+	/** @var bool|string */
+	public $key;
 
 
 	/**
@@ -43,14 +43,15 @@ class DataGridAction extends Component implements IDataGridAction
 	 * @param  string  textual link destination
 	 * @param  Html    element which is added to a generated link
 	 * @param  bool    use ajax? (add class self::$ajaxClass into generated link)
-	 * @param  bool    generate link with argument? (variable $keyName must be defined in data grid)
+	 * @param  mixed   generate link with argument? (if yes you can specify name of parameter 
+	 * 				   otherwise variable DataGrid::$keyName will be used and must be defined)
 	 * @return void
 	 */
-	public function __construct($title, $destination, Html $icon = NULL, $useAjax = FALSE, $type = self::WITH_KEY)
+	public function __construct($title, $destination, Html $icon = NULL, $useAjax = FALSE, $key = self::WITH_KEY)
 	{
 		parent::__construct();
-		$this->type = $type;
 		$this->destination = $destination;
+		$this->key = $key;
 
 		$a = Html::el('a')->title($title);
 		if ($useAjax) $a->addClass(self::$ajaxClass);
@@ -70,11 +71,16 @@ class DataGridAction extends Component implements IDataGridAction
 	 */
 	public function generateLink(array $args = NULL)
 	{
-		$control = $this->lookup('DataGrid', TRUE)->lookup('Nette\Application\Control', TRUE);
-		switch ($this->type) {
-			case self::WITHOUT_KEY: $link = $control->link($this->destination); break;
-			case self::WITH_KEY: $link = $control->link($this->destination, $args); break;
-			default: throw new InvalidArgumentException("Invalid type of action.");
+		$dataGrid = $this->lookup('DataGrid', TRUE);
+		$control = $dataGrid->lookup('Nette\Application\Control', TRUE);
+		
+		switch ($this->key) {
+		case self::WITHOUT_KEY:
+			$link = $control->link($this->destination); break;
+		case self::WITH_KEY:
+		default:
+			$key = $this->key == NULL || is_bool($this->key) ? $dataGrid->keyName : $this->key;
+			$link = $control->link($this->destination, array($key => $args[$dataGrid->keyName])); break;
 		}
 
 		$this->html->href($link);

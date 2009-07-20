@@ -1090,16 +1090,17 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  string  textual link destination
 	 * @param  Html    element which is added to a generated link
 	 * @param  bool    use ajax? (add class self::$ajaxClass into generated link)
-	 * @param  bool    generate link with argument? (variable $keyName must be defined in data grid)
+	 * @param  mixed   generate link with argument? (if yes you can specify name of parameter 
+	 * 				   otherwise variable DataGrid::$keyName will be used and must be defined)
 	 * @return DataGridAction
 	 */
-	public function addAction($title, $signal, $icon = NULL, $useAjax = FALSE, $type = DataGridAction::WITH_KEY)
+	public function addAction($title, $signal, $icon = NULL, $useAjax = FALSE, $key = DataGridAction::WITH_KEY)
 	{
 		if (!$this->hasColumns('ActionColumn')) {
 			throw new InvalidStateException('No ActionColumn defined. Use DataGrid::addActionColumn before you add actions.');
 		}
 		
-		return $this->currentActionColumn->addAction($title, $signal, $icon, $useAjax, $type);
+		return $this->currentActionColumn->addAction($title, $signal, $icon, $useAjax, $key);
 	}
 
 
