@@ -101,7 +101,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 	/** @var DataGrid */
 	protected $dataGrid;
-	
+
 	/** @var array  of function(Html $row, DibiRow $data) */
 	public $onRowRender;
 
@@ -427,7 +427,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				if (count($list) > 1 && isset($list[$column->getName()])) {
 					$text .= Html::el('span')->setHtml($list[$column->getName()][1]);
 				}
-				
+
 				$up = clone $down = Html::el('a')->addClass(DataGridColumn::$ajaxClass);
 				$up->addClass($a ? 'active' : '')->href($column->getOrderLink('a'))->add(Html::el('span')->class('up'));
 				$down->addClass($d ? 'active' : '')->href($column->getOrderLink('d'))->add(Html::el('span')->class('down'));
@@ -457,7 +457,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	{
 		$row = $this->getWrapper('row.filter container');
 		$form = $this->dataGrid->getForm(TRUE);
-		
+
 		$submitControl = $form['filterSubmit']->control;
 		$submitControl->addClass($this->getValue('row.filter control .submit'));
 		$submitControl->title = $submitControl->value;
@@ -491,12 +491,12 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$cell->setHtml($value);
 			$row->add($cell);
 		}
-		
+
 		if (!$this->dataGrid->hasActions()) {
 			$submitControl->addStyle('display: none');
 			$row->add($submitControl);
 		}
-		
+
 		return $row;
 	}
 
@@ -530,7 +530,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		foreach ($this->dataGrid->getColumns() as $column) {
 			$cell = $this->getWrapper('row.content cell container');
 			$cell->attrs = $column->getCellPrototype()->attrs;
-			
+
 			if ($column instanceof ActionColumn) {
 				$value = '';
 				foreach ($this->dataGrid->getActions() as $action) {

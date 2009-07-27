@@ -92,7 +92,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/** @var string */
 	protected $receivedSignal;
-	
+
 	/** @var ActionColumn */
 	protected $currentActionColumn;
 
@@ -428,12 +428,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 		$session->remove();
 	}
-	
-	
+
+
 	/**
 	 * Returns array of classes persistent parameters.
 	 * @param  string  class name
-	 * @return array 
+	 * @return array
 	 */
 	public static function getPersistentParams()
 	{
@@ -473,9 +473,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			if (isset($list[$by])) $this->order = $this->defaultOrder;
 			unset($list);
 		}
-		
+
 		parse_str($this->order, $list);
-		
+
 		if ($dir == NULL) {
 			if (!isset($list[$by])) {
 				if (!$this->multiOrder) $list = array();
@@ -512,14 +512,14 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			if ($value !== '') $filters[$key] = $value;
 		}
 		$this->filters = http_build_query($filters, '', '&');
-		
+
 		// default filtering
 		if (empty($this->filters) && !empty($this->defaultFilters)) {
 			parse_str($this->defaultFilters, $list);
 			if (isset($list[$by])) $this->filters = $this->defaultFilters;
 			unset($list);
 		}
-		
+
 		$this->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->redirect('this');
 	}
@@ -618,8 +618,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		$this->applySorting();
 		$this->applyPaging();
 	}
-	
-	
+
+
 	/**
 	 * Applies default sorting on data grid.
 	 * @return void
@@ -630,8 +630,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			$this->order = $this->defaultOrder;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Applies default filtering on data grid.
 	 * @return void
@@ -642,8 +642,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			$this->filters = $this->defaultFilters;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Applies paging on data grid.
 	 * @return void
@@ -750,7 +750,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	{
 		if (!$this->wasRendered) {
 			$this->wasRendered = TRUE;
-			
+
 			if (!$this->hasColumns() || (count($this->getColumns('ActionColumn')) == count($this->getColumns()))) {
 				// auto-generate columns
 				if ($this->hasColumns('ActionColumn')) {
@@ -772,7 +772,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 					}
 				}
 			}
-			
+
 			if ($this->disableOrder) {
 				foreach ($this->getColumns() as $column) {
 					$column->orderable = FALSE;
@@ -922,7 +922,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	protected function regenerateFormControls()
 	{
 		$form = $this->getForm();
-		
+
 		// regenerate checker's checkbox controls
 		if ($this->hasOperations()) {
 			$form->removeComponent($form['checker']);
@@ -935,12 +935,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		// for selectbox filter controls update values if was filtered over column
 		if ($this->hasFilters()) {
 			parse_str($this->filters, $list);
-			
+
 			foreach ($this->getFilters() as $filter) {
 				if ($filter instanceof SelectboxFilter) {
 					$filter->generateItems();
-				} 
-				
+				}
+
 				if ($this->filters === $this->defaultFilters && ($filter->value !== NULL || $filter->value !== '')) {
 					if (!in_array($filter->getName(), array_keys($list))) $filter->value = NULL;
 				}
@@ -1072,8 +1072,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 		return $this[$name] = $column;
 	}
-	
-	
+
+
 	/**
 	 * @param  ActionColumn
 	 * @return void
@@ -1090,7 +1090,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  string  textual link destination
 	 * @param  Html    element which is added to a generated link
 	 * @param  bool    use ajax? (add class self::$ajaxClass into generated link)
-	 * @param  mixed   generate link with argument? (if yes you can specify name of parameter 
+	 * @param  mixed   generate link with argument? (if yes you can specify name of parameter
 	 * 				   otherwise variable DataGrid::$keyName will be used and must be defined)
 	 * @return DataGridAction
 	 */
@@ -1099,7 +1099,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		if (!$this->hasColumns('ActionColumn')) {
 			throw new InvalidStateException('No ActionColumn defined. Use DataGrid::addActionColumn before you add actions.');
 		}
-		
+
 		return $this->currentActionColumn->addAction($title, $signal, $icon, $useAjax, $key);
 	}
 
@@ -1141,7 +1141,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		return $this->translator === NULL ? $s : call_user_func_array(array($this->getTranslator(), 'translate'), $args);
 	}
 
-	
+
 
 	/********************* interface \ISignalReceiver *********************/
 

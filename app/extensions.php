@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Extension methods difinition file.

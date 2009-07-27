@@ -196,7 +196,7 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 	}
 
 
-	
+
 	/********************* Default sorting and filtering *********************/
 
 
@@ -216,11 +216,11 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 		parse_str($this->getDataGrid()->defaultOrder, $list);
 		$list[$this->getName()] = strtolower($order[0]);
 		$this->getDataGrid()->defaultOrder = http_build_query($list, '', '&');
-		
+
 		return $this;
 	}
-	
-	
+
+
 	/**
 	 * Adds default filtering to data grid.
 	 * @param string
@@ -231,11 +231,11 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 		parse_str($this->getDataGrid()->defaultFilters, $list);
 		$list[$this->getName()] = $value;
 		$this->getDataGrid()->defaultFilters = http_build_query($list, '', '&');
-		
+
 		return $this;
 	}
-	
-	
+
+
 	/**
 	 * Removes data grid's default sorting.
 	 * @return DataGridColumn  provides a fluent interface
@@ -245,11 +245,11 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 		parse_str($this->getDataGrid()->defaultOrder, $list);
 		if (isset($list[$this->getName()])) unset($list[$this->getName()]);
 		$this->getDataGrid()->defaultOrder = http_build_query($list, '', '&');
-		
+
 		return $this;
 	}
-	
-	
+
+
 	/**
 	 * Removes data grid's default filtering.
 	 * @return DataGridColumn  provides a fluent interface
@@ -259,13 +259,13 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 		parse_str($this->getDataGrid()->defaultFilters, $list);
 		if (isset($list[$this->getName()])) unset($list[$this->getName()]);
 		$this->getDataGrid()->defaultFilters = http_build_query($list, '', '&');
-		
+
 		return $this;
 	}
 
 
 
-	
+
 	/********************* filter factories *********************/
 
 
@@ -330,8 +330,8 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 		$this->_addFilter(new SelectboxFilter($items, $skipFirst));
 		return $this->getFilter();
 	}
-	
-	
+
+
 	/**
 	 * Internal filter adding routine.
 	 * @param  IDataGridColumnFilter $filter

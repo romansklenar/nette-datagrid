@@ -30,8 +30,8 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 		$this->removeComponent($this->getComponent('filters'));
 		$this->orderable = FALSE;
 	}
-	
-	
+
+
 	/**
 	 * Has column filter box?
 	 * @return bool
@@ -40,8 +40,8 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	{
 		return FALSE;
 	}
-	
-	
+
+
 	/**
 	 * Returns column's filter.
 	 * @param  bool   throw exception if component doesn't exist?
@@ -55,8 +55,8 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 		}
 		return NULL;
 	}
-	
-	
+
+
 	/**
 	 * Action factory.
 	 * @param  string  textual title
@@ -72,8 +72,8 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 		$this[] = $action;
 		return $action;
 	}
-	
-	
+
+
 	/**
 	 * Does column has any action?
 	 * @return bool
@@ -82,8 +82,8 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	{
 		return count($this->getActions($type)) > 0;
 	}
-	
-	
+
+
 	/**
 	 * Returns column's action specified by name.
 	 * @param  string action's name
@@ -94,8 +94,8 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	{
 		return $this->getComponent('actions')->getComponent($name, $need);
 	}
-	
-	
+
+
 	/**
 	 * Iterates over all column's actions.
 	 * @param  string
@@ -134,9 +134,9 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	{
 		throw new InvalidStateException("ActionColumn cannot be filtered.");
 	}
-	
-	
-	
+
+
+
 	/********************* interface \ArrayAccess *********************/
 
 

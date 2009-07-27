@@ -29,7 +29,7 @@ class DataGridAction extends Component implements IDataGridAction
 
 	/** @var string */
 	public $destination;
-	
+
 	/** @var bool|string */
 	public $key;
 
@@ -43,7 +43,7 @@ class DataGridAction extends Component implements IDataGridAction
 	 * @param  string  textual link destination
 	 * @param  Html    element which is added to a generated link
 	 * @param  bool    use ajax? (add class self::$ajaxClass into generated link)
-	 * @param  mixed   generate link with argument? (if yes you can specify name of parameter 
+	 * @param  mixed   generate link with argument? (if yes you can specify name of parameter
 	 * 				   otherwise variable DataGrid::$keyName will be used and must be defined)
 	 * @return void
 	 */
@@ -73,7 +73,7 @@ class DataGridAction extends Component implements IDataGridAction
 	{
 		$dataGrid = $this->lookup('DataGrid', TRUE);
 		$control = $dataGrid->lookup('Nette\Application\Control', TRUE);
-		
+
 		switch ($this->key) {
 		case self::WITHOUT_KEY:
 			$link = $control->link($this->destination); break;

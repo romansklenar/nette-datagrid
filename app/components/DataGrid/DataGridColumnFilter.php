@@ -61,8 +61,8 @@ abstract class DataGridColumnFilter extends Component implements IDataGridColumn
 		}
 		return $this->value;
 	}
-	
-	
+
+
 	/**
 	 * Sets filter's value.
 	 * @param string

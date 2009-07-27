@@ -130,10 +130,10 @@ class ExamplePresenter extends BasePresenter
 			$grid['orderDate']->addDateFilter();
 			$grid['status']->addSelectboxFilter();
 			$grid['creditLimit']->addFilter();
-			
-			
+
+
 			/**** default sorting and filtering ****/
-			
+
 			$grid['city']->addDefaultSorting('asc');
 			$grid['contactLastName']->addDefaultSorting('asc');
 			$grid['orders']->addDefaultFiltering(TRUE);
@@ -216,8 +216,8 @@ class ExamplePresenter extends BasePresenter
 		$grid->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
 	}
-	
-	
+
+
 	/**
 	 * 'customersGrid' onCellRender event.
 	 * @param  Html
