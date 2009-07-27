@@ -91,9 +91,9 @@ class PositionColumn extends NumericColumn
 	 */
 	public function formatContent($value, $data = NULL)
 	{
-		$presenter = $this->lookup('Nette\Aplication\Presenter', TRUE); // intentionally presenter
-		$uplink = $presenter->link($this->destination, array('key' => $value, 'dir' => 'up'));
-		$downlink = $presenter->link($this->destination, array('key' => $value, 'dir' => 'down'));
+		$control = $this->getDataGrid(TRUE)->lookup('Nette\Application\Control', TRUE);
+		$uplink = $control->link($this->destination, array('key' => $value, 'dir' => 'up'));
+		$downlink = $control->link($this->destination, array('key' => $value, 'dir' => 'down'));
 
 		$up = Html::el('a')->title($this->moves['up'])->href($uplink)->add(Html::el('span')->class('up'));
 		$down = Html::el('a')->title($this->moves['down'])->href($downlink)->add(Html::el('span')->class('down'));
