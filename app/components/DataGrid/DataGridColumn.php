@@ -320,15 +320,15 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 	/**
 	 * Adds select box filter input to data grid.
 	 * @param  array   items from which to choose
-	 * @param  int     skip first items value from validation?
+	 * @param  bool    add empty first item to selectbox?
 	 * @param  bool    translate all items in selectbox?
 	 * @return IDataGridColumnFilter
 	 * @throws InvalidArgumentException
 	 */
-	public function addSelectboxFilter($items = NULL, $skipFirst = NULL, $translateItems = TRUE)
+	public function addSelectboxFilter($items = NULL, $firstEmpty = TRUE, $translateItems = TRUE)
 	{
-		$this->_addFilter(new SelectboxFilter($items, $skipFirst));
-		return $this->getFilter();
+		$this->_addFilter(new SelectboxFilter($items, $firstEmpty));
+		return $this->getFilter()->translateItems($translateItems);
 	}
 
 

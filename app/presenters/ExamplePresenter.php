@@ -126,7 +126,7 @@ class ExamplePresenter extends BasePresenter
 			$grid['city']->addSelectboxFilter()->translateItems(FALSE);
 			$grid['country']->addSelectboxFilter()->translateItems(FALSE);
 			$grid['postalCode']->addFilter();
-			$grid['orders']->addSelectboxFilter(array('?' => '?', '0' => "Don't have", '1' => "Have"), TRUE);
+			$grid['orders']->addSelectboxFilter(array('0' => "Don't have", '1' => "Have"), TRUE);
 			$grid['orderDate']->addDateFilter();
 			$grid['status']->addSelectboxFilter();
 			$grid['creditLimit']->addFilter();

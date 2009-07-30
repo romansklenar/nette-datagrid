@@ -1,7 +1,8 @@
 TODO
 ====
-? našeptávání - http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete
+? našeptávání (pouze s JS) - http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete
 - skrývání sloupců (pouze s JS)
+- podpora pro jQuey UI Sortable (s i bez JS)
 
 - ImageColumn
 	- potřeba zajistit, aby načítání obrázku fungovalo jak z DB tak z FS

@@ -26,20 +26,20 @@ class SelectboxFilter extends DataGridColumnFilter
 	protected $translateItems;
 
 	/** @var bool */
-	protected $skipFirst;
+	protected $firstEmpty;
 
 
 	/**
 	 * Selectbox filter constructor.
 	 * @param  array   items from which to choose
-	 * @param  int     skip first items value from validation?
+	 * @param  bool    add empty first item to selectbox?
 	 * @param  bool    translate all items in selectbox?
 	 * @return void
 	 */
-	public function __construct(array $items = NULL, $skipFirst = NULL, $translateItems = TRUE)
+	public function __construct(array $items = NULL, $firstEmpty = TRUE, $translateItems = TRUE)
 	{
 		$this->items = $items;
-		$this->skipFirst = $skipFirst;
+		$this->firstEmpty = $firstEmpty;
 		$this->translateItems = $translateItems;
 		parent::__construct();
 	}
@@ -70,8 +70,7 @@ class SelectboxFilter extends DataGridColumnFilter
 		$fluent->where('%and', $cond)->orderBy($columnName);
 		$items = $fluent->fetchPairs($columnName, $columnName);
 
-		$this->generatedItems = array_merge(array('?' => '?'), $items);
-		$this->skipFirst = TRUE;
+		$this->generatedItems = $this->firstEmpty ? array_merge(array('' => '?'), $items) : $items;
 
 		// if was data grid already filtered by this filter don't update with filtred items (keep full list)
 		if (empty($this->element->value)) {
@@ -97,8 +96,8 @@ class SelectboxFilter extends DataGridColumnFilter
 		}
 
 		// skip first item?
-		if ($this->skipFirst) {
-			$this->element->skipFirst();
+		if ($this->firstEmpty) {
+			$this->element->skipFirst('?');
 		}
 
 		// translate items?
