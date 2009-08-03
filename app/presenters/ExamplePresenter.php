@@ -16,9 +16,10 @@ class ExamplePresenter extends BasePresenter
 	{
 		Debug::timer('grids-creating');
 
-		$this->template->baseGrid = $this->getComponent('baseGrid');
-		$this->template->officesGrid = $this->getComponent('officesGrid');
-		$this->template->customersGrid = $this->getComponent('customersGrid');
+		// only for creating time measure
+		$this['baseGrid'];
+		$this['officesGrid'];
+		$this['customersGrid'];
 
 		Environment::setVariable('creating', Debug::timer('grids-creating') * 1000);
 	}
@@ -107,12 +108,12 @@ class ExamplePresenter extends BasePresenter
 
 			$grid->addColumn('customerName', 'Name');
 			$grid->addColumn('contactLastName', 'Surname');
-			$grid->addColumn('addressLine1', 'Address')->getHeaderPrototype()->style('width: 180px');
+			$grid->addColumn('addressLine1', 'Address')->getHeaderPrototype()->addStyle('width: 180px');
 			$grid->addColumn('city', 'City');
 			$grid->addColumn('country', 'Country');
 			$grid->addColumn('postalCode', 'Postal code');
 			$caption = Html::el('span')->setText('O')->title('Has orders?')->class('link');
-			$grid->addCheckboxColumn('orders', $caption)->getHeaderPrototype()->style('text-align: center');
+			$grid->addCheckboxColumn('orders', $caption)->getHeaderPrototype()->addStyle('text-align: center');
 			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y'); // czech format: '%d.%m.%Y'
 			$grid->addColumn('status', 'Status');
 			$grid->addNumericColumn('creditLimit', 'Credit', 0);
@@ -128,7 +129,7 @@ class ExamplePresenter extends BasePresenter
 			$grid['postalCode']->addFilter();
 			$grid['orders']->addSelectboxFilter(array('0' => "Don't have", '1' => "Have"), TRUE);
 			$grid['orderDate']->addDateFilter();
-			$grid['status']->addSelectboxFilter();
+			$grid['status']->addSelectboxFilter(array('Cancelled' => 'Cancelled', 'Resolved' => 'Resolved', 'Shipped' => 'Shipped', 'NULL' => "Without orders"));
 			$grid['creditLimit']->addFilter();
 
 
@@ -142,10 +143,13 @@ class ExamplePresenter extends BasePresenter
 			/**** column content affecting ****/
 
 			// by css styling
-			$grid['orderDate']->getCellPrototype()->style('text-align: center');
+			$grid['orderDate']->getCellPrototype()->addStyle('text-align: center');
+			$grid['status']->getHeaderPrototype()->addStyle('width: 60px');
+			$grid['addressLine1']->getHeaderPrototype()->addStyle('width: 150px');
+			$grid['city']->getHeaderPrototype()->addStyle('width: 90px');
 
 			// by replacement of given pattern
-			$el = Html::el('span')->style('margin: 0 auto');
+			$el = Html::el('span')->addStyle('margin: 0 auto');
 			$grid['status']->replacement['Shipped'] = clone $el->class("icon icon-shipped")->title("Shipped");
 			$grid['status']->replacement['Resolved'] = clone $el->class("icon icon-resolved")->title("Resolved");
 			$grid['status']->replacement['Cancelled'] = clone $el->class("icon icon-cancelled")->title("Cancelled");
@@ -157,7 +161,7 @@ class ExamplePresenter extends BasePresenter
 
 			/**** add some actions ****/
 
-			$grid->addActionColumn('Actions')->getHeaderPrototype()->style('width: 98px');
+			$grid->addActionColumn('Actions')->getHeaderPrototype()->addStyle('width: 98px');
 			$icon = Html::el('span');
 			$grid->addAction('Copy', 'Customer:copy', clone $icon->class('icon icon-copy'));
 			$grid->addAction('Detail', 'Customer:detail', clone $icon->class('icon icon-detail'));

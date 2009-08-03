@@ -513,13 +513,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 		$this->filters = http_build_query($filters, '', '&');
 
-		// default filtering
-		if (empty($this->filters) && !empty($this->defaultFilters)) {
-			parse_str($this->defaultFilters, $list);
-			if (isset($list[$by])) $this->filters = $this->defaultFilters;
-			unset($list);
-		}
-
 		$this->invalidateControl();
 		if (!$this->presenter->isAjax()) $this->redirect('this');
 	}
@@ -843,7 +836,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 				$form = new AppForm($this, $name);
 				$form->setTranslator($this->getTranslator());
-				FormControl::$idMask = 'frm-datagrid-' . String::capitalize($this->getName()) . '-%s-%s';
+				FormControl::$idMask = 'frm-datagrid-' . String::capitalize($this->getUniqueId()) . '-%s-%s';
 				$form->onSubmit[] = array($this, 'formSubmitHandler');
 
 				$form->addSubmit('resetSubmit', 'Reset state');
