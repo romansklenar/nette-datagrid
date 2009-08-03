@@ -35,6 +35,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			'container' => 'tr class=header',
 			'cell' => array(
 				'container' => 'th', // .checker, .action
+				'.active' => 'active',
 			),
 		),
 
@@ -429,17 +430,22 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				}
 
 				$up = clone $down = Html::el('a')->addClass(DataGridColumn::$ajaxClass);
-				$up->addClass($a ? 'active' : '')->href($column->getOrderLink('a'))->add(Html::el('span')->class('up'));
-				$down->addClass($d ? 'active' : '')->href($column->getOrderLink('d'))->add(Html::el('span')->class('down'));
+				$up->addClass($a ? 'active' : '')->href($column->getOrderLink('a'))
+					->add(Html::el('span')->class('up'));
+				$down->addClass($d ? 'active' : '')->href($column->getOrderLink('d'))
+					->add(Html::el('span')->class('down'));
 				$positioner = Html::el('span')->class('positioner')->add($up)->add($down);
+				$active = $a || $d;
 
-				$value = (string) Html::el('a')->href($column->getOrderLink())->class(DataGridColumn::$ajaxClass)->setHtml($text) . $positioner;
+				$value = (string) Html::el('a')->href($column->getOrderLink())
+					->addClass(DataGridColumn::$ajaxClass)->setHtml($text) . $positioner;
 			} else {
 				$value = (string) Html::el('p')->setText($value);
 			}
 
 			$cell = $this->getWrapper('row.header cell container')->setHtml($value);
 			$cell->attrs = $column->getHeaderPrototype()->attrs;
+			$cell->addClass(isset($active) && $active == TRUE ? $this->getValue('row.header cell .active') : NULL);
 			if ($column instanceof ActionColumn) $cell->addClass('actions');
 
 			$row->add($cell);
