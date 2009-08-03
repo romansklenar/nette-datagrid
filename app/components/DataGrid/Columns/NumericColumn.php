@@ -67,16 +67,23 @@ class NumericColumn extends DataGridColumn
 
 		$column = $this->getName();
 		$cond = array();
-		$operator = '=';
 
-		$v = str_replace(',', '.', $value);
-		if (preg_match('/^(?<operator>\>|\>\=|\<|\<\=|\=|\<\>)?(?<value>[\.|\d]+)$/', $v, $matches)) {
-			if (isset($matches['operator']) && !empty($matches['operator'])) {
-				$operator = $matches['operator'];
+		if ($value === 'NULL' || $value === 'NOT NULL') {
+			$cond[] = array("[$column] IS $value");
+
+		} else {
+			$operator = '=';
+			$v = str_replace(',', '.', $value);
+
+			if (preg_match('/^(?<operator>\>|\>\=|\<|\<\=|\=|\<\>)?(?<value>[\.|\d]+)$/', $v, $matches)) {
+				if (isset($matches['operator']) && !empty($matches['operator'])) {
+					$operator = $matches['operator'];
+				}
+				$value = $matches['value'];
 			}
-			$value = $matches['value'];
+
+			$cond[] = array("[$column] $operator %f", $value);
 		}
-		$cond[] = array("[$column] $operator %f", $value);
 
 		$datagrid = $this->getDataGrid(TRUE);
 		$datagrid->dataSource->where('%and', $cond);

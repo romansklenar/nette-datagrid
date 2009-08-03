@@ -79,6 +79,9 @@ class TextColumn extends DataGridColumn
 				$cond[] = array("[$column] REGEXP '$value'");
 			}
 
+		} elseif ($value === 'NULL' || $value === 'NOT NULL') {
+			$cond[] = array("[$column] IS $value");
+
 		} else {
 			$cond[] = array("[$column] LIKE '%$value%'");
 		}
