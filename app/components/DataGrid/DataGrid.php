@@ -918,10 +918,19 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 		// regenerate checker's checkbox controls
 		if ($this->hasOperations()) {
+			$values = array();
+			if ($form->isPopulated()) {
+				$values = $form->getValues();
+			}
+
 			$form->removeComponent($form['checker']);
 			$sub = $form->addContainer('checker');
 			foreach ($this->getRows() as $row) {
 				$sub->addCheckbox($row[$this->keyName], $row[$this->keyName]);
+			}
+
+			if (!empty($values['checker'])) {
+				$form->setDefaults(array('checker' => $values['checker']));
 			}
 		}
 
