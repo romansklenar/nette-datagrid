@@ -78,6 +78,9 @@ $("table.datagrid td.checker input:checkbox").livequery(datagridCheckboxClicked)
 // zaškrtávání celým řádkem
 var previous = null; // index from
 $("table.datagrid tr td:not(.checker)").live("click", function (e) {
+	// jen kliknutí levým tlačítkem
+	if (e.button != 0) return true;
+	  
 	var row = $(this).parent("tr");
 	
 	// výběr více řádků při držení klavesy SHIFT nebo CTRL

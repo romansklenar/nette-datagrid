@@ -218,13 +218,6 @@ div[id $="__grid"] {
 	z-index: 2005;
 }
 
-input.datepicker {
-	background: white url('../images/calendar.gif') no-repeat right;
-	border: 1px solid #ccc;
-	padding: 0;
-	padding-right: 26px;
-}
-
 /* Fonts */
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: inherit; font-size: 1em; }
 
@@ -248,34 +241,34 @@ span.icon {
 	text-indent: -99999px;
 }
 .icon-add {
-	background-image: url('../images/icons/page_add.png');
+	background-image: url('../images/datagrid/icons/page_add.png');
 }
 .icon-edit {
-	background-image: url('../images/icons/page_edit.png');
+	background-image: url('../images/datagrid/icons/page_edit.png');
 }
 .icon-del {
-	background-image: url('../images/icons/page_delete.png');
+	background-image: url('../images/datagrid/icons/page_delete.png');
 }
 .icon-copy {
-	background-image: url('../images/icons/page_copy.png');
+	background-image: url('../images/datagrid/icons/page_copy.png');
 }
 .icon-save {
-	background-image: url('../images/icons/page_save.png');
+	background-image: url('../images/datagrid/icons/page_save.png');
 }
 .icon-detail {
-	background-image: url('../images/icons/page_detail.png');
+	background-image: url('../images/datagrid/icons/page_detail.png');
 }
 .icon-print {
-	background-image: url('../images/icons/printer.png');
+	background-image: url('../images/datagrid/icons/printer.png');
 }
 .icon-bin {
-	background-image: url('../images/icons/bin_closed.png');
+	background-image: url('../images/datagrid/icons/bin_closed.png');
 }
 .icon-find {
-	background-image: url('../images/icons/find.png');
+	background-image: url('../images/datagrid/icons/find.png');
 }
 .icon-refresh, .icon-invert {
-	background-image: url('../images/icons/arrow_refresh.png');
+	background-image: url('../images/datagrid/icons/arrow_refresh.png');
 }
 .icon-invert, .icon-find {
 	cursor: pointer;
@@ -288,16 +281,16 @@ span.icon {
 	float: none !important
 }
 .icon-shipped {
-	background-image: url('../images/icons/cart_go.png');
+	background-image: url('../images/datagrid/icons/cart_go.png');
 }
 .icon-resolved {
-	background-image: url('../images/icons/flag_green.png');
+	background-image: url('../images/datagrid/icons/flag_green.png');
 }
 .icon-cancelled {
-	background-image: url('../images/icons/flag_red.png');
+	background-image: url('../images/datagrid/icons/flag_red.png');
 }
 .icon-no-orders {
-	background-image: url('../images/icons/box.png');
+	background-image: url('../images/datagrid/icons/box.png');
 }
 
 

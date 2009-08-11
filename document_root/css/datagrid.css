@@ -51,19 +51,20 @@ table.datagrid input[type=submit] {
 	background: transparent no-repeat right center;
 }
 table.datagrid input[name=filterSubmit] {
-	background-image: url('../images/icons/find.png') !important;
+	background-image: url('../images/datagrid/icons/find.png') !important;
 }
 table.datagrid input[name=operationSubmit] {
-	background-image: url('../images/icons/accept.png') !important;
+	background-image: url('../images/datagrid/icons/accept.png') !important;
 }
 table.datagrid input[name=pageSubmit], table.datagrid input[name=itemsSubmit] {
-	background-image: url('../images/icons/arrow_rotate_clockwise.png') !important;
+	background-image: url('../images/datagrid/icons/arrow_rotate_clockwise.png') !important;
 }
 table.datagrid input[name=resetSubmit] {
-	background-image: url('../images/icons/arrow_refresh_small.png') !important;
+	background-image: url('../images/datagrid/icons/arrow_refresh_small.png') !important;
 }
-
-
+table.datagrid input.datepicker {
+	background: white url('../images/datagrid/calendar.gif') no-repeat right !important;
+}
 table.datagrid td, table.datagrid th {
 	color: #525b37;
 	border: 1px solid #BBCBF4;
@@ -71,7 +72,7 @@ table.datagrid td, table.datagrid th {
 }
 table.datagrid th {
 	color: #505767;
-	background: #C6DBFF url('../images/th-bg.gif') no-repeat;
+	background: #C6DBFF url('../images/datagrid/th-bg.gif') no-repeat;
 	text-align: left;
 	padding: 0 10px;
 }
@@ -85,7 +86,7 @@ table.datagrid tr.header th a span {
 	padding-left: 6px;
 }
 table.datagrid tr.filters, table.datagrid tr.filters td {
-	background: #C6DBFF url('../images/th-bg-mid.gif') no-repeat;
+	background: #C6DBFF url('../images/datagrid/th-bg-mid.gif') no-repeat;
 	padding: 3px 6px !important;
 }
 table.datagrid tr.header th span.link {
@@ -98,7 +99,7 @@ table.datagrid th a, table.datagrid tr.filters a.filter {
 	float: left;
 }
 table.datagrid tr.filters a.filter {
-	background: url('../images/icons/find.png') no-repeat right center;
+	background: url('../images/datagrid/icons/find.png') no-repeat right center;
 	padding-right: 25px;
 	padding-left: 5px;
 	font-weight: bold;
@@ -115,7 +116,7 @@ table.datagrid tr.filters td.actions {
 	*padding: 6px !important;
 }
 table.datagrid tr.footer td {
-	background: #C6DBFF url('../images/th-bg-top.gif') repeat-x;
+	background: #C6DBFF url('../images/datagrid/th-bg-top.gif') repeat-x;
 	color: #505767;
 	border: 1px solid #BBCBF4;
 	padding: 0 10px;
@@ -148,10 +149,10 @@ table.datagrid span.positioner a span {
 	padding-left: 0px !important;
 }
 table.datagrid span.positioner a span.up {
-	background: url('../images/asc.gif') no-repeat right center;
+	background: url('../images/datagrid/asc.gif') no-repeat right center;
 }
 table.datagrid span.positioner a span.down {
-	background: url('../images/desc.gif') no-repeat right center;
+	background: url('../images/datagrid/desc.gif') no-repeat right center;
 }
 table.datagrid span.positioner a span.down:hover, table.datagrid span.positioner a span.up:hover {
 	opacity: 1;
@@ -204,16 +205,16 @@ table.datagrid .paginator .paginator-next,  table.datagrid .paginator .paginator
 	text-indent: -99999px;
 }
 table.datagrid .paginator .paginator-first {
-	background-image: url('../images/icons/control_start_blue.png');
+	background-image: url('../images/datagrid/icons/control_start_blue.png');
 }
 table.datagrid .paginator .paginator-prev {
-	background-image: url('../images/icons/control_left_blue.png');
+	background-image: url('../images/datagrid/icons/control_left_blue.png');
 }
 table.datagrid .paginator .paginator-next {
-	background-image: url('../images/icons/control_right_blue.png');
+	background-image: url('../images/datagrid/icons/control_right_blue.png');
 }
 table.datagrid .paginator .paginator-last {
-	background-image: url('../images/icons/control_end_blue.png');
+	background-image: url('../images/datagrid/icons/control_end_blue.png');
 }
 table.datagrid .inactive {
 	opacity: 0.40;
