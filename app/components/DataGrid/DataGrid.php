@@ -930,7 +930,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			}
 
 			if (!empty($values['checker'])) {
-				$form->setDefaults(array('checker' => $values['checker']));
+				$form->setValues(array('checker' => $values['checker']));
 			}
 		}
 
