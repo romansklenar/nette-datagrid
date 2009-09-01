@@ -55,7 +55,7 @@ class CheckboxColumn extends NumericColumn
 		$column = $this->getName();
 		$value = (int)(bool)$value;
 		$cond = array();
-		if ($value) $cond[] = array("[$column] > %b", TRUE);
+		if ($value) $cond[] = array("[$column] >= %b", TRUE);
 		else $cond[] = array("[$column] = %b", FALSE, " OR [$column] IS NULL");
 		$datagrid->dataSource->where('%and', $cond);
 	}

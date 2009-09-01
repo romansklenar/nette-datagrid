@@ -109,6 +109,9 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	/** @var array  of function(Html $cell, string $column, mixed $value) */
 	public $onCellRender;
 
+	/** @var array  of function(Html $action, DibiRow $data) */
+	public $onActionRender;
+
 
 
 	/**
@@ -543,6 +546,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 					$html = $action->getHtml();
 					$html->title($this->dataGrid->translate($html->title));
 					$action->generateLink(array($primary => $data[$primary]));
+					$this->onActionRender($html, $data);
 					$value .= $html->render() . ' ';
 				}
 				$cell->addClass('actions');

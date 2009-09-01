@@ -33,10 +33,17 @@ class TextColumn extends DataGridColumn
 
 		// translate & truncate
 		if ($value instanceof Html) {
-			$value->setText(String::truncate($this->dataGrid->translate($value->getText()), $this->maxLength));
+			$text = $this->dataGrid->translate($value->getText());
+			if ($this->maxLength != 0) {
+				$text = String::truncate($text, $this->maxLength);
+			}
+			$value->setText($text);
 			$value->title = $this->dataGrid->translate($value->title);
+
 		} else {
-			$value = String::truncate($this->dataGrid->translate($value), $this->maxLength);
+			if ($this->maxLength != 0) {
+				$value = String::truncate($value, $this->maxLength);
+			}
 		}
 
 		foreach ($this->formatCallback as $callback) {
