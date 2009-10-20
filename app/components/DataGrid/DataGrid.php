@@ -745,25 +745,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			$this->wasRendered = TRUE;
 
 			if (!$this->hasColumns() || (count($this->getColumns('ActionColumn')) == count($this->getColumns()))) {
-				// auto-generate columns
-				if ($this->hasColumns('ActionColumn')) {
-					$columns = $this->getColumns('ActionColumn');
-					foreach ($columns as $column) {
-						unset($this[$column->getName()]);
-					}
-				}
-
-				$ds = clone $this->dataSource;
-				$row = $ds->select('*')->fetch();
-				$keys = array_keys((array)$row);
-				foreach ($keys as $key) $this->addColumn($key);
-
-				if (isset($columns)) {
-					foreach ($columns as $column) {
-						$this[$column->getName()] = $column;
-						$this->setCurrentActionColumn($column);
-					}
-				}
+				$this->generateColumns();
 			}
 
 			if ($this->disableOrder) {
@@ -834,7 +816,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 		$form = new AppForm($this, $name);
 		$form->setTranslator($this->getTranslator());
-		FormControl::$idMask = 'frm-datagrid-' . String::capitalize($this->getUniqueId()) . '-%s-%s';
+		FormControl::$idMask = 'frm-datagrid-' . $this->getUniqueId() . '-%s-%s';
 		$form->onSubmit[] = array($this, 'formSubmitHandler');
 
 		$form->addSubmit('resetSubmit', 'Reset state');
@@ -845,27 +827,25 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 		// page input
 		$form->addText('page', 'Page', 1);
+		$form['page']->setDefaultValue($this->page);
 		$form->addSubmit('pageSubmit', 'Change page');
 
 		// items per page selector
 		$form->addSelect('items', 'Items per page', array_combine($this->displayedItems, $this->displayedItems));
+		$form['items']->setDefaultValue($this->itemsPerPage);
 		$form->addSubmit('itemsSubmit', 'Change');
-
-		$defaults = array(
-			'page' => $this->page,
-			'items' => $this->itemsPerPage,
-		);
 
 		// generate filters FormControls
 		if ($this->hasFilters()) {
+			$defaults = array();
 			$sub = $form->addContainer('filters');
 			foreach ($this->getFilters() as $filter) {
 				$sub->addComponent($filter->getFormControl(), $filter->getName());
 				// NOTE: must be setted after is FormControl conntected to the form
-				$defaults['filters'][$filter->getName()] = $filter->getValue();
+				$defaults[$filter->getName()] = $filter->value;
 			}
+			$sub->setDefaults($defaults);
 		}
-		$form->setDefaults($defaults);
 
 		// checker
 		if ($this->hasOperations()) {
@@ -944,8 +924,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 
 		// page input & items selectbox
-		$form['page']->setDefaultValue($this->paginator->page); // intentionally page from paginator
-		$form['items']->setDefaultValue($this->itemsPerPage);
+		$form['page']->setValue($this->paginator->page); // intentionally page from paginator
+		$form['items']->setValue($this->paginator->itemsPerPage);
 	}
 
 
@@ -965,6 +945,33 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 		if ($callback != NULL && $this->onOperationSubmit == NULL) {
 			 $this->setOnOperationSubmit($callback);
+		}
+	}
+
+
+	/**
+	 * Generates columns from datasource.
+	 * @return void
+	 */
+	protected function generateColumns()
+	{
+		if ($this->hasColumns('ActionColumn')) {
+			$columns = $this->getColumns('ActionColumn');
+			foreach ($columns as $column) {
+				unset($this[$column->getName()]);
+			}
+		}
+
+		$ds = clone $this->dataSource;
+		$row = $ds->select('*')->fetch();
+		$keys = array_keys((array)$row);
+		foreach ($keys as $key) $this->addColumn($key);
+
+		if (isset($columns)) {
+			foreach ($columns as $column) {
+				$this[$column->getName()] = $column;
+				$this->setCurrentActionColumn($column);
+			}
 		}
 	}
 
