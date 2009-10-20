@@ -35,7 +35,7 @@ if (!is_writable(Environment::getVariable('logDir'))) {
 
 /** 2c) Setup Nette\Debug for better exception and error visualisation */
 //Debug::$productionMode = $_SERVER['REMOTE_ADDR'] !== '127.0.0.1';  // admin's computer IP
-$mode = (Environment::isDebugging() && !Environment::getHttpRequest()->isAjax()) ? Debug::DEVELOPMENT : Debug::PRODUCTION;
+$mode = (!Environment::isProduction() && !Environment::getHttpRequest()->isAjax()) ? Debug::DEVELOPMENT : Debug::PRODUCTION;
 Debug::enable($mode, NULL);
 Debug::$strictMode = TRUE;
 Debug::$showLocation = TRUE;
@@ -44,7 +44,7 @@ Debug::$showLocation = TRUE;
 /** 2d) enable RobotLoader - this allows load all classes automatically */
 $loader = new RobotLoader();
 $loader->addDirectory(explode(';', $config->scanDirs));
-$loader->autoRebuild = Environment::isDebugging() ? TRUE : FALSE; // rebuild if class is not found?
+$loader->autoRebuild = Environment::isProduction() ? FALSE : TRUE; // rebuild if class is not found?
 $loader->register();
 
 

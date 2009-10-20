@@ -70,7 +70,7 @@ abstract class DataGridColumnFilter extends Component implements IDataGridColumn
 	 */
 	public function setValue($value)
 	{
-		$control = $this->getFormControl();
-		$control->value = $this->value = $value;
+		$this->getFormControl()->setDefaultValue($value);
+		$this->value = $value;
 	}
 }

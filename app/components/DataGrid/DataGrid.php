@@ -823,76 +823,73 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * Component factory.
 	 * @see Nette/ComponentContainer#createComponent()
 	 */
-	protected function createComponent($name)
+	protected function createComponentForm($name)
 	{
-		switch ($name) {
-			case 'form':
-				// NOTE: signal-submit on form disregard component's state
-				//		because form is created directly by Presenter in signal handling phase
-				//		and this principle is used to detect submit signal
-				if (!$this->wasRendered) {
-					$this->receivedSignal = 'submit';
-				}
-
-				$form = new AppForm($this, $name);
-				$form->setTranslator($this->getTranslator());
-				FormControl::$idMask = 'frm-datagrid-' . String::capitalize($this->getUniqueId()) . '-%s-%s';
-				$form->onSubmit[] = array($this, 'formSubmitHandler');
-
-				$form->addSubmit('resetSubmit', 'Reset state');
-				$form->addSubmit('filterSubmit', 'Apply filters');
-
-				$form->addSelect('operations', 'Selected:', $this->operations);
-				$form->addSubmit('operationSubmit', 'Send')->onClick = $this->onOperationSubmit;
-
-				// page input
-				$form->addText('page', 'Page', 1);
-				$form['page']->setValue($this->page);
-				$form->addSubmit('pageSubmit', 'Change page');
-
-				// items per page selector
-				$form->addSelect('items', 'Items per page', array_combine($this->displayedItems, $this->displayedItems));
-				$form['items']->setValue($this->itemsPerPage);
-				$form->addSubmit('itemsSubmit', 'Change');
-
-				// generate filters FormControls
-				if ($this->hasFilters()) {
-					$sub = $form->addContainer('filters');
-					foreach ($this->getFilters() as $filter) {
-						$sub->addComponent($filter->getFormControl(), $filter->getName());
-						// NOTE: must be setted after is FormControl conntected to the form
-						$sub->getComponent($filter->getName(), TRUE)->setValue($filter->getValue());
-					}
-				}
-
-				// checker
-				if ($this->hasOperations()) {
-					$sub = $form->addContainer('checker');
-
-					if ($this->isSignalReceiver('submit')) {
-						// NOTE: important!
-						$ds = clone $this->dataSource;
-						$this->filterItems();
-					}
-
-					foreach ($this->getRows() as $row) {
-						$sub->addCheckbox($row[$this->keyName], $row[$this->keyName]);
-					}
-
-					if (isset($ds)) $this->dataSource = $ds;
-				}
-
-				$renderer = $form->getRenderer();
-				$renderer->wrappers['controls']['container'] = NULL;
-				$renderer->wrappers['label']['container'] = NULL;
-				$renderer->wrappers['control']['container'] = NULL;
-				$form->setRenderer($renderer);
-				return;
-
-			default:
-				parent::createComponent($name);
-				return;
+		// NOTE: signal-submit on form disregard component's state
+		//		because form is created directly by Presenter in signal handling phase
+		//		and this principle is used to detect submit signal
+		if (!$this->wasRendered) {
+			$this->receivedSignal = 'submit';
 		}
+
+		$form = new AppForm($this, $name);
+		$form->setTranslator($this->getTranslator());
+		FormControl::$idMask = 'frm-datagrid-' . String::capitalize($this->getUniqueId()) . '-%s-%s';
+		$form->onSubmit[] = array($this, 'formSubmitHandler');
+
+		$form->addSubmit('resetSubmit', 'Reset state');
+		$form->addSubmit('filterSubmit', 'Apply filters');
+
+		$form->addSelect('operations', 'Selected:', $this->operations);
+		$form->addSubmit('operationSubmit', 'Send')->onClick = $this->onOperationSubmit;
+
+		// page input
+		$form->addText('page', 'Page', 1);
+		$form->addSubmit('pageSubmit', 'Change page');
+
+		// items per page selector
+		$form->addSelect('items', 'Items per page', array_combine($this->displayedItems, $this->displayedItems));
+		$form->addSubmit('itemsSubmit', 'Change');
+
+		$defaults = array(
+			'page' => $this->page,
+			'items' => $this->itemsPerPage,
+		);
+
+		// generate filters FormControls
+		if ($this->hasFilters()) {
+			$sub = $form->addContainer('filters');
+			foreach ($this->getFilters() as $filter) {
+				$sub->addComponent($filter->getFormControl(), $filter->getName());
+				// NOTE: must be setted after is FormControl conntected to the form
+				$defaults['filters'][$filter->getName()] = $filter->getValue();
+			}
+		}
+		$form->setDefaults($defaults);
+
+		// checker
+		if ($this->hasOperations()) {
+			$sub = $form->addContainer('checker');
+
+			if ($this->isSignalReceiver('submit')) {
+				// NOTE: important!
+				$ds = clone $this->dataSource;
+				$this->filterItems();
+			}
+
+			foreach ($this->getRows() as $row) {
+				$sub->addCheckbox($row[$this->keyName], $row[$this->keyName]);
+			}
+
+			if (isset($ds)) $this->dataSource = $ds;
+		}
+
+		$renderer = $form->getRenderer();
+		$renderer->wrappers['controls']['container'] = NULL;
+		$renderer->wrappers['label']['container'] = NULL;
+		$renderer->wrappers['control']['container'] = NULL;
+		$form->setRenderer($renderer);
+		return;
 	}
 
 
@@ -918,10 +915,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 		// regenerate checker's checkbox controls
 		if ($this->hasOperations()) {
-			$values = array();
-			if ($form->isPopulated()) {
-				$values = $form->getValues();
-			}
+			$values = $form->getValues();
 
 			$form->removeComponent($form['checker']);
 			$sub = $form->addContainer('checker');
@@ -930,7 +924,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			}
 
 			if (!empty($values['checker'])) {
-				$form->setValues(array('checker' => $values['checker']));
+				$form->setDefaults(array('checker' => $values['checker']));
 			}
 		}
 
@@ -950,8 +944,8 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 
 		// page input & items selectbox
-		$form['page']->setValue($this->paginator->page); // intentionally page from paginator
-		$form['items']->setValue($this->itemsPerPage);
+		$form['page']->setDefaultValue($this->paginator->page); // intentionally page from paginator
+		$form['items']->setDefaultValue($this->itemsPerPage);
 	}
 
 

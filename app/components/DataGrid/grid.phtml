@@ -1,12 +1,12 @@
-{snippet grid}
+{snippet:grid}
 
 {foreach $flashes as $flash}
 <div class="flash {$flash->type}">{$flash->message}</div>
 {/foreach}
 
-{? $control->render('begin')}
-{? $control->render('errors')}
-{? $control->render('body')}
-{? $control->render('end')}
+{widget $control begin}
+{widget $control errors}
+{widget $control body}
+{widget $control end}
 
 {/snippet}

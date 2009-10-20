@@ -35,8 +35,7 @@
 <body>
 	<h1>DataGrid - Nette Framework example</h1>
 
-	{snippet flashMessage}
-	<div id="flashes">
+	<div id="flashes" n:snippet="flashMessage">
 		{foreach $flashes as $flash}
 		<div class="flash {$flash->type}">{$flash->message}</div>
 		{/foreach}
@@ -50,12 +49,11 @@
 		-->
 
 	</div>
-	{/snippet}
 
 
 	<div id="mainframe-cover">
 		<div id="mainframe" class="rounded">
-			@{include $content}
+			@{include #content}
 		</div>
 	</div>
 </body>
