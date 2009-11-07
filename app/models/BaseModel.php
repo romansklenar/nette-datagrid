@@ -47,6 +47,9 @@ abstract class BaseModel extends Object implements IModel
 
 		if ($conf->engine == 'sqlite') {
 			$connection->getDriver()->registerFunction('regexp', 'Sqlite::regexp', 2);
+			
+		} elseif ($conf->engine == 'postgre') {
+			dibi::addSubst('', '::');
 		}
 
 		if ($conf->profiler) {

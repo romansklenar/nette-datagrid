@@ -82,6 +82,12 @@ class TextColumn extends DataGridColumn
 			$driver = $datagrid->dataSource->getConnection()->getConfig('driver');
 			if ($driver == 'sqlite' && (int) sqlite_libversion() == 2) {
 				$cond[] = array("REGEXP($column, '$value')");
+
+			} elseif ($driver == 'postgre') {
+				$value = str_replace('.*', '%', $value);
+				$value = trim($value, '^$');
+				$cond[] = array("[$column] SIMILAR TO '$value'");
+
 			} else {
 				$cond[] = array("[$column] REGEXP '$value'");
 			}

@@ -96,11 +96,8 @@ msgid "Have"
 msgstr "Má"
 
 #: columns
-msgid "Name"
-msgstr "Jméno"
-
-msgid "Surname"
-msgstr "Příjmení"
+msgid "Customer"
+msgstr "Zákazník"
 
 msgid "Address"
 msgstr "Adresa"
@@ -114,8 +111,14 @@ msgstr "Země"
 msgid "Postal code"
 msgstr "PSČ"
 
-msgid "Has orders?"
-msgstr "Má objednávky?"
+msgid "Employees count"
+msgstr "Počet zaměstnanců"
+
+msgid "Has employees"
+msgstr "Má zaměstnance?"
+
+msgid "Number of products on order"
+msgstr "Počet produktů na objednávce"
 
 msgid "Date"
 msgstr "Datum"
@@ -151,6 +154,15 @@ msgstr "Vyřešeno"
 
 msgid "Cancelled"
 msgstr "Zrušeno"
+
+msgid "On Hold"
+msgstr "Pozdrženo"
+
+msgid "In Process"
+msgstr "Zpracovává se"
+
+msgid "Disputed"
+msgstr "Sporné"
 
 msgid "Without orders"
 msgstr "Bez objednávek"

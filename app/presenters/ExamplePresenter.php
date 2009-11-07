@@ -19,7 +19,7 @@ class ExamplePresenter extends BasePresenter
 		// only for creating time measure
 		$this['baseGrid'];
 		$this['officesGrid'];
-		$this['customersGrid'];
+		$this['ordersGrid'];
 
 		Environment::setVariable('creating', Debug::timer('grids-creating') * 1000);
 	}
@@ -33,30 +33,19 @@ class ExamplePresenter extends BasePresenter
 	{
 		switch ($name) {
 		case 'baseGrid':
-			$model = new DatagridModel('customers');
+			$model = new DatagridModel;
 			$grid = new DataGrid;
-			$grid->bindDataTable($model->getCustomerAndOrderInfo());
+			$grid->bindDataTable($model->getOrdersInfo());
 
 			// if no columns are defined, takes all cols from given data source
-			$grid->addColumn('customerName', 'Name');
-			$grid->addColumn('contactLastName', 'Surname');
-			$grid->addColumn('addressLine1', 'Address');
-			$grid->addColumn('city', 'City');
-			$grid->addColumn('country', 'Country');
-			$grid->addColumn('postalCode', 'Postal code');
-			$grid->addCheckboxColumn('orders', 'Has orders');
-			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y');
-			$grid->addColumn('status', 'Status');
-			$grid->addNumericColumn('creditLimit', 'Credit', 0);
-
 			$this->addComponent($grid, $name);
 			return;
 
 
 		case 'officesGrid':
-			$model = new DatagridModel('offices');
+			$model = new DatagridModel;
 			$grid = new DataGrid;
-			$grid->bindDataTable($model->findAll($model->table)->orderBy('position')->toDataSource()); // binds DibiDataSource
+			$grid->bindDataTable($model->getOfficesInfo()->orderBy('position')); // binds DibiDataSource
 			$grid->keyName = 'officeCode'; // for actions or operations
 			$grid->disableOrder = TRUE;
 
@@ -67,6 +56,10 @@ class ExamplePresenter extends BasePresenter
 			$grid->addColumn('city', 'City')->addFilter();
 			$grid->addColumn('country', 'Country')->addSelectboxFilter()->translateItems(FALSE);
 			$grid->addColumn('postalCode', 'Postal code')->addFilter();
+			$grid->addCheckboxColumn('hasEmployees', 'Has employees')
+				->addSelectboxFilter(array('0' => "Don't have", '1' => "Have"), TRUE);
+			$grid->addNumericColumn('employeesCount', 'Employees count')->getCellPrototype()->addStyle('text-align: center');
+			$grid['employeesCount']->addFilter();
 
 			$grid->addActionColumn('Actions');
 			$icon = Html::el('span');
@@ -78,8 +71,8 @@ class ExamplePresenter extends BasePresenter
 			return;
 
 
-		case 'customersGrid':
-			$model = new DatagridModel('customers');
+		case 'ordersGrid':
+			$model = new DatagridModel;
 			$grid = new DataGrid;
 
 			$translator = new Translator(Environment::expand('%templatesDir%/customersGrid.cs.mo'));
@@ -87,33 +80,31 @@ class ExamplePresenter extends BasePresenter
 
 			$renderer = new DataGridRenderer;
 			$renderer->paginatorFormat = '%input%'; // customize format of paginator
-			$renderer->onCellRender[] = array($this, 'customersGridOnCellRendered');
+			$renderer->onCellRender[] = array($this, 'ordersGridOnCellRendered');
 			$grid->setRenderer($renderer);
 
 			$grid->itemsPerPage = 10; // display 10 rows per page
 			$grid->displayedItems = array('all', 10, 20, 50); // items per page selectbox items
 			$grid->rememberState = TRUE;
 			$grid->timeout = '+ 7 days'; // change session expiration after 7 days
-			$grid->bindDataTable($model->getCustomerAndOrderInfo());
+			$grid->bindDataTable($model->getOrdersInfo());
 			$grid->multiOrder = FALSE; // order by one column only
 
 			$operations = array('delete' => 'delete', 'deal' => 'deal', 'print' => 'print', 'forward' => 'forward'); // define operations
 			// in czech for example: $operations = array('delete' => 'smazat', 'deal' => 'vyřídit', 'print' => 'tisk', 'forward' => 'předat');
 			// or you can left translate values by translator adapter
 			$callback = array($this, 'gridOperationHandler');
-			$grid->allowOperations($operations, $callback, 'customerNumber'); // allows checkboxes to do operations with more rows
+			$grid->allowOperations($operations, $callback, 'orderNumber'); // allows checkboxes to do operations with more rows
 
 
 			/**** add some columns ****/
 
-			$grid->addColumn('customerName', 'Name');
-			$grid->addColumn('contactLastName', 'Surname');
+			$grid->addColumn('customerName', 'Customer');
 			$grid->addColumn('addressLine1', 'Address')->getHeaderPrototype()->addStyle('width: 180px');
 			$grid->addColumn('city', 'City');
 			$grid->addColumn('country', 'Country');
-			$grid->addColumn('postalCode', 'Postal code');
-			$caption = Html::el('span')->setText('O')->title('Has orders?')->class('link');
-			$grid->addCheckboxColumn('orders', $caption)->getHeaderPrototype()->addStyle('text-align: center');
+			$caption = Html::el('span')->setText('P')->title('Number of products on order')->class('link');
+			$grid->addNumericColumn('productsCount', $caption)->getCellPrototype()->addStyle('text-align: center');
 			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y'); // czech format: '%d.%m.%Y'
 			$grid->addColumn('status', 'Status');
 			$grid->addNumericColumn('creditLimit', 'Credit', 0);
@@ -122,23 +113,19 @@ class ExamplePresenter extends BasePresenter
 			/**** add some filters ****/
 
 			$grid['customerName']->addFilter();
-			$grid['contactLastName']->addFilter();
 			$grid['addressLine1']->addFilter();
 			$grid['city']->addSelectboxFilter()->translateItems(FALSE);
 			$grid['country']->addSelectboxFilter()->translateItems(FALSE);
-			$grid['postalCode']->addFilter();
-			$grid['orders']->addSelectboxFilter(array('0' => "Don't have", '1' => "Have"), TRUE);
+			$grid['productsCount']->addFilter();
 			$grid['orderDate']->addDateFilter();
-			$grid['status']->addSelectboxFilter(array('Cancelled' => 'Cancelled', 'Resolved' => 'Resolved', 'Shipped' => 'Shipped', 'NULL' => "Without orders"));
+			$grid['status']->addSelectboxFilter();
 			$grid['creditLimit']->addFilter();
 
 
 			/**** default sorting and filtering ****/
 
-			$grid['city']->addDefaultSorting('asc');
-			$grid['contactLastName']->addDefaultSorting('asc');
-			$grid['orders']->addDefaultFiltering(TRUE);
-			$grid['country']->addDefaultFiltering('USA');
+			$grid['orderDate']->addDefaultSorting('desc');
+			$grid['productsCount']->addDefaultFiltering('>2');
 
 			/**** column content affecting ****/
 
@@ -153,6 +140,9 @@ class ExamplePresenter extends BasePresenter
 			$grid['status']->replacement['Shipped'] = clone $el->class("icon icon-shipped")->title("Shipped");
 			$grid['status']->replacement['Resolved'] = clone $el->class("icon icon-resolved")->title("Resolved");
 			$grid['status']->replacement['Cancelled'] = clone $el->class("icon icon-cancelled")->title("Cancelled");
+			$grid['status']->replacement['On Hold'] = clone $el->class("icon icon-hold")->title("On Hold");
+			$grid['status']->replacement['In Process'] = clone $el->class("icon icon-process")->title("In Process");
+			$grid['status']->replacement['Disputed'] = clone $el->class("icon icon-disputed")->title("Disputed");
 			$grid['status']->replacement[''] = clone $el->class("icon icon-no-orders")->title("Without orders");
 
 			// by callback(s)
@@ -189,7 +179,7 @@ class ExamplePresenter extends BasePresenter
 	{
 		// how to findout which checkboxes in checker was checked?  $values['checker']['ID'] => bool(TRUE)
 		$form = $button->getParent();
-		$grid = $this->getComponent('customersGrid');
+		$grid = $this->getComponent('ordersGrid');
 
 		// was submitted?
 		if ($form->isSubmitted() && $form->isValid()) {
@@ -229,7 +219,7 @@ class ExamplePresenter extends BasePresenter
 	 * @param  mixed
 	 * @return Html
 	 */
-	public function customersGridOnCellRendered(Html $cell, $column, $value)
+	public function ordersGridOnCellRendered(Html $cell, $column, $value)
 	{
 		if ($column === 'creditLimit') {
 			if ($value < 30000) $cell->addClass('money-low');
@@ -247,7 +237,6 @@ class ExamplePresenter extends BasePresenter
 	 */
 	public function handlePositionMove($key, $dir)
 	{
-		// TODO: write your own more sophisticated handler ;) $model->officePositionMove($key, $dir)
 		$model = new DatagridModel('offices');
 		$model->officePositionMove($key, $dir);
 

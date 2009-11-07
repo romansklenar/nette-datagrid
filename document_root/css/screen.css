@@ -276,7 +276,8 @@ span.icon {
 	margin-right: auto !important;
 	padding: 0 !important;
 }
-.icon-shipped, .icon-resolved, .icon-cancelled, 
+.icon-shipped, .icon-resolved, .icon-cancelled,
+.icon-process, .icon-hold, .icon-disputed,
 .icon-no-orders, .icon-invert, .icon-find {
 	float: none !important
 }
@@ -291,6 +292,15 @@ span.icon {
 }
 .icon-no-orders {
 	background-image: url('../images/datagrid/icons/box.png');
+}
+.icon-process {
+	background-image: url('../images/datagrid/icons/date_go.png');
+}
+.icon-hold {
+	background-image: url('../images/datagrid/icons/flag_orange.png');
+}
+.icon-disputed {
+	background-image: url('../images/datagrid/icons/flag_blue.png');
 }
 
 

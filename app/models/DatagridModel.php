@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Data grid model example.
+ * Very basic and simple datagrid model example.
  *
  * @author     Roman Sklenář
  * @package    DataGrid\Example
@@ -58,20 +58,67 @@ class DatagridModel extends BaseModel
      */
 	public function getDataSource($table)
 	{
-		return $this->connection->dataSource('SELECT * FROM %n', $table);
+		return $this->connection->dataSource('SELECT * FROM [%n]', $table);
 	}
 
 
 	/**
 	 * @return DibiDataSource
 	 */
-	public function getCustomerAndOrderInfo()
+	public function getOrdersInfo()
 	{
 		return $this->connection->dataSource(
-			'SELECT c.*, count(o.orderNumber) AS orders, o.orderDate, o.status
-			FROM customers AS c
-				LEFT JOIN orders AS o ON c.customerNumber = o.customerNumber
-			GROUP BY c.customerNumber'
+			'SELECT o.[orderNumber] AS [orderNumber], c.[customerNumber] AS [customerNumber],
+				c.[customerName] AS [customerName], c.[addressLine1] AS [addressLine1],
+				c.[city] AS [city], c.[country] AS [country], c.[creditLimit] AS [creditLimit],
+				o.[orderDate] AS [orderDate], o.[status] AS [status], count(d.[productCode]) AS [productsCount]
+			FROM [Orders] AS o
+				JOIN [Customers] AS c ON c.[customerNumber] = o.[customerNumber]
+				JOIN [OrderDetails] AS d ON d.[orderNumber] = o.[orderNumber]
+			GROUP BY o.[orderNumber], c.[customerNumber], c.[customerName], c.[addressLine1],
+				c.[city], c.[country], c.[creditLimit], o.[orderDate], o.[status]'
+		);
+	}
+
+
+	/**
+	 * @return DibiDataSource
+	 */
+	public function getOfficesInfo()
+	{
+		$driver = $this->getConnection()->getConfig('driver');
+		return $driver == 'sqlite' || $driver == 'pdo' ? $this->getOfficesInfoSqlite() : $this->getOfficesInfoPgsql();
+	}
+
+
+	/**
+	 * @return DibiDataSource
+	 */
+	private function getOfficesInfoPgsql()
+	{
+		return $this->connection->dataSource(
+			'SELECT o.*,
+				(SELECT COUNT(*) FROM [Employees] AS e WHERE o.[officeCode] = e.[officeCode] GROUP BY e.[officeCode]) AS [employeesCount],
+				CASE WHEN (SELECT COUNT(*) FROM [Employees] AS e WHERE o.[officeCode] = e.[officeCode] GROUP BY e.[officeCode]) > 0 THEN TRUE ELSE FALSE END AS [hasEmployees]
+				FROM [Offices] AS o'
+		);
+	}
+
+
+	/**
+	 * @return DibiDataSource
+	 */
+	private function getOfficesInfoSqlite()
+	{
+		return $this->connection->dataSource(
+			'SELECT o.[officeCode] AS [officeCode], o.[city] AS [city], o.[phone] AS [phone],
+				o.[addressLine1] AS [addressLine1], o.[addressLine2] AS [addressLine2], o.[state] AS [state],
+				o.[country] AS [country], o.[postalCode] AS [postalCode], o.[position] AS [position],
+				count(e.[employeeNumber]) AS [employeesCount], CASE WHEN count(e.[employeeNumber]) > 0 THEN 1 ELSE 0 END AS [hasEmployees]
+				FROM [Offices] AS o
+				JOIN [Employees] AS e ON o.[officeCode] = e.[officeCode]
+				GROUP BY o.[officeCode]
+				ORDER BY o.[position]'
 		);
 	}
 
@@ -85,18 +132,20 @@ class DatagridModel extends BaseModel
 	public function officePositionMove($key, $dir)
 	{
 		// TODO: write your own more sophisticated handler ;)
-		$this->table = 'offices';
+		$this->table = 'Offices';
 		$this->primary = 'officeCode';
 
+		$key = (int) $key;
+
 		if ($dir == 'down') {
-			$old = $this->findAll()->where('[position] = %i', $key)->fetch();
-			$new = $this->findAll()->where('[position] = %i', $key + 1)->fetch();
+			$old = $this->findAll()->where('[position]=%i', $key)->fetch();
+			$new = $this->findAll()->where('[position]=%i', $key + 1)->fetch();
 			$this->update($old->officeCode, array('position' => $key + 1));
 			$this->update($new->officeCode, array('position' => $key));
 
 		} else {
-			$old = $this->findAll()->where('[position] = %i', $key)->fetch();
-			$new = $this->findAll()->where('[position] = %i', $key - 1)->fetch();
+			$old = $this->findAll()->where('[position]=%i', $key)->fetch();
+			$new = $this->findAll()->where('[position]=%i', $key - 1)->fetch();
 			$this->update($old->officeCode, array('position' => $key - 1));
 			$this->update($new->officeCode, array('position' => $key));
 		}
@@ -117,7 +166,7 @@ class DatagridModel extends BaseModel
 	 */
 	public function find($id)
 	{
-		return $this->findAll()->where("$this->primary=%i", $id);
+		return $this->findAll()->where("%n=%i", $this->primary, $id);
 	}
 
 
@@ -126,7 +175,7 @@ class DatagridModel extends BaseModel
 	 */
 	public function update($id, array $data)
 	{
-		return $this->connection->update($this->table, $data)->where("$this->primary=%i", $id)->execute();
+		return $this->connection->update($this->table, $data)->where("%n=%i", $this->primary, $id)->execute();
 	}
 
 
@@ -144,6 +193,6 @@ class DatagridModel extends BaseModel
 	 */
 	public function delete($id)
 	{
-		return $this->connection->delete($this->table)->where("$this->primary=%i", $id)->execute();
+		return $this->connection->delete($this->table)->where("%n=%i", $this->primary, $id)->execute();
 	}
 }
