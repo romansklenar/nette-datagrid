@@ -46,14 +46,14 @@ class NumericColumn extends DataGridColumn
 				$value = $this->replacement[$value];
 			}
 		}
-		$value = round($value, $this->precision);
 
 		foreach ($this->formatCallback as $callback) {
 			if (is_callable($callback)) {
 				$value = call_user_func($callback, $value, $data);
 			}
 		}
-		return $value;
+
+		return round($value, $this->precision);
 	}
 
 	/**
