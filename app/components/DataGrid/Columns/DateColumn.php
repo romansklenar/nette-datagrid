@@ -42,7 +42,7 @@ class DateColumn extends TextColumn
 	 */
 	public function formatContent($value, $data = NULL)
 	{
-		if ($value == NULL || empty($value)) return 'N/A';
+		if ((int)$value == NULL || empty($value)) return 'N/A';
 		$value = parent::formatContent($value, $data);
 
 		$value = is_numeric($value) ? (int) $value : ($value instanceof DateTime ? $value->format('U') : strtotime($value));
