@@ -963,7 +963,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		}
 
 		$ds = clone $this->dataSource;
-		$row = $ds->select('*')->fetch();
+		$row = $ds->select('*')->applyLimit(1)->fetch();
 		$keys = array_keys((array)$row);
 		foreach ($keys as $key) $this->addColumn($key);
 
