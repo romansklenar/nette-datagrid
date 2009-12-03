@@ -559,7 +559,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			}
 
 			$cell->setHtml((string)$value);
-			$this->onCellRender($cell, $column->getName(), !($column instanceof ActionColumn) ? $data[$column->getName()] : NULL);
+			$this->onCellRender($cell, $column->getName(), !($column instanceof ActionColumn) ? $data[$column->getName()] : $data);
 			$row->add($cell);
 		}
 		unset($form, $primary, $cell, $value, $action);
