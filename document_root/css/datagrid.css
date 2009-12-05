@@ -7,13 +7,13 @@ table.datagrid {
 table.datagrid tr {
 	background: #FFFFFF;
 }
-table.datagrid tr.even {
+table.datagrid tbody tr.even {
 	background: #F6F7FA;
 }
-table.datagrid tr:hover {
+table.datagrid tbody tr:hover {
 	background: #E1E7F3 !important;
 }
-table.datagrid tr.selected {
+table.datagrid tbody tr.selected, table.datagrid tbody tr.selected td {
 	background: #B3F76F !important;
 }
 

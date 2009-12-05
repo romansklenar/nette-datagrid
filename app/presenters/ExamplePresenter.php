@@ -107,7 +107,7 @@ class ExamplePresenter extends BasePresenter
 			$grid->addNumericColumn('productsCount', $caption)->getCellPrototype()->addStyle('text-align: center');
 			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y'); // czech format: '%d.%m.%Y'
 			$grid->addColumn('status', 'Status');
-			$grid->addNumericColumn('creditLimit', 'Credit', 0);
+			$grid->addColumn('creditLimit', 'Credit')->getCellPrototype()->addStyle('text-align: center');
 
 
 			/**** add some filters ****/
