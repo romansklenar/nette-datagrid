@@ -9,149 +9,138 @@
 class ExamplePresenter extends BasePresenter
 {
 
-	/**
-	 * Component factory
-	 * @see Nette/ComponentContainer#createComponent()
-	 */
-	protected function createComponent($name)
+	protected function createComponentBaseGrid()
 	{
-		switch ($name) {
-		case 'baseGrid':
-			$model = new DatagridModel;
-			$grid = new DataGrid;
-			$grid->bindDataTable($model->getOrdersInfo());
+		$model = new DatagridModel;
 
-			// if no columns are defined, takes all cols from given data source
-			$this->addComponent($grid, $name);
-			return;
+		// if no columns are defined, takes all cols from given data source
+		$grid = new DataGrid;
+		$grid->bindDataTable($model->getOrdersInfo());
 
-
-		case 'officesGrid':
-			$model = new DatagridModel;
-			$grid = new DataGrid;
-			$grid->bindDataTable($model->getOfficesInfo()->orderBy('position')); // binds DibiDataSource
-			$grid->keyName = 'officeCode'; // for actions or operations
-			$grid->disableOrder = TRUE;
-
-			$pos = array('up' => 'Move up', 'down' => 'Move down');
-			$grid->addPositionColumn('position', 'Position', 'positionMove!', $pos)->addFilter();
-			$grid->addColumn('phone', 'Phone')->addFilter();
-			$grid->addColumn('addressLine1', 'Address')->addFilter();
-			$grid->addColumn('city', 'City')->addFilter();
-			$grid->addColumn('country', 'Country')->addSelectboxFilter()->translateItems(FALSE);
-			$grid->addColumn('postalCode', 'Postal code')->addFilter();
-			$grid->addCheckboxColumn('hasEmployees', 'Has employees')
-				->addSelectboxFilter(array('0' => "Don't have", '1' => "Have"), TRUE);
-			$grid->addNumericColumn('employeesCount', 'Employees count')->getCellPrototype()->addStyle('text-align: center');
-			$grid['employeesCount']->addFilter();
-
-			$grid->addActionColumn('Actions');
-			$icon = Html::el('span');
-			$grid->addAction('New entry', 'Office:new', clone $icon->class('icon icon-add'), FALSE, DataGridAction::WITHOUT_KEY);
-			$grid->addAction('Edit', 'Office:edit', clone $icon->class('icon icon-edit'));
-			$grid->addAction('Delete', 'Office:delete', clone $icon->class('icon icon-del'));
-
-			$this->addComponent($grid, $name);
-			return;
-
-
-		case 'ordersGrid':
-			$model = new DatagridModel;
-			$grid = new DataGrid;
-
-			$translator = new Translator(Environment::expand('%templatesDir%/customersGrid.cs.mo'));
-			$grid->setTranslator($translator);
-
-			$renderer = new DataGridRenderer;
-			$renderer->paginatorFormat = '%input%'; // customize format of paginator
-			$renderer->onCellRender[] = array($this, 'ordersGridOnCellRendered');
-			$grid->setRenderer($renderer);
-
-			$grid->itemsPerPage = 10; // display 10 rows per page
-			$grid->displayedItems = array('all', 10, 20, 50); // items per page selectbox items
-			$grid->rememberState = TRUE;
-			$grid->timeout = '+ 7 days'; // change session expiration after 7 days
-			$grid->bindDataTable($model->getOrdersInfo());
-			$grid->multiOrder = FALSE; // order by one column only
-
-			$operations = array('delete' => 'delete', 'deal' => 'deal', 'print' => 'print', 'forward' => 'forward'); // define operations
-			// in czech for example: $operations = array('delete' => 'smazat', 'deal' => 'vyřídit', 'print' => 'tisk', 'forward' => 'předat');
-			// or you can left translate values by translator adapter
-			$callback = array($this, 'gridOperationHandler');
-			$grid->allowOperations($operations, $callback, 'orderNumber'); // allows checkboxes to do operations with more rows
-
-
-			/**** add some columns ****/
-
-			$grid->addColumn('customerName', 'Customer');
-			$grid->addColumn('addressLine1', 'Address')->getHeaderPrototype()->addStyle('width: 180px');
-			$grid->addColumn('city', 'City');
-			$grid->addColumn('country', 'Country');
-			$caption = Html::el('span')->setText('P')->title('Number of products on order')->class('link');
-			$grid->addNumericColumn('productsCount', $caption)->getCellPrototype()->addStyle('text-align: center');
-			$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y'); // czech format: '%d.%m.%Y'
-			$grid->addColumn('status', 'Status');
-			$grid->addColumn('creditLimit', 'Credit')->getCellPrototype()->addStyle('text-align: center');
-
-
-			/**** add some filters ****/
-
-			$grid['customerName']->addFilter();
-			$grid['addressLine1']->addFilter();
-			$grid['city']->addSelectboxFilter()->translateItems(FALSE);
-			$grid['country']->addSelectboxFilter()->translateItems(FALSE);
-			$grid['productsCount']->addFilter();
-			$grid['orderDate']->addDateFilter();
-			$grid['status']->addSelectboxFilter();
-			$grid['creditLimit']->addFilter();
-
-
-			/**** default sorting and filtering ****/
-
-			$grid['orderDate']->addDefaultSorting('desc');
-			$grid['productsCount']->addDefaultFiltering('>2');
-
-			/**** column content affecting ****/
-
-			// by css styling
-			$grid['orderDate']->getCellPrototype()->addStyle('text-align: center');
-			$grid['status']->getHeaderPrototype()->addStyle('width: 60px');
-			$grid['addressLine1']->getHeaderPrototype()->addStyle('width: 150px');
-			$grid['city']->getHeaderPrototype()->addStyle('width: 90px');
-
-			// by replacement of given pattern
-			$el = Html::el('span')->addStyle('margin: 0 auto');
-			$grid['status']->replacement['Shipped'] = clone $el->class("icon icon-shipped")->title("Shipped");
-			$grid['status']->replacement['Resolved'] = clone $el->class("icon icon-resolved")->title("Resolved");
-			$grid['status']->replacement['Cancelled'] = clone $el->class("icon icon-cancelled")->title("Cancelled");
-			$grid['status']->replacement['On Hold'] = clone $el->class("icon icon-hold")->title("On Hold");
-			$grid['status']->replacement['In Process'] = clone $el->class("icon icon-process")->title("In Process");
-			$grid['status']->replacement['Disputed'] = clone $el->class("icon icon-disputed")->title("Disputed");
-			$grid['status']->replacement[''] = clone $el->class("icon icon-no-orders")->title("Without orders");
-
-			// by callback(s)
-			$grid['creditLimit']->formatCallback[] = 'Helpers::currency';
-
-
-			/**** add some actions ****/
-
-			$grid->addActionColumn('Actions')->getHeaderPrototype()->addStyle('width: 98px');
-			$icon = Html::el('span');
-			$grid->addAction('Copy', 'Customer:copy', clone $icon->class('icon icon-copy'));
-			$grid->addAction('Detail', 'Customer:detail', clone $icon->class('icon icon-detail'));
-			$grid->addAction('Edit', 'Customer:edit', clone $icon->class('icon icon-edit'));
-			$grid->addAction('Delete', 'Customer:delete', clone $icon->class('icon icon-del'));
-
-
-			$this->addComponent($grid, $name);
-			return;
-
-
-		default:
-			parent::createComponent($name);
-			return;
-		}
+		return $grid;
 	}
+
+	protected function createComponentOfficesGrid()
+	{
+		$model = new DatagridModel;
+
+		$grid = new DataGrid;
+		$grid->bindDataTable($model->getOfficesInfo()->orderBy('position')); // binds DibiDataSource
+		$grid->keyName = 'officeCode'; // for actions or operations
+		$grid->disableOrder = TRUE;
+
+		$pos = array('up' => 'Move up', 'down' => 'Move down');
+		$grid->addPositionColumn('position', 'Position', 'positionMove!', $pos)->addFilter();
+		$grid->addColumn('phone', 'Phone')->addFilter();
+		$grid->addColumn('addressLine1', 'Address')->addFilter();
+		$grid->addColumn('city', 'City')->addFilter();
+		$grid->addColumn('country', 'Country')->addSelectboxFilter()->translateItems(FALSE);
+		$grid->addColumn('postalCode', 'Postal code')->addFilter();
+		$grid->addCheckboxColumn('hasEmployees', 'Has employees')
+			->addSelectboxFilter(array('0' => "Don't have", '1' => "Have"), TRUE);
+		$grid->addNumericColumn('employeesCount', 'Employees count')->getCellPrototype()->addStyle('text-align: center');
+		$grid['employeesCount']->addFilter();
+
+		$grid->addActionColumn('Actions');
+		$icon = Html::el('span');
+		$grid->addAction('New entry', 'Office:new', clone $icon->class('icon icon-add'), FALSE, DataGridAction::WITHOUT_KEY);
+		$grid->addAction('Edit', 'Office:edit', clone $icon->class('icon icon-edit'));
+		$grid->addAction('Delete', 'Office:delete', clone $icon->class('icon icon-del'));
+
+		return $grid;
+	}
+
+	protected function createComponentOrdersGrid()
+	{
+		$model = new DatagridModel;
+		$grid = new DataGrid;
+
+		$translator = new GettextTranslator(Environment::expand('%templatesDir%/customersGrid.cs.mo'));
+		$grid->setTranslator($translator);
+
+		$renderer = new DataGridRenderer;
+		$renderer->paginatorFormat = '%input%'; // customize format of paginator
+		$renderer->onCellRender[] = array($this, 'ordersGridOnCellRendered');
+		$grid->setRenderer($renderer);
+
+		$grid->itemsPerPage = 10; // display 10 rows per page
+		$grid->displayedItems = array('all', 10, 20, 50); // items per page selectbox items
+		$grid->rememberState = TRUE;
+		$grid->timeout = '+ 7 days'; // change session expiration after 7 days
+		$grid->bindDataTable($model->getOrdersInfo());
+		$grid->multiOrder = FALSE; // order by one column only
+
+		$operations = array('delete' => 'delete', 'deal' => 'deal', 'print' => 'print', 'forward' => 'forward'); // define operations
+		// in czech for example: $operations = array('delete' => 'smazat', 'deal' => 'vyřídit', 'print' => 'tisk', 'forward' => 'předat');
+		// or you can left translate values by translator adapter
+		$callback = array($this, 'gridOperationHandler');
+		$grid->allowOperations($operations, $callback, 'orderNumber'); // allows checkboxes to do operations with more rows
+
+
+		/**** add some columns ****/
+
+		$grid->addColumn('customerName', 'Customer');
+		$grid->addColumn('addressLine1', 'Address')->getHeaderPrototype()->addStyle('width: 180px');
+		$grid->addColumn('city', 'City');
+		$grid->addColumn('country', 'Country');
+		$caption = Html::el('span')->setText('P')->title('Number of products on order')->class('link');
+		$grid->addNumericColumn('productsCount', $caption)->getCellPrototype()->addStyle('text-align: center');
+		$grid->addDateColumn('orderDate', 'Date', '%m/%d/%Y'); // czech format: '%d.%m.%Y'
+		$grid->addColumn('status', 'Status');
+		$grid->addColumn('creditLimit', 'Credit')->getCellPrototype()->addStyle('text-align: center');
+
+
+		/**** add some filters ****/
+
+		$grid['customerName']->addFilter();
+		$grid['addressLine1']->addFilter();
+		$grid['city']->addSelectboxFilter()->translateItems(FALSE);
+		$grid['country']->addSelectboxFilter()->translateItems(FALSE);
+		$grid['productsCount']->addFilter();
+		$grid['orderDate']->addDateFilter();
+		$grid['status']->addSelectboxFilter();
+		$grid['creditLimit']->addFilter();
+
+
+		/**** default sorting and filtering ****/
+
+		$grid['orderDate']->addDefaultSorting('desc');
+		$grid['productsCount']->addDefaultFiltering('>2');
+
+		/**** column content affecting ****/
+
+		// by css styling
+		$grid['orderDate']->getCellPrototype()->addStyle('text-align: center');
+		$grid['status']->getHeaderPrototype()->addStyle('width: 60px');
+		$grid['addressLine1']->getHeaderPrototype()->addStyle('width: 150px');
+		$grid['city']->getHeaderPrototype()->addStyle('width: 90px');
+
+		// by replacement of given pattern
+		$el = Html::el('span')->addStyle('margin: 0 auto');
+		$grid['status']->replacement['Shipped'] = clone $el->class("icon icon-shipped")->title("Shipped");
+		$grid['status']->replacement['Resolved'] = clone $el->class("icon icon-resolved")->title("Resolved");
+		$grid['status']->replacement['Cancelled'] = clone $el->class("icon icon-cancelled")->title("Cancelled");
+		$grid['status']->replacement['On Hold'] = clone $el->class("icon icon-hold")->title("On Hold");
+		$grid['status']->replacement['In Process'] = clone $el->class("icon icon-process")->title("In Process");
+		$grid['status']->replacement['Disputed'] = clone $el->class("icon icon-disputed")->title("Disputed");
+		$grid['status']->replacement[''] = clone $el->class("icon icon-no-orders")->title("Without orders");
+
+		// by callback(s)
+		$grid['creditLimit']->formatCallback[] = 'Helpers::currency';
+
+
+		/**** add some actions ****/
+
+		$grid->addActionColumn('Actions')->getHeaderPrototype()->addStyle('width: 98px');
+		$icon = Html::el('span');
+		$grid->addAction('Copy', 'Customer:copy', clone $icon->class('icon icon-copy'));
+		$grid->addAction('Detail', 'Customer:detail', clone $icon->class('icon icon-detail'));
+		$grid->addAction('Edit', 'Customer:edit', clone $icon->class('icon icon-edit'));
+		$grid->addAction('Delete', 'Customer:delete', clone $icon->class('icon icon-del'));
+
+		return $grid;
+	}
+
 
 
 	/**
