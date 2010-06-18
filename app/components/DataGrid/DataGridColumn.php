@@ -12,7 +12,6 @@ require_once dirname(__FILE__) . '/IDataGridColumn.php';
  * @license    New BSD License
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
- * @version    $Id$
  */
 abstract class DataGridColumn extends ComponentContainer implements IDataGridColumn
 {

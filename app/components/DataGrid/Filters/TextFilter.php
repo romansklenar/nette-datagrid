@@ -12,7 +12,6 @@ require_once dirname(__FILE__) . '/../DataGridColumnFilter.php';
  * @license    New BSD License
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
- * @version    $Id$
  */
 class TextFilter extends DataGridColumnFilter
 {

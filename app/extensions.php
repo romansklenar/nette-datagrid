@@ -1,14 +1,5 @@
 <?php
 
-/**
- * Extension methods difinition file.
- *
- * @copyright  Copyright (c) 2009 TOPSPIN, s.r.o.
- * @package    PodaciDenik
- * @version    $Id$
- */
-
-
 
 // budoucí metoda Form::addDatePicker()
 function Form_addDatePicker(Form $_this, $name, $label, $cols = NULL, $maxLength = NULL)
