@@ -10,7 +10,7 @@ require_once dirname(__FILE__) . '/TextColumn.php';
  * @author     Roman Sklenář
  * @copyright  Copyright (c) 2009 Roman Sklenář (http://romansklenar.cz)
  * @license    New BSD License
- * @example    http://nettephp.com/extras/datagrid
+ * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  * @version    $Id$
  */
