@@ -8,5 +8,4 @@
  */
 abstract class BasePresenter extends /*Nette\Application\*/Presenter
 {
-	public $oldLayoutMode = FALSE; // explicitní zapnutí podpory nových šablon
 }

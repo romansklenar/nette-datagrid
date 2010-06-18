@@ -54,9 +54,9 @@ if (is_file(APP_DIR . '/extensions.php')) {
 }
 
 
-/** 2f) enable Profiler and RoutingDebugger */
+/** 2f) enable DebugBar */
 if ($mode == Debug::DEVELOPMENT) {
-	Debug::enableProfiler();
+	Debug::$showBar = TRUE;
 }
 
 

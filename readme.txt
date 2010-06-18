@@ -1,7 +1,7 @@
 DataGrid example application
 ----------------------------
 
-This version of DataGrid works with Nette Framework version 0.9.3 and Dibi 1.3. You can find archives
+This version of DataGrid works with Nette Framework version 0.9.4 and Dibi 1.3. You can find archives
 Nette.zip and dibi.zip in this folder. Those are prepared versions which you can just unpack and use.
 Nette Framework (with Dibi included) can be downloaded from http://nettephp.com/download
 

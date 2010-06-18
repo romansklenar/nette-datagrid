@@ -54,7 +54,7 @@ abstract class BaseModel extends Object implements IModel
 
 		if ($conf->profiler) {
 			$profiler = is_numeric($conf->profiler) || is_bool($conf->profiler) ?
-				new DibiProfiler : new $conf->profiler;
+				new DibiProfiler(array()) : new $conf->profiler;
 			$profiler->setFile(Environment::expand('%logDir%') . '/sql.log');
 			$connection->setProfiler($profiler);
 		}
