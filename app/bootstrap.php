@@ -104,8 +104,3 @@ $router[] = new SimpleRouter('Example:default');
 
 // Step 5: Run the application!
 $application->run();
-
-$creating  = number_format(Environment::getVariable('creating'), 1, '.', ' ');
-$rendering = number_format(Environment::getVariable('rendering'), 1, '.', ' ');
-$total = number_format(Environment::getVariable('creating') + Environment::getVariable('rendering'), 1, '.', ' ');
-Debug::$counters['DataGrids time'] = "$total ms (C: $creating ms | R: $rendering ms)";

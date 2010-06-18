@@ -1,5 +1,3 @@
-{? Debug::timer('grids-rendering') }
-
 @{block #content}
 
 <h2>Example 1 - simple datagrid</h2>
@@ -16,6 +14,3 @@
 @{widget ordersGrid}
 
 <br />
-
-
-{? Environment::setVariable('rendering', Debug::timer('grids-rendering') * 1000) }

@@ -8,22 +8,6 @@
  */
 class ExamplePresenter extends BasePresenter
 {
-	/**
-	 * Common render method.
-	 * @return void
-	 */
-	public function renderDefault()
-	{
-		Debug::timer('grids-creating');
-
-		// only for creating time measure
-		$this['baseGrid'];
-		$this['officesGrid'];
-		$this['ordersGrid'];
-
-		Environment::setVariable('creating', Debug::timer('grids-creating') * 1000);
-	}
-
 
 	/**
 	 * Component factory
