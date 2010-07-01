@@ -1,8 +1,9 @@
 <?php
 
+namespace DataGrid\Columns;
+use DataGrid, Nette\Web\Html;
+
 require_once dirname(__FILE__) . '/NumericColumn.php';
-
-
 
 /**
  * Representation of positioning data grid column, that provides moving entries up or down.
@@ -59,19 +60,19 @@ class PositionColumn extends NumericColumn
 			$this->destination = $destination;
 		}
 
-		$this->monitor('DataGrid');
+		$this->monitor('Datagrid\DataGrid');
 	}
 
 
 	/**
 	 * This method will be called when the component (or component's parent)
 	 * becomes attached to a monitored object. Do not call this method yourself.
-	 * @param  IComponent
+	 * @param  Nette\IComponent
 	 * @return void
 	 */
 	protected function attached($dataGrid)
 	{
-		if ($dataGrid instanceof DataGrid) {
+		if ($dataGrid instanceof DataGrid\DataGrid) {
 			$dataSource = clone $dataGrid->dataSource;
 			$dataSource->orderBy(array());
 			$this->min = (int) $dataSource->select($this->getName())->orderBy($this->getName(), 'ASC')->fetchSingle();
@@ -85,7 +86,7 @@ class PositionColumn extends NumericColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
-	 * @param  DibiRow|array
+	 * @param  \DibiRow|array
 	 * @return string
 	 */
 	public function formatContent($value, $data = NULL)

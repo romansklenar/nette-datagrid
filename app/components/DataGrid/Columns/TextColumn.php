@@ -1,8 +1,9 @@
 <?php
 
+namespace DataGrid\Columns;
+use Nette;
+
 require_once dirname(__FILE__) . '/../DataGridColumn.php';
-
-
 
 /**
  * Representation of textual data grid column.
@@ -13,12 +14,12 @@ require_once dirname(__FILE__) . '/../DataGridColumn.php';
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class TextColumn extends DataGridColumn
+class TextColumn extends Column
 {
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
-	 * @param  DibiRow|array
+	 * @param  \DibiRow|array
 	 * @return string
 	 */
 	public function formatContent($value, $data = NULL)
@@ -38,17 +39,17 @@ class TextColumn extends DataGridColumn
 		}
 
 		// translate & truncate
-		if ($value instanceof Html) {
+		if ($value instanceof Nette\Web\Html) {
 			$text = $this->dataGrid->translate($value->getText());
 			if ($this->maxLength != 0) {
-				$text = String::truncate($text, $this->maxLength);
+				$text = Nette\String::truncate($text, $this->maxLength);
 			}
 			$value->setText($text);
 			$value->title = $this->dataGrid->translate($value->title);
 
 		} else {
 			if ($this->maxLength != 0) {
-				$value = String::truncate($value, $this->maxLength);
+				$value = Nette\String::truncate($value, $this->maxLength);
 			}
 		}
 

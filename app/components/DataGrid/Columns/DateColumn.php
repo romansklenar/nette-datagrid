@@ -1,8 +1,8 @@
 <?php
 
+namespace DataGrid\Columns;
+
 require_once dirname(__FILE__) . '/TextColumn.php';
-
-
 
 /**
  * Representation of date data grid column.
@@ -36,7 +36,7 @@ class DateColumn extends TextColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
-	 * @param  DibiRow|array
+	 * @param  \DibiRow|array
 	 * @return string
 	 */
 	public function formatContent($value, $data = NULL)
@@ -44,7 +44,7 @@ class DateColumn extends TextColumn
 		if ((int)$value == NULL || empty($value)) return 'N/A';
 		$value = parent::formatContent($value, $data);
 
-		$value = is_numeric($value) ? (int) $value : ($value instanceof DateTime ? $value->format('U') : strtotime($value));
+		$value = is_numeric($value) ? (int) $value : ($value instanceof \DateTime ? $value->format('U') : strtotime($value));
 		return strftime($this->format, $value);
 	}
 

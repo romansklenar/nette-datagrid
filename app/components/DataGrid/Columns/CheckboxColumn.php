@@ -1,8 +1,9 @@
 <?php
 
+namespace DataGrid\Columns;
+use Nette;
+
 require_once dirname(__FILE__) . '/NumericColumn.php';
-
-
 
 /**
  * Representation of checkbox data grid column.
@@ -30,12 +31,12 @@ class CheckboxColumn extends NumericColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
-	 * @param  DibiRow|array
+	 * @param  \DibiRow|array
 	 * @return string
 	 */
 	public function formatContent($value, $data = NULL)
 	{
-		$checkbox = Html::el('input')->type('checkbox')->disabled('disabled');
+		$checkbox = Nette\Web\Html::el('input')->type('checkbox')->disabled('disabled');
 		if ($value) $checkbox->checked = TRUE;
 		return (string) $checkbox;
 	}

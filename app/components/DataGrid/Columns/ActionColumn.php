@@ -1,8 +1,9 @@
 <?php
 
+namespace DataGrid\Columns;
+use Nette, DataGrid;
+
 require_once dirname(__FILE__) . '/../DataGridColumn.php';
-
-
 
 /**
  * Representation of data grid action column.
@@ -14,7 +15,7 @@ require_once dirname(__FILE__) . '/../DataGridColumn.php';
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class ActionColumn extends DataGridColumn implements ArrayAccess
+class ActionColumn extends Column implements \ArrayAccess
 {
 
 	/**
@@ -25,7 +26,7 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	public function __construct($caption = 'Actions')
 	{
 		parent::__construct($caption);
-		$this->addComponent(new ComponentContainer, 'actions');
+		$this->addComponent(new Nette\ComponentContainer, 'actions');
 		$this->removeComponent($this->getComponent('filters'));
 		$this->orderable = FALSE;
 	}
@@ -44,13 +45,13 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	/**
 	 * Returns column's filter.
 	 * @param  bool   throw exception if component doesn't exist?
-	 * @return IDataGridColumnFilter|NULL
-	 * @throws InvalidStateException
+	 * @return DataGrid\Filters\IColumnFilter|NULL
+	 * @throws \InvalidStateException
 	 */
 	public function getFilter($need = TRUE)
 	{
 		if ($need == TRUE) {
-			throw new InvalidStateException("ActionColumn cannot has filter.");
+			throw new \InvalidStateException("DataGrid\Columns\ActionColumn cannot has filter.");
 		}
 		return NULL;
 	}
@@ -63,11 +64,11 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	 * @param  Html    element which is added to a generated link
 	 * @param  bool    use ajax? (add class self::$ajaxClass into generated link)
 	 * @param  bool    generate link with argument? (variable $keyName must be defined in data grid)
-	 * @return DataGridAction
+	 * @return DataGrid\Action
 	 */
-	public function addAction($title, $signal, $icon = NULL, $useAjax = FALSE, $type = DataGridAction::WITH_KEY)
+	public function addAction($title, $signal, $icon = NULL, $useAjax = FALSE, $type = DataGrid\Action::WITH_KEY)
 	{
-		$action = new DataGridAction($title, $signal, $icon, $useAjax, $type);
+		$action = new DataGrid\Action($title, $signal, $icon, $useAjax, $type);
 		$this[] = $action;
 		return $action;
 	}
@@ -87,7 +88,8 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	 * Returns column's action specified by name.
 	 * @param  string action's name
 	 * @param  bool   throw exception if component doesn't exist?
-	 * @return IDataGridColumnAction|NULL
+	 * @return Nette\IComponent|NULL
+	 * @todo return type
 	 */
 	public function getAction($name = NULL, $need = TRUE)
 	{
@@ -98,11 +100,11 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	/**
 	 * Iterates over all column's actions.
 	 * @param  string
-	 * @return ArrayIterator|NULL
+	 * @return \ArrayIterator|NULL
 	 */
-	public function getActions($type = 'IDataGridAction')
+	public function getActions($type = 'DataGrid\IAction')
 	{
-		$actions = new ArrayObject();
+		$actions = new \ArrayObject();
 		foreach ($this->getComponent('actions')->getComponents(FALSE, $type) as $action) {
 			$actions->append($action);
 		}
@@ -113,25 +115,25 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
-	 * @param  DibiRow|array
+	 * @param  \DibiRow|array
 	 * @return string
-	 * @throws InvalidStateException
+	 * @throws \InvalidStateException
 	 */
 	public function formatContent($value, $data = NULL)
 	{
-		throw new InvalidStateException("ActionColumn cannot be formated.");
+		throw new InvalidStateException("DataGrid\Columns\ActionColumn cannot be formated.");
 	}
 
 
 	/**
 	 * Filters data source.
 	 * @param  mixed
-	 * @throws InvalidStateException
+	 * @throws \InvalidStateException
 	 * @return void
 	 */
 	public function applyFilter($value)
 	{
-		throw new InvalidStateException("ActionColumn cannot be filtered.");
+		throw new \InvalidStateException("DataGrid\Columns\ActionColumn cannot be filtered.");
 	}
 
 
@@ -143,13 +145,13 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	/**
 	 * Adds the component to the container.
 	 * @param  string  component name
-	 * @param  IComponent
+	 * @param  Nette\IComponent
 	 * @return void.
 	 */
 	final public function offsetSet($name, $component)
 	{
-		if (!$component instanceof IComponent) {
-			throw new InvalidArgumentException("ActionColumn accepts only IComponent objects.");
+		if (!$component instanceof Nette\IComponent) {
+			throw new \InvalidArgumentException("DataGrid\Columns\ActionColumn accepts only IComponent objects.");
 		}
 		$this->getComponent('actions')->addComponent($component, $name == NULL ? count($this->getActions()) : $name);
 	}
@@ -158,8 +160,8 @@ class ActionColumn extends DataGridColumn implements ArrayAccess
 	/**
 	 * Returns component specified by name. Throws exception if component doesn't exist.
 	 * @param  string  component name
-	 * @return IComponent
-	 * @throws InvalidArgumentException
+	 * @return Nette\IComponent
+	 * @throws \InvalidArgumentException
 	 */
 	final public function offsetGet($name)
 	{

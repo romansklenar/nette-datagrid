@@ -1,5 +1,7 @@
 <?php
 
+namespace DataGrid;
+
 /**
  * Defines method that must be implemented to allow a component act like a data grid action.
  *
@@ -8,11 +10,11 @@
  * @license    New BSD License
  * @package    Nette\Extras\DataGrid
  */
-interface IDataGridAction
+interface IAction
 {
 	/**
 	 * Gets action element template.
-	 * @return Html
+	 * @return Nette\Web\Html
 	 */
 	function getHtml();
 

@@ -1,8 +1,9 @@
 <?php
 
+namespace DataGrid;
+use Nette, Nette\Web\Html;
+
 require_once dirname(__FILE__) . '/IDataGridRenderer.php';
-
-
 
 /**
  * Converts a data grid into the HTML output.
@@ -13,7 +14,7 @@ require_once dirname(__FILE__) . '/IDataGridRenderer.php';
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class DataGridRenderer extends Object implements IDataGridRenderer
+class Renderer extends Nette\Object implements IRenderer
 {
 	/** @var array  of HTML tags */
 	public $wrappers = array(
@@ -99,16 +100,16 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	/** @var string  template file*/
 	public $file;
 
-	/** @var DataGrid */
+	/** @var DataGrid\DataGrid */
 	protected $dataGrid;
 
-	/** @var array  of function(Html $row, DibiRow $data) */
+	/** @var array  of function(Nette\Web\Html $row, DibiRow $data) */
 	public $onRowRender;
 
-	/** @var array  of function(Html $cell, string $column, mixed $value) */
+	/** @var array  of function(Nette\Web\Html $cell, string $column, mixed $value) */
 	public $onCellRender;
 
-	/** @var array  of function(Html $action, DibiRow $data) */
+	/** @var array  of function(Nette\Web\Html $action, DibiRow $data) */
 	public $onActionRender;
 
 
@@ -125,7 +126,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 	/**
 	 * Provides complete datagrid rendering.
-	 * @param  DataGrid
+	 * @param  DataGrid\DataGrid
 	 * @param  string
 	 * @return string
 	 */
@@ -135,8 +136,8 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$this->dataGrid = $dataGrid;
 		}
 
-		if (!$dataGrid->dataSource instanceof DibiDataSource) {
-			throw new InvalidArgumentException("Data source was not setted. You must set data source to data grid before rendering.");
+		if (!$dataGrid->dataSource instanceof \DibiDataSource) {
+			throw new \InvalidArgumentException("Data source was not setted. You must set data source to data grid before rendering.");
 		}
 
 		if ($mode !== NULL) {
@@ -224,7 +225,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 		// body
 		$body = Html::el($container->getName() == 'table' ? 'tbody' : NULL);
-		$iterator = new SmartCachingIterator($this->dataGrid->getRows());
+		$iterator = new Nette\SmartCachingIterator($this->dataGrid->getRows());
 		foreach ($iterator as $data) {
 			$row = $this->generateContentRow($data);
 			$row->addClass($iterator->isEven() ? $this->getValue('row.content .even') : NULL);
@@ -259,7 +260,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		$translator = $this->dataGrid->getTranslator();
 
 		$a = Html::el('a');
-		$a->addClass(DataGridAction::$ajaxClass);
+		$a->addClass(Action::$ajaxClass);
 
 		// to-first button
 		$first = $this->getWrapper('paginator button first');
@@ -392,7 +393,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 	/**
 	 * Generates datagrid headrer.
-	 * @return Html
+	 * @return Nette\Web\Html
 	 */
 	protected function generateHeaderRow()
 	{
@@ -431,7 +432,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 					$text .= Html::el('span')->setHtml($list[$column->getName()][1]);
 				}
 
-				$up = clone $down = Html::el('a')->addClass(DataGridColumn::$ajaxClass);
+				$up = clone $down = Html::el('a')->addClass(Columns\Column::$ajaxClass);
 				$up->addClass($a ? 'active' : '')->href($column->getOrderLink('a'))
 					->add(Html::el('span')->class('up'));
 				$down->addClass($d ? 'active' : '')->href($column->getOrderLink('d'))
@@ -440,7 +441,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 				$active = $a || $d;
 
 				$value = (string) Html::el('a')->href($column->getOrderLink())
-					->addClass(DataGridColumn::$ajaxClass)->setHtml($text) . $positioner;
+					->addClass(Columns\Column::$ajaxClass)->setHtml($text) . $positioner;
 			} else {
 				$value = (string) Html::el('p')->setText($value);
 			}
@@ -448,7 +449,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$cell = $this->getWrapper('row.header cell container')->setHtml($value);
 			$cell->attrs = $column->getHeaderPrototype()->attrs;
 			$cell->addClass(isset($active) && $active == TRUE ? $this->getValue('row.header cell .active') : NULL);
-			if ($column instanceof ActionColumn) $cell->addClass('actions');
+			if ($column instanceof Columns\ActionColumn) $cell->addClass('actions');
 
 			$row->add($cell);
 		}
@@ -459,7 +460,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 	/**
 	 * Generates datagrid filter.
-	 * @return Html
+	 * @return Nette\Web\Html
 	 */
 	protected function generateFilterRow()
 	{
@@ -476,14 +477,14 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			// TODO: set on filters too?
 			$cell->attrs = $column->getCellPrototype()->attrs;
 
-			if ($column instanceof ActionColumn) {
+			if ($column instanceof Columns\ActionColumn) {
 				$value = (string) $submitControl;
 				$cell->addClass('actions');
 
 			} else {
 				if ($column->hasFilter()) {
 					$filter = $column->getFilter();
-					if ($filter instanceof SelectboxFilter) {
+					if ($filter instanceof Filters\SelectboxFilter) {
 						$class = $this->getValue('row.filter control .select');
 					} else {
 						$class = $this->getValue('row.filter control .input');
@@ -512,7 +513,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 	/**
 	 * Generates datagrid row content.
 	 * @param  DibiRow data
-	 * @return Html
+	 * @return Nette\Web\Html
 	 */
 	protected function generateContentRow($data)
 	{
@@ -522,7 +523,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 		if ($this->dataGrid->hasOperations() || $this->dataGrid->hasActions()) {
 			$primary = $this->dataGrid->keyName;
 			if (!isset($data[$primary])) {
-				throw new InvalidArgumentException("Invalid name of key for group operations or actions. Column '" . $primary . "' does not exist in data source.");
+				throw new \InvalidArgumentException("Invalid name of key for group operations or actions. Column '" . $primary . "' does not exist in data source.");
 			}
 		}
 
@@ -539,7 +540,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 			$cell = $this->getWrapper('row.content cell container');
 			$cell->attrs = $column->getCellPrototype()->attrs;
 
-			if ($column instanceof ActionColumn) {
+			if ($column instanceof Columns\ActionColumn) {
 				$value = '';
 				foreach ($this->dataGrid->getActions() as $action) {
 					$html = $action->getHtml();
@@ -552,13 +553,13 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 			} else {
 				if (!array_key_exists($column->getName(), $data)) {
-					throw new InvalidArgumentException("Non-existing column '" . $column->getName() . "' in datagrid '" . $this->dataGrid->getName() . "'");
+					throw new \InvalidArgumentException("Non-existing column '" . $column->getName() . "' in datagrid '" . $this->dataGrid->getName() . "'");
 				}
 				$value = $column->formatContent($data[$column->getName()], $data);
 			}
 
 			$cell->setHtml((string)$value);
-			$this->onCellRender($cell, $column->getName(), !($column instanceof ActionColumn) ? $data[$column->getName()] : $data);
+			$this->onCellRender($cell, $column->getName(), !($column instanceof Columns\ActionColumn) ? $data[$column->getName()] : $data);
 			$row->add($cell);
 		}
 		unset($form, $primary, $cell, $value, $action);
@@ -569,7 +570,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 	/**
 	 * Generates datagrid footer.
-	 * @return Html
+	 * @return Nette\Web\Html
 	 */
 	protected function generateFooterRow()
 	{
@@ -606,7 +607,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 	/**
 	 * @param  string
-	 * @return Html
+	 * @return Nette\Web\Html
 	 */
 	protected function getWrapper($name)
 	{
@@ -633,7 +634,7 @@ class DataGridRenderer extends Object implements IDataGridRenderer
 
 	/**
 	 * Returns DataGrid.
-	 * @return DataGrid
+	 * @return DataGrid\Datagrid
 	 */
 	public function getDataGrid()
 	{

@@ -1,8 +1,8 @@
 <?php
 
+namespace DataGrid\Columns;
+
 require_once dirname(__FILE__) . '/../DataGridColumn.php';
-
-
 
 /**
  * Representation of numeric data grid column.
@@ -13,7 +13,7 @@ require_once dirname(__FILE__) . '/../DataGridColumn.php';
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class NumericColumn extends DataGridColumn
+class NumericColumn extends Column
 {
 	/** @var int */
 	public $precision;
@@ -35,7 +35,7 @@ class NumericColumn extends DataGridColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
-	 * @param  DibiRow|array
+	 * @param  \DibiRow|array
 	 * @return string
 	 */
 	public function formatContent($value, $data = NULL)

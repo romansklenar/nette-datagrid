@@ -1,8 +1,9 @@
 <?php
 
+namespace DataGrid;
+use Nette;
+
 require_once dirname(__FILE__) . '/IDataGridAction.php';
-
-
 
 /**
  * Representation of data grid action.
@@ -13,14 +14,14 @@ require_once dirname(__FILE__) . '/IDataGridAction.php';
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class DataGridAction extends Component implements IDataGridAction
+class Action extends Nette\Component implements IAction
 {
 	/**#@+ special action key */
 	const WITH_KEY		= TRUE;
 	const WITHOUT_KEY	= FALSE;
 	/**#@-*/
 
-	/** @var Html  action element template */
+	/** @var Nette\Web\Html  action element template */
 	protected $html;
 
 	/** @var string */
@@ -40,22 +41,22 @@ class DataGridAction extends Component implements IDataGridAction
 	 *
 	 * @param  string  textual title
 	 * @param  string  textual link destination
-	 * @param  Html    element which is added to a generated link
+	 * @param  Nette\Web\Html    element which is added to a generated link
 	 * @param  bool    use ajax? (add class self::$ajaxClass into generated link)
 	 * @param  mixed   generate link with argument? (if yes you can specify name of parameter
-	 * 				   otherwise variable DataGrid::$keyName will be used and must be defined)
+	 * 				   otherwise variable DataGrid\DataGrid::$keyName will be used and must be defined)
 	 * @return void
 	 */
-	public function __construct($title, $destination, Html $icon = NULL, $useAjax = FALSE, $key = self::WITH_KEY)
+	public function __construct($title, $destination, Nette\Web\Html $icon = NULL, $useAjax = FALSE, $key = self::WITH_KEY)
 	{
 		parent::__construct();
 		$this->destination = $destination;
 		$this->key = $key;
 
-		$a = Html::el('a')->title($title);
+		$a = Nette\Web\Html::el('a')->title($title);
 		if ($useAjax) $a->addClass(self::$ajaxClass);
 
-		if ($icon !== NULL && $icon instanceof Html) {
+		if ($icon !== NULL && $icon instanceof Nette\Web\Html) {
 			$a->add($icon);
 		} else {
 			$a->setText($title);
@@ -70,7 +71,7 @@ class DataGridAction extends Component implements IDataGridAction
 	 */
 	public function generateLink(array $args = NULL)
 	{
-		$dataGrid = $this->lookup('DataGrid', TRUE);
+		$dataGrid = $this->lookup('DataGrid\DataGrid', TRUE);
 		$control = $dataGrid->lookup('Nette\Application\Control', TRUE);
 
 		switch ($this->key) {
@@ -87,13 +88,13 @@ class DataGridAction extends Component implements IDataGridAction
 
 
 
-	/********************* interface \IDataGridAction *********************/
+	/********************* interface DataGrid\IAction *********************/
 
 
 
 	/**
 	 * Gets action element template.
-	 * @return Html
+	 * @return Nette\Web\Html
 	 */
 	public function getHtml()
 	{

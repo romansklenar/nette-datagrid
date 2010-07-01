@@ -1,5 +1,7 @@
 <?php
 
+namespace DataGrid\Columns;
+
 /**
  * Defines method that must be implemented to allow a component act like a data grid column.
  *
@@ -8,7 +10,7 @@
  * @license    New BSD License
  * @package    Nette\Extras\DataGrid
  */
-interface IDataGridColumn
+interface IColumn
 {
 	/**
 	 * Is column orderable?
@@ -34,7 +36,7 @@ interface IDataGridColumn
 
 	/**
 	 * Returns column's filter.
-	 * @return IDataGridColumnFilter|NULL
+	 * @return DataGrid\Filters\IColumnFilter|NULL
 	 */
 	function getFilter();
 
