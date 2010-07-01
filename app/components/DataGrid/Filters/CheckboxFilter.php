@@ -3,8 +3,6 @@
 namespace DataGrid\Filters;
 use Nette, DataGrid;
 
-require_once dirname(__FILE__) . '/../DataGridColumnFilter.php';
-
 /**
  * Representation of data grid column checkbox filter.
  *

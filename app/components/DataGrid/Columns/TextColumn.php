@@ -3,8 +3,6 @@
 namespace DataGrid\Columns;
 use Nette;
 
-require_once dirname(__FILE__) . '/../DataGridColumn.php';
-
 /**
  * Representation of textual data grid column.
  *

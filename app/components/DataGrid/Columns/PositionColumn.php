@@ -3,8 +3,6 @@
 namespace DataGrid\Columns;
 use DataGrid, Nette\Web\Html;
 
-require_once dirname(__FILE__) . '/NumericColumn.php';
-
 /**
  * Representation of positioning data grid column, that provides moving entries up or down.
  *

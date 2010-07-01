@@ -3,8 +3,6 @@
 namespace DataGrid\Columns;
 use Nette, DataGrid;
 
-require_once dirname(__FILE__) . '/../DataGridColumn.php';
-
 /**
  * Representation of data grid action column.
  * If you want to write your own implementation you must inherit this class.

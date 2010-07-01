@@ -3,8 +3,6 @@
 namespace DataGrid;
 use Nette;
 
-require_once dirname(__FILE__) . '/IDataGridAction.php';
-
 /**
  * Representation of data grid action.
  *

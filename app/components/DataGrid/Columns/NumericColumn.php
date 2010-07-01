@@ -2,8 +2,6 @@
 
 namespace DataGrid\Columns;
 
-require_once dirname(__FILE__) . '/../DataGridColumn.php';
-
 /**
  * Representation of numeric data grid column.
  *

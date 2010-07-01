@@ -2,8 +2,6 @@
 
 namespace DataGrid\Columns;
 
-require_once dirname(__FILE__) . '/TextColumn.php';
-
 /**
  * Representation of image data grid column.
  *

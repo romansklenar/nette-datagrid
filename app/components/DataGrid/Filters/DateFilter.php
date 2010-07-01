@@ -2,8 +2,6 @@
 
 namespace DataGrid\Filters;
 
-require_once dirname(__FILE__) . '/TextFilter.php';
-
 /**
  * Representation of data grid column date filter.
  *

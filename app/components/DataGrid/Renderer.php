@@ -3,8 +3,6 @@
 namespace DataGrid;
 use Nette, Nette\Web\Html;
 
-require_once dirname(__FILE__) . '/IDataGridRenderer.php';
-
 /**
  * Converts a data grid into the HTML output.
  *

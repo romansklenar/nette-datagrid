@@ -3,8 +3,6 @@
 namespace DataGrid\Columns;
 use Nette;
 
-require_once dirname(__FILE__) . '/NumericColumn.php';
-
 /**
  * Representation of checkbox data grid column.
  *

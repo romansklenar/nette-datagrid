@@ -3,8 +3,6 @@
 namespace DataGrid\Columns;
 use Nette, Nette\Web\Html, Datagrid, DataGrid\Filters;
 
-require_once dirname(__FILE__) . '/IDataGridColumn.php';
-
 /**
  * Base class that implements the basic common functionality to data grid columns.
  *

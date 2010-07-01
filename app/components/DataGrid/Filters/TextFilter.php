@@ -3,8 +3,6 @@
 namespace DataGrid\Filters;
 use Nette;
 
-require_once dirname(__FILE__) . '/../DataGridColumnFilter.php';
-
 /**
  * Representation of data grid column textual filter.
  *
