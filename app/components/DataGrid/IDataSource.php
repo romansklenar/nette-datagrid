@@ -23,6 +23,13 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	const SMALLER_OR_EQUAL	= '<=';
 	const LIKE				= 'LIKE';
 	const NOT_LIKE			= 'NOT LIKE';
+	const IS_NULL			= 'IS NULL';
+	const IS_NOT_NULL		= 'IS NOT NULL';
+	/**#@-*/
+
+	/**#@+ filter chain types */
+	const CHAIN_AND		= 'AND';
+	const CHAIN_OR		= 'OR';
 	/**#@-*/
 
 	/**
@@ -36,15 +43,16 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * Add filtering onto specified column
 	 * @param string column name
 	 * @param string filter
-	 * @param int operation mode
+	 * @param string|array operation mode
+	 * @param string chain type (if third argument is array)
 	 * @throws \InvalidArgumentException
 	 */
-	function filter($column, $value, $operation = IDataSource::EQUAL);
+	function filter($column, $value, $operation = IDataSource::EQUAL, $chainType = NULL);
 
 	/**
 	 * Adds ordering to specified column
 	 * @param string column name
-	 * @param int one of IDataSource::ASCENDING, IDataSource::DESCENDING
+	 * @param string one of ordering types
 	 * @throws \InvalidArgumentException
 	 */
 	function sort($column, $order = IDataSource::ASCENDING);

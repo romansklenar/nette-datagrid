@@ -22,7 +22,7 @@ class DataSource extends Nette\Object implements DataGrid\IDataSource
 			}
 			$this->_qb = $query;
 		} elseif (is_string($query)) {
-			$this->_qb = Nette\Environment::getEntityManager()->createQueryBuilder()->from($qb); /** @todo */
+			$this->_qb = Nette\Environment::getEntityManager()->createQueryBuilder()->from($query); /** @todo */
 		} else {
 			throw new \InvalidArgumentException;
 		}
@@ -33,9 +33,9 @@ class DataSource extends Nette\Object implements DataGrid\IDataSource
 		$this->_qb->addSelect($columns);
 	}
 
-	protected function isValidFilterOperation($operation)
+	protected function validateFilterOperation($operation)
 	{
-		return in_array($operation, array(
+		static $types = array(
 			self::EQUAL,
 			self::NOT_EQUAL,
 			self::GREATER,
@@ -44,16 +44,53 @@ class DataSource extends Nette\Object implements DataGrid\IDataSource
 			self::SMALLER_OR_EQUAL,
 			self::LIKE,
 			self::NOT_LIKE,
-		));
-	}
+			self::IS_NULL,
+			self::IS_NOT_NULL,
+		);
 
-	public function filter($column, $value, $type = self::EQUAL)
-	{
-		if (!$this->isValidFilterOperation($type)) {
+		if (!in_array($operation, $types)) {
 			throw new \InvalidArgumentException('Invalid filter operation type.');
 		}
+	}
+
+	public function filter($column, $value, $type = self::EQUAL, $chainType = NULL)
+	{
 		$nextParamId = count($this->_qb->getParameters()) + 1;
-		$this->_qb->andWhere("$column $type ?$nextParamId")->setParameter($nextParamId, $value);
+		
+		if (is_array($type)) {
+			if ($chainType !== self::CHAIN_AND && $chainType !== self::CHAIN_OR) {
+				throw new \InvalidArgumentException('Invalid chain operation type.');
+			}
+			$conds = array();
+			$paramUsed = FALSE;
+			foreach ($type as $t) {
+				$this->validateFilterOperation($t);
+				if ($t === self::IS_NULL || $t === self::IS_NOT_NULL) {
+					$conds[] = "$column $t";
+				} else {
+					$conds[] = "$column $t ?$nextParamId";
+					$paramUsed = TRUE;
+				}
+			}
+
+			if ($chainType === self::CHAIN_AND) {
+				foreach ($conds as $cond)  {
+					$this->_qb->andWhere($cond);
+				}
+			} elseif ($chainType === self::CHAIN_OR) {
+				$this->_qb->andWhere(new Expr\Orx($conds));
+			}
+
+			$paramUsed && $this->_qb->setParameter($nextParamId++, $value);
+		} else {
+			$this->validateFilterOperation($type);
+
+			if ($type === self::IS_NULL || $type === self::IS_NOT_NULL) {
+				$this->_qb->andWhere("$column $type");
+			} else {
+				$this->_qb->andWhere("$column $type ?$nextParamId")->setParameter($nextParamId, $value);
+			}
+		}
 	}
 
 	public function sort($column, $order = self::ASCENDING)
