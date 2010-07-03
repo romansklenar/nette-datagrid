@@ -82,7 +82,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	/** @var DataGrid\IRenderer */
 	protected $renderer;
 
-	/** @var \DibiDataSource */
+	/** @var IDataSource */
 	protected $dataSource;
 
 	/** @var Nette\Paginator */
@@ -121,25 +121,26 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 
 
 	/**
-	 * Binds data source to data grid.
-	 * @param  \DibiDataSource
-	 * @throws \DibiException
-	 * @return void
-	 */
-	public function bindDataTable(\DibiDataSource $dataSource)
-	{
-		$this->dataSource = $dataSource;
-		$this->paginator->itemCount = count($dataSource);
-	}
-
-
-	/**
 	 * Getter / property method.
-	 * @return DibiDataSource
+	 * @return DataGrid\IDataSource
 	 */
 	public function getDataSource()
 	{
 		return $this->dataSource;
+	}
+
+
+	/**
+	 * Setter / property method.
+	 * Binds data source to data grid.
+	 * @param  DataGrid\IDataSource
+	 * @return DataGrid\DataGrid
+	 */
+	public function setDataSource(IDataSource $dataSource)
+	{
+		$this->dataSource = $dataSource;
+		$this->paginator->itemCount = count($dataSource);
+		return $this;
 	}
 
 
