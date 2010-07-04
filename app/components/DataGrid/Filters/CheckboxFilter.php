@@ -21,7 +21,7 @@ class CheckboxFilter extends ColumnFilter
 	public function getFormControl()
 	{
 		if ($this->element instanceof Nette\Forms\FormControl) return $this->element;
-		$element = new Nette\Forms\Checkbox($this->getName());
+		$element = new Nette\Forms\Checkbox($this->name);
 
 		return $this->element = $element;
 	}

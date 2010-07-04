@@ -1,7 +1,7 @@
 <?php
 
 namespace DataGrid\Filters;
-use Nette;
+use Nette, DataGrid;
 
 /**
  * Representation of data grid column selectbox filter.
@@ -34,12 +34,13 @@ class SelectboxFilter extends ColumnFilter
 	 * @param  bool    translate all items in selectbox?
 	 * @return void
 	 */
-	public function __construct(array $items = NULL, $firstEmpty = TRUE, $translateItems = TRUE)
+	//public function __construct(array $items = NULL, $firstEmpty = TRUE, $translateItems = TRUE)
+	public function __construct(DataGrid\DataGrid $dataGrid, $name, array $items = NULL, $firstEmpty = TRUE, $translateItems = TRUE)
 	{
 		$this->items = $items;
 		$this->firstEmpty = $firstEmpty;
 		$this->translateItems = $translateItems;
-		parent::__construct();
+		parent::__construct($dataGrid, $name);
 	}
 
 
@@ -52,10 +53,8 @@ class SelectboxFilter extends ColumnFilter
 		// NOTE: don't generate if was items given in constructor
 		if (is_array($this->items)) return;
 
-		$dataGrid = $this->lookup('DataGrid\DataGrid', TRUE);
-
-		$columnName = $this->getName();
-		$dataSource = clone $dataGrid->dataSource;
+		$columnName = $this->name;
+		$dataSource = clone $this->dataGrid->getDataSource();
 		$dataSource->applyLimit(NULL);
 		$fluent = $dataSource->toFluent();
 		$fluent->removeClause('select');

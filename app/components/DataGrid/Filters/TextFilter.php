@@ -22,7 +22,7 @@ class TextFilter extends ColumnFilter
 	{
 		if ($this->element instanceof Nette\Forms\FormControl) return $this->element;
 
-		$this->element = new Nette\Forms\TextInput($this->getName(), 5);
+		$this->element = new Nette\Forms\TextInput($this->name, 5);
 		return $this->element;
 	}
 }

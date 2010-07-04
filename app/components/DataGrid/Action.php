@@ -12,7 +12,7 @@ use Nette;
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class Action extends Nette\Component implements IAction
+class Action extends Nette\Object implements IAction
 {
 	/**#@+ special action key */
 	const WITH_KEY		= TRUE;
@@ -31,6 +31,8 @@ class Action extends Nette\Component implements IAction
 	/** @var bool|string */
 	public $key;
 
+	/** @var DataGrid\DataGrid */
+	protected $dataGrid;
 
 	/**
 	 * Data grid action constructor.
@@ -45,9 +47,9 @@ class Action extends Nette\Component implements IAction
 	 * 				   otherwise variable DataGrid\DataGrid::$keyName will be used and must be defined)
 	 * @return void
 	 */
-	public function __construct($title, $destination, Nette\Web\Html $icon = NULL, $useAjax = FALSE, $key = self::WITH_KEY)
+	public function __construct(DataGrid $dataGrid, $title, $destination, Nette\Web\Html $icon = NULL, $useAjax = FALSE, $key = self::WITH_KEY)
 	{
-		parent::__construct();
+		$this->dataGrid = $dataGrid;
 		$this->destination = $destination;
 		$this->key = $key;
 
@@ -69,7 +71,7 @@ class Action extends Nette\Component implements IAction
 	 */
 	public function generateLink(array $args = NULL)
 	{
-		$dataGrid = $this->lookup('DataGrid\DataGrid', TRUE);
+		$dataGrid = $this->dataGrid;
 		$control = $dataGrid->lookup('Nette\Application\Control', TRUE);
 
 		switch ($this->key) {

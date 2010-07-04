@@ -1,7 +1,7 @@
 <?php
 
 namespace DataGrid\Columns;
-use Nette;
+use Nette, DataGrid;
 
 /**
  * Representation of checkbox data grid column.
@@ -19,9 +19,10 @@ class CheckboxColumn extends NumericColumn
 	 * @param  string  column's textual caption
 	 * @return void
 	 */
-	public function __construct($caption = NULL)
+	//public function __construct($caption = NULL)
+	public function __construct(DataGrid\DataGrid $dataGrid, $name, $caption = NULL)
 	{
-		parent::__construct($caption, 0);
+		parent::__construct($dataGrid, $name, $caption, 0);
 		$this->getCellPrototype()->style('text-align: center');
 	}
 
@@ -49,8 +50,8 @@ class CheckboxColumn extends NumericColumn
 	{
 		if (!$this->hasFilter()) return;
 
-		$datagrid = $this->getDataGrid(TRUE);
-		$column = $this->getName();
+		$datagrid = $this->dataGrid;
+		$column = $this->name;
 		$value = (int)(bool)$value;
 		$cond = array();
 		if ($value) $cond[] = array("[$column] >= %b", TRUE);

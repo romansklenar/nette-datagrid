@@ -18,9 +18,9 @@ class ImageColumn extends TextColumn
 	 * @param  string  column's textual caption
 	 * @return void
 	 */
-	public function __construct($caption = NULL)
+	public function __construct(DataGrid\DataGrid $dataGrid, $name, $caption = NULL, $maxLength = NULL)
 	{
 		throw new \NotImplementedException("Class was not implemented yet.");
-		parent::__construct($caption);
+		parent::__construct($dataGrid, $name, $caption, $maxLength);
 	}
 }
