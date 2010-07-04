@@ -226,11 +226,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 */
 	public function getColumns($type = 'IDataGridColumn')
 	{
-		$columns = new ArrayObject();
-		foreach ($this->getComponents(FALSE, $type) as $column) {
-			$columns->append($column);
-		}
-		return $columns->getIterator();
+		return new ArrayIterator(iterator_to_array($this->getComponents(FALSE, $type))); // due to bug in InstanceFilterIterator::count()
 	}
 
 
