@@ -64,10 +64,6 @@ class TextColumn extends Column
 	{
 		if (!$this->hasFilter()) return;
 
-		$datagrid = $this->dataGrid;
-		$column = $this->name;
-		$cond = array();
-
 		if (strstr($value, '*')) {
 			// rewrite asterix to regex usage (*str -> *str$, str* -> ^str*, st*r -> st.*r)
 			$f = $value[0];
@@ -78,7 +74,7 @@ class TextColumn extends Column
 			$value = str_replace('.*', '*', $value);
 			$value = str_replace('*', '.*', $value);
 
-			// NOTE: sqlite2 does not have REGEXP statement, you must register your own function
+			/*// NOTE: sqlite2 does not have REGEXP statement, you must register your own function
 			$driver = $datagrid->dataSource->getConnection()->getConfig('driver');
 			if ($driver == 'sqlite' && (int) sqlite_libversion() == 2) {
 				$cond[] = array("REGEXP($column, '$value')");
@@ -90,15 +86,16 @@ class TextColumn extends Column
 
 			} else {
 				$cond[] = array("[$column] REGEXP '$value'");
-			}
-
+			}*/
+			$this->dataGrid->getDataSource()->filter($this->name, $value, 'LIKE'); //asterisks are converted internally
 		} elseif ($value === 'NULL' || $value === 'NOT NULL') {
-			$cond[] = array("[$column] IS $value");
-
+			//$cond[] = array("[$column] IS $value");
+			$this->dataGrid->getDataSource()->filter($this->name, NULL, "IS $value");
 		} else {
-			$cond[] = array("[$column] LIKE '%$value%'");
+			//$cond[] = array("[$column] LIKE '%$value%'");
+			$this->dataGrid->getDataSource()->filter($this->name, "*$value*", 'LIKE');
 		}
 
-		$datagrid->dataSource->where('%and', $cond);
+		//$datagrid->dataSource->where('%and', $cond);
 	}
 }

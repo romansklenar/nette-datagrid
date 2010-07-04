@@ -134,8 +134,8 @@ class Renderer extends Nette\Object implements IRenderer
 			$this->dataGrid = $dataGrid;
 		}
 
-		if (!$dataGrid->dataSource instanceof \DibiDataSource) {
-			throw new \InvalidArgumentException("Data source was not setted. You must set data source to data grid before rendering.");
+		if (!($dataGrid->dataSource instanceof IDataSource)) {
+			throw new \InvalidArgumentException("Data source was not set. You must set data source to data grid before rendering.");
 		}
 
 		if ($mode !== NULL) {

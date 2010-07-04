@@ -64,12 +64,9 @@ class NumericColumn extends Column
 	{
 		if (!$this->hasFilter()) return;
 
-		$column = $this->name;
-		$cond = array();
-
 		if ($value === 'NULL' || $value === 'NOT NULL') {
-			$cond[] = array("[$column] IS $value");
-
+			//$cond[] = array("[$column] IS $value");
+			$this->dataGrid->getDataSource()->filter($this->name, NULL, "IS $value");
 		} else {
 			$operator = '=';
 			$v = str_replace(',', '.', $value);
@@ -81,10 +78,11 @@ class NumericColumn extends Column
 				$value = $matches['value'];
 			}
 
-			$cond[] = array("[$column] $operator %f", $value);
+			//$cond[] = array("[$column] $operator %f", $value);
+			$this->dataGrid->getDataSource()->filter($this->name, (float) $value, $operator); //or skip converting?
 		}
 
-		$datagrid = $this->dataGrid;
-		$datagrid->dataSource->where('%and', $cond);
+		//$datagrid = $this->dataGrid;
+		//$datagrid->dataSource->where('%and', $cond);
 	}
 }

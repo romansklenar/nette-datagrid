@@ -53,7 +53,7 @@ class SelectboxFilter extends ColumnFilter
 		// NOTE: don't generate if was items given in constructor
 		if (is_array($this->items)) return;
 
-		$columnName = $this->name;
+		/*$columnName = $this->name;
 		$dataSource = clone $this->dataGrid->getDataSource();
 		$dataSource->applyLimit(NULL);
 		$fluent = $dataSource->toFluent();
@@ -65,7 +65,14 @@ class SelectboxFilter extends ColumnFilter
 		$cond[] = array("[$columnName] NOT LIKE %s", '');
 
 		$fluent->where('%and', $cond)->orderBy($columnName);
-		$items = $fluent->fetchPairs($columnName, $columnName);
+		$items = $fluent->fetchPairs($columnName, $columnName);*/
+		$dataSource = $this->dataGrid->getDataSource();
+		$dataSource->select($this->name, $dataSource::DISTINCT);
+		$dataSource->filter(NULL);
+		$dataSource->reduce(NULL, NULL);
+		$iterator = $dataSource->getIterator();
+		$items = iterator_to_array($iterator);
+		$items = array_combine($items, $items);
 
 		$this->generatedItems = $this->firstEmpty ? array_merge(array('' => '?'), $items) : $items;
 

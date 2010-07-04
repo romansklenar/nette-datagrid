@@ -10,8 +10,13 @@ namespace DataGrid;
 interface IDataSource extends \Countable, \IteratorAggregate
 {
 	/**#@+ ordering types */
-	const ASCENDING		= 1;
-	const DESCENDING	= 2;
+	const ASCENDING		= 'ASC';
+	const DESCENDING	= 'DESC';
+	/**#@-*/
+
+	/**#@+ select modes */
+	const NORMAL		= 'NORMAL';
+	const DISTINCT		= 'DISTINCT';
 	/**#@-*/
 
 	/**#@+ filter operations */
@@ -37,7 +42,7 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * @param string|array columns to be selected
 	 * @throws \InvalidArgumentException
 	 */
-	function select($columns);
+	function select($columns, $mode = IDataSource::NORMAL);
 
 	/**
 	 * Add filtering onto specified column
@@ -47,7 +52,7 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * @param string chain type (if third argument is array)
 	 * @throws \InvalidArgumentException
 	 */
-	function filter($column, $value, $operation = IDataSource::EQUAL, $chainType = NULL);
+	function filter($column, $value = NULL, $operation = IDataSource::EQUAL, $chainType = NULL);
 
 	/**
 	 * Adds ordering to specified column
