@@ -39,12 +39,8 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	function getColumns();
 
 	/**
-<<<<<<< HEAD
 	 * Does datasource have column of given name?
 	 *
-=======
-	 * Is column with given name valid?
->>>>>>> e9d61b703b54557205d777637666536330180569
 	 * @return boolean
 	 */
 	function hasColumn($name);
