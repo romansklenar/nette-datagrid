@@ -135,7 +135,7 @@ class Renderer extends Nette\Object implements IRenderer
 		}
 
 		if (! $dataGrid->dataSource instanceof DataSources\IDataSource) {
-			throw new \InvalidArgumentException('Data source was not set. You must set data source to DataGrid before rendering.');
+			throw new \InvalidStateException('Data source is not instance of IDataSource. ' . \gettype($this->dataSource) . ' given.');
 		}
 
 		if ($mode !== NULL) {

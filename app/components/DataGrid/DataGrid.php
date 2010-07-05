@@ -82,7 +82,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	/** @var DataGrid\IRenderer */
 	protected $renderer;
 
-	/** @var IDataSource */
+	/** @var DataGrid\DataSources\IDataSource */
 	protected $dataSource;
 
 	/** @var Nette\Paginator */
@@ -122,7 +122,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 
 	/**
 	 * Getter / property method.
-	 * @return DataGrid\IDataSource
+	 * @return DataGrid\DataSources\IDataSource
 	 */
 	public function getDataSource()
 	{
@@ -133,10 +133,10 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	/**
 	 * Setter / property method.
 	 * Binds data source to data grid.
-	 * @param  DataGrid\IDataSource
+	 * @param  DataGrid\DataSources\IDataSource
 	 * @return DataGrid\DataGrid
 	 */
-	public function setDataSource(IDataSource $dataSource)
+	public function setDataSource(DataSources\IDataSource $dataSource)
 	{
 		$this->dataSource = $dataSource;
 		$this->paginator->itemCount = count($dataSource);
@@ -209,13 +209,14 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 
 	/**
 	 * Iterates over datagrid rows.
+	 * 
 	 * @throws \InvalidStateException
-	 * @return \DibiResultIterator
+	 * @return \Iterator
 	 */
 	public function getRows()
 	{
-		if (!$this->dataSource instanceof DataSources\IDataSource) {
-			throw new \InvalidStateException("Data source has not been set or has invalid data type. You must set data source before you want get rows.");
+		if (! $this->dataSource instanceof DataSources\IDataSource) {
+				throw new \InvalidStateException('Data source is not instance of IDataSource. ' . \gettype($this->dataSource) . ' given.');
 		}
 		return $this->dataSource->getIterator();
 	}
@@ -223,7 +224,8 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 
 	/**
 	 * Iterates over datagrid columns.
-	 * @param  string
+	 * 
+	 * @param string $type
 	 * @throws \InvalidArgumentException
 	 * @return \ArrayIterator
 	 */
