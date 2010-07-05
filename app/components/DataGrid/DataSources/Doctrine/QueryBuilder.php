@@ -6,19 +6,15 @@ use Doctrine;
 
 /**
  * Query Builder based data source
- * 
  * @author Michael Moravec
  * @author Štěpán Svoboda
  */
 class QueryBuilder extends Mapped
 {
 
-	/**
-	 * @var QueryBuilder 
-	 */
+	/** @var Doctrine\ORM\QueryBuilder */
 	private $qb;
 
-	
 	/**
 	 * @param QueryBuilder $qb
 	 */
@@ -95,11 +91,11 @@ class QueryBuilder extends Mapped
 		return (int) $query->getSingleScalarResult();
 	}
 
+	
 	public function getFilterItems($column)
 	{
 		//	Pekelník: mušeli bysme nějak implementovat tu funkci z $fluent->distinct()... což namená removeSelect() a setSelect('Distinct <column>') 
 		//	Majkl: v ní se to může naklonovat, resetnout select, aplikovat distinct a selectnout
 		throw new \NotImplementedException();
 	}
-
 }

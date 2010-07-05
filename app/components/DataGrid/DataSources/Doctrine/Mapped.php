@@ -9,30 +9,23 @@ use Nette, Doctrine, DataGrid,
 
 /**
  * Base class for Doctrine2 based data sources
- * 
  * @author Michael Moravec
  * @author Štěpán Svoboda
  */
 abstract class Mapped extends DataSource
 {
-	/**
-	 * Column alias to raw resultset columns mapping
-	 *
-	 * @var array
-	 */
+	/** @var array Column aliases to raw resultset columns mapping */
 	protected $mapping = array();
-
 
 	/**
 	 * Set columns mapping
-	 *
-	 * @param $mapping array
+	 * @param array
+	 * @return void
 	 */
 	public function setMapping(array $mapping)
 	{
 		$this->mapping = $mapping;
 	}
-
 
 	/**
 	 * Does datasource have column of given name?
