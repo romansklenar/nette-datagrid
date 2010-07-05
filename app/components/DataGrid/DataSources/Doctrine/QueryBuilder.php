@@ -40,7 +40,10 @@ class QueryBuilder extends Mapped
 					$conds[] = "{$this->mapping[$column]} $t";
 				} else {
 					$conds[] = "{$this->mapping[$column]} $t ?$nextParamId";
-					$this->qb->setParameter($nextParamId++, $value);
+					$this->qb->setParameter(
+						$nextParamId++,
+						$t === self::LIKE || $t === self::NOT_LIKE ? $this->_formatValueForLikeExpr($value) : $value
+					);
 				}
 			}
 
@@ -57,9 +60,20 @@ class QueryBuilder extends Mapped
 			if ($operation === self::IS_NULL || $operation === self::IS_NOT_NULL) {
 				$this->qb->andWhere("{$this->mapping[$column]} $operation");
 			} else {
-				$this->qb->andWhere("{$this->mapping[$column]} $operation ?$nextParamId")->setParameter($nextParamId, $value);
+				$this->qb->andWhere("{$this->mapping[$column]} $operation ?$nextParamId");
+				$this->qb->setParameter(
+					$nextParamId,
+					$operation === self::LIKE || $operation === self::NOT_LIKE ? $this->_formatValueForLikeExpr($value) : $value
+				);
 			}
 		}
+	}
+
+	private function _formatValueForLikeExpr($value)
+	{
+		$value = str_replace('%', '\\%', $value); //escape wildcard character used in PDO
+		$value = \Nette\String::replace($value, '~(?!\\\\)(.?)\\*~', '\\1%'); //replace asterisks
+		return str_replace('\\*', '*', $value); //replace escaped asterisks
 	}
 
 	public function sort($column, $order = self::ASCENDING)
@@ -73,14 +87,18 @@ class QueryBuilder extends Mapped
 
 	public function reduce($count, $start = 0)
 	{
-		if (($count !== NULL && $count < 1) || ($start !== NULL && ($start < 0 || $start >= count($this)))) {
-			throw new \OutOfRangeException;
-		}
-		$this->qb->setMaxResults($count)->setFirstResult($start);
+		if ($count == NULL || $count > 0) { //intentionally ==
+			$this->qb->setMaxResults($count == NULL ? NULL : $count);
+		} else throw new \OutOfRangeException;
+
+		if ($start == NULL || ($start > 0 && $start < count($this))) {
+			$this->qb->setFirstResult($start == NULL ? NULL : $start);
+		} else throw new \OutOfRangeException;
 	}
 
 	public function getIterator()
 	{
+		echo $this->qb->getDQL();dump($this->qb->getParameters());
 		return new \ArrayIterator($this->qb->getQuery()->getScalarResult());
 	}
 
