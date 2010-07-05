@@ -10,26 +10,26 @@ namespace DataGrid\DataSources;
 interface IDataSource extends \Countable, \IteratorAggregate
 {
 	/**#@+ ordering types */
-	const ASCENDING		= 1;
-	const DESCENDING	= 2;
+	const ASCENDING = 1;
+	const DESCENDING = 2;
 	/**#@-*/
 
 	/**#@+ filter operations */
-	const EQUAL				= '=';
-	const NOT_EQUAL			= '!=';
-	const GREATER			= '>';
-	const GREATER_OR_EQUAL	= '>=';
-	const LESS				= '<';
-	const LESS_OR_EQUAL		= '<=';
-	const LIKE				= 'LIKE';
-	const NOT_LIKE			= 'NOT LIKE';
-	const IS_NULL			= 'IS NULL';
-	const IS_NOT_NULL		= 'IS NOT NULL';
+	const EQUAL	= '=';
+	const NOT_EQUAL = '!=';
+	const GREATER = '>';
+	const GREATER_OR_EQUAL = '>=';
+	const LESS = '<';
+	const LESS_OR_EQUAL = '<=';
+	const LIKE = 'LIKE';
+	const NOT_LIKE = 'NOT LIKE';
+	const IS_NULL = 'IS NULL';
+	const IS_NOT_NULL = 'IS NOT NULL';
 	/**#@-*/
 
 	/**#@+ filter chain types */
-	const CHAIN_AND		= 'AND';
-	const CHAIN_OR		= 'OR';
+	const CHAIN_AND = 'AND';
+	const CHAIN_OR	= 'OR';
 	/**#@-*/
 
 	/**
