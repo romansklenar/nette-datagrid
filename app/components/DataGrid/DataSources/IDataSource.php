@@ -4,7 +4,6 @@ namespace DataGrid\DataSources;
 
 /**
  * An interface which provides main data logic for DataGrid
- * 
  * @author Michael Moravec
  * @author Štěpán Svoboda
  */
@@ -20,8 +19,8 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	const NOT_EQUAL			= '!=';
 	const GREATER			= '>';
 	const GREATER_OR_EQUAL	= '>=';
-	const SMALLER			= '<';
-	const SMALLER_OR_EQUAL	= '<=';
+	const LESS				= '<';
+	const LESS_OR_EQUAL		= '<=';
 	const LIKE				= 'LIKE';
 	const NOT_LIKE			= 'NOT LIKE';
 	const IS_NULL			= 'IS NULL';
@@ -33,32 +32,25 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	const CHAIN_OR		= 'OR';
 	/**#@-*/
 
-
 	/**
 	 * Get list of columns available in datasource
-	 *
 	 * @return array
 	 */
 	function getColumns();
 
-
 	/**
 	 * Is column with given name valid?
-	 *
 	 * @return boolean
 	 */
 	function isValidColumn($name);
 
-
 	/**
 	 * Return distinct values for a selectbox filter
-	 *
 	 * @param string Column name
 	 * @return array
 	 */
 	function getFilterValues($column);
 	
-
 	/**
 	 * Add filtering onto specified column
 	 * @param string column name

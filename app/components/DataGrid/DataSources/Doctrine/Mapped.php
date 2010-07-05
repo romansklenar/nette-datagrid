@@ -9,38 +9,30 @@ use Nette, Doctrine, DataGrid,
 
 /**
  * Base class for Doctrine2 based data sources
- * 
  * @author Michael Moravec
  * @author Štěpán Svoboda
  */
 abstract class Mapped extends DataSource
 {
-	/**
-	 * Column alias to raw resultset columns mapping
-	 *
-	 * @var array
-	 */
+	/** @var array Column aliases to raw resultset columns mapping */
 	protected $mapping = array();
-
 
 	/**
 	 * Set columns mapping
-	 *
-	 * @param $mapping array
+	 * @param array
+	 * @return void
 	 */
 	public function setMapping(array $mapping)
 	{
 		$this->mapping = $mapping;
 	}
 
-
 	/**
 	 * Is column with given name valid?
-	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function isValid($column)
 	{
-		return \in_array($column, $this->mapping);
+		return in_array($column, $this->mapping);
 	}
 }

@@ -6,19 +6,15 @@ use Doctrine\ORM\QueryBuilder;
 
 /**
  * Query Builder based data source
- * 
  * @author Michael Moravec
  * @author Štěpán Svoboda
  */
 class QueryBuilder extends Mapped
 {
 
-	/**
-	 * @var QueryBuilder 
-	 */
+	/** @var Doctrine\ORM\QueryBuilder */
 	private $qb;
 
-	
 	/**
 	 * @param QueryBuilder $qb
 	 */
@@ -94,5 +90,4 @@ class QueryBuilder extends Mapped
 
 		return (int) $query->getSingleScalarResult();
 	}
-
 }
