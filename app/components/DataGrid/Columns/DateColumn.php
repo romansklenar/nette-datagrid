@@ -57,6 +57,6 @@ class DateColumn extends TextColumn
 		if (! $this->hasFilter()) return;
 
 		$datagrid = $this->getDataGrid(TRUE);
-		$this->dataGrid->getDataSource()->filter($this->name, $value, '=');
+		$this->dataGrid->getDataSource()->filter($this->name, '=', $value);
 	}
 }

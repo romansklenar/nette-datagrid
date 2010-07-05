@@ -54,9 +54,9 @@ class CheckboxColumn extends NumericColumn
 		$datagrid = $this->getDataGrid(TRUE);
 		$value = (boolean) $value;
 		if ($value) {
-			$dataGrid->getDataSource()->filter($this->name, $value, '>=');
+			$dataGrid->getDataSource()->filter($this->name, '>=', $value);
 		} else {
-			$dataGrid->getDataSource()->filter($this->name, $value, array('=', 'IS NULL'), 'OR');
+			$dataGrid->getDataSource()->filter($this->name, array('=', 'IS NULL'), $value, 'OR');
 		}
 	}
 

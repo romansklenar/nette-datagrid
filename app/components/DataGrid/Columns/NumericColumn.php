@@ -67,7 +67,7 @@ class NumericColumn extends Column
 
 		if ($value === 'NULL' || $value === 'NOT NULL') {
 			
-			$dataGrid->getDataSource()->filter($this->name, NULL, "IS $value");
+			$dataGrid->getDataSource()->filter($this->name, "IS $value");
 
 		} else {
 			$operator = '=';
@@ -80,7 +80,7 @@ class NumericColumn extends Column
 				$value = $matches['value'];
 			}
 
-			$dataGrid->getDataSource()->filter($this->name, (float) $value, $operator); //or skip converting?
+			$dataGrid->getDataSource()->filter($this->name, $operator, (float) $value); //or skip converting?
 		}
 	}
 }

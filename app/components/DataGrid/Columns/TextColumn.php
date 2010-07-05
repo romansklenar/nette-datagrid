@@ -64,27 +64,14 @@ class TextColumn extends Column
 	{
 		if (!$this->hasFilter()) return;
 
-		$dataGrid = $this->getDataGrid(TRUE);
+		$dataSource = $this->getDataGrid(TRUE)->getDataSource();
 
-		if (strstr($value, '*')) {
-			// rewrite asterix to regex usage (*str -> *str$, str* -> ^str*, st*r -> st.*r)
-			$f = $value[0];
-			$l = $value[strlen($value)-1];
-			if ($f == '*' && $l == '*') $value = "^$value$";
-			elseif ($f == '*' && $l != '$') $value = "$value$";
-			elseif ($l == '*' && $f != '^') $value = "^$value";
-			$value = str_replace('.*', '*', $value);
-			$value = str_replace('*', '.*', $value);
-
-			$dataGrid->getDataSource()->filter($this->name, $value, 'LIKE'); //asterisks are converted internally
-
+		if (strpos($value, '*') !== FALSE) {
+			$dataSource->filter($this->name, 'LIKE', $value); //asterisks are converted internally
 		} elseif ($value === 'NULL' || $value === 'NOT NULL') {
-			
-			$dataGrid->getDataSource()->filter($this->name, NULL, "IS $value");
-
+			$dataSource->filter($this->name, "IS $value");
 		} else {
-
-			$dataGrid->getDataSource()->filter($this->name, "*$value*", 'LIKE');
+			$dataSource->filter($this->name, 'LIKE', "*$value*");
 		}
 	}
 }
