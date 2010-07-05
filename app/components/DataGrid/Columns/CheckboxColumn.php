@@ -1,6 +1,7 @@
 <?php
 
 namespace DataGrid\Columns;
+
 use Nette;
 
 /**
@@ -14,6 +15,7 @@ use Nette;
  */
 class CheckboxColumn extends NumericColumn
 {
+
 	/**
 	 * Checkbox column constructor.
 	 * @param  string  column's textual caption
@@ -25,7 +27,6 @@ class CheckboxColumn extends NumericColumn
 		$this->getCellPrototype()->style('text-align: center');
 	}
 
-
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
@@ -35,26 +36,28 @@ class CheckboxColumn extends NumericColumn
 	public function formatContent($value, $data = NULL)
 	{
 		$checkbox = Nette\Web\Html::el('input')->type('checkbox')->disabled('disabled');
-		if ($value) $checkbox->checked = TRUE;
+		if ($value)
+			$checkbox->checked = TRUE;
 		return (string) $checkbox;
 	}
 
-
 	/**
-	 * Filters data source.
+	 * Filter data source
+	 * 
 	 * @param  mixed
 	 * @return void
 	 */
 	public function applyFilter($value)
 	{
-		if (!$this->hasFilter()) return;
+		if (! $this->hasFilter()) return;
 
 		$datagrid = $this->getDataGrid(TRUE);
-		$column = $this->getName();
-		$value = (int)(bool)$value;
-		$cond = array();
-		if ($value) $cond[] = array("[$column] >= %b", TRUE);
-		else $cond[] = array("[$column] = %b", FALSE, " OR [$column] IS NULL");
-		$datagrid->dataSource->where('%and', $cond);
+		$value = (boolean) $value;
+		if ($value) {
+			$dataGrid->getDataSource()->filter($this->name, $value, '>=');
+		} else {
+			$dataGrid->getDataSource()->filter($this->name, $value, array('=', 'IS NULL'), 'OR');
+		}
 	}
+
 }

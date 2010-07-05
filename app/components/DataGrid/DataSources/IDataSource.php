@@ -10,8 +10,8 @@ namespace DataGrid\DataSources;
 interface IDataSource extends \Countable, \IteratorAggregate
 {
 	/**#@+ ordering types */
-	const ASCENDING = 1;
-	const DESCENDING = 2;
+	const ASCENDING = 'ASC';
+	const DESCENDING = 'DESC';
 	/**#@-*/
 
 	/**#@+ filter operations */
@@ -60,7 +60,7 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * @param string chain type (if third argument is array)
 	 * @throws \InvalidArgumentException
 	 */
-	function filter($column, $value, $operation = IDataSource::EQUAL, $chainType = NULL);
+	function filter($column, $operation = IDataSource::EQUAL, $value = NULL, $chainType = NULL);
 
 	/**
 	 * Adds ordering to specified column

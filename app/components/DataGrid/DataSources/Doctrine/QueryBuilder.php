@@ -23,8 +23,12 @@ class QueryBuilder extends Mapped
 		$this->qb = $qb;
 	}
 
-	public function filter($column, $value, $type = self::EQUAL, $chainType = NULL)
+	public function filter($column, $operation = self::EQUAL, $value = NULL, $chainType = NULL)
 	{
+		if (!$this->hasColumn($column)) {
+			throw new \InvalidArgumentException('Trying to filter data source by unknown column.');
+		}
+
 		$nextParamId = count($this->qb->getParameters()) + 1;
 
 		if (is_array($type)) {
@@ -70,7 +74,7 @@ class QueryBuilder extends Mapped
 
 	public function reduce($count, $start = 0)
 	{
-		if ($count < 1 || $start < 0 || $start >= count($this)) {
+		if (($count !== NULL && $count < 1) || ($start !== NULL && ($start < 0 || $start >= count($this)))) {
 			throw new \OutOfRangeException;
 		}
 		$this->qb->setMaxResults($count)->setFirstResult($start);
@@ -91,11 +95,23 @@ class QueryBuilder extends Mapped
 		return (int) $query->getSingleScalarResult();
 	}
 
-	
 	public function getFilterItems($column)
 	{
 		//	Pekelník: mušeli bysme nějak implementovat tu funkci z $fluent->distinct()... což namená removeSelect() a setSelect('Distinct <column>') 
 		//	Majkl: v ní se to může naklonovat, resetnout select, aplikovat distinct a selectnout
 		throw new \NotImplementedException();
+
+		//
+		// Tohle je z toho původního commitu (třeba se to bude hodit...)
+		// 
+		//		$items = $fluent->fetchPairs($columnName, $columnName);
+		//		$dataSource = $this->dataGrid->getDataSource();
+		//		$dataSource->select($this->name, $dataSource::DISTINCT);
+		//		$dataSource->filter(NULL);
+		//		$dataSource->reduce(NULL, NULL);
+		//		$iterator = $dataSource->getIterator();
+		//		$items = iterator_to_array($iterator);
+		//		$items = array_combine($items, $items);
 	}
+
 }

@@ -52,22 +52,8 @@ class SelectboxFilter extends ColumnFilter
 		// NOTE: don't generate if was items given in constructor
 		if (is_array($this->items)) return;
 
-		$dataGrid = $this->lookup('DataGrid\DataGrid', TRUE);
-
-		$columnName = $this->getName();
-		$dataSource = clone $dataGrid->dataSource;
-		$dataSource->applyLimit(NULL);
-		$fluent = $dataSource->toFluent();
-		$fluent->removeClause('select');
-		$fluent->select();
-		$fluent->distinct($columnName);
-
-		$cond = array();
-		$cond[] = array("[$columnName] NOT LIKE %s", '');
-
-		$fluent->where('%and', $cond)->orderBy($columnName);
-		$items = $fluent->fetchPairs($columnName, $columnName);
-
+		$dataGrid = $this->lookup('DataGrid\DataGrid');
+		$items = $dataGrid->getDataSource()->getFilterItems($this->getName());
 		$this->generatedItems = $this->firstEmpty ? array_merge(array('' => '?'), $items) : $items;
 
 		// if was data grid already filtered by this filter don't update with filtred items (keep full list)
