@@ -29,7 +29,7 @@ class QueryBuilder extends Mapped
 
 	public function filter($column, $value, $type = self::EQUAL, $chainType = NULL)
 	{
-		$nextParamId = count($this->_qb->getParameters()) + 1;
+		$nextParamId = count($this->qb->getParameters()) + 1;
 
 		if (is_array($type)) {
 			if ($chainType !== self::CHAIN_AND && $chainType !== self::CHAIN_OR) {
@@ -49,27 +49,27 @@ class QueryBuilder extends Mapped
 
 			if ($chainType === self::CHAIN_AND) {
 				foreach ($conds as $cond) {
-					$this->_qb->andWhere($cond);
+					$this->qb->andWhere($cond);
 				}
 			} elseif ($chainType === self::CHAIN_OR) {
-				$this->_qb->andWhere(new Expr\Orx($conds));
+				$this->qb->andWhere(new Expr\Orx($conds));
 			}
 
-			$paramUsed && $this->_qb->setParameter($nextParamId++, $value);
+			$paramUsed && $this->qb->setParameter($nextParamId++, $value);
 		} else {
 			$this->validateFilterOperation($type);
 
 			if ($type === self::IS_NULL || $type === self::IS_NOT_NULL) {
-				$this->_qb->andWhere("$column $type");
+				$this->qb->andWhere("$column $type");
 			} else {
-				$this->_qb->andWhere("$column $type ?$nextParamId")->setParameter($nextParamId, $value);
+				$this->qb->andWhere("$column $type ?$nextParamId")->setParameter($nextParamId, $value);
 			}
 		}
 	}
 
 	public function sort($column, $order = self::ASCENDING)
 	{
-		$this->_qb->addOrderBy($column, $order === self::ASCENDING ? 'ASC' : 'DESC');
+		$this->qb->addOrderBy($column, $order === self::ASCENDING ? 'ASC' : 'DESC');
 	}
 
 	public function reduce($count, $start = 0)
@@ -77,17 +77,17 @@ class QueryBuilder extends Mapped
 		if ($count < 1 || $start < 0 || $start >= count($this)) {
 			throw new \OutOfRangeException;
 		}
-		$this->_qb->setMaxResults($count)->setFirstResult($start);
+		$this->qb->setMaxResults($count)->setFirstResult($start);
 	}
 
 	public function getIterator()
 	{
-		return new \ArrayIterator($this->_qb->getQuery()->getScalarResult());
+		return new \ArrayIterator($this->qb->getQuery()->getScalarResult());
 	}
 
 	public function count()
 	{
-		$query = clone $this->_qb->getQuery();
+		$query = clone $this->qb->getQuery();
 
 		$query->setHint(Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array(__NAMESPACE__ . '\Utils\CountingASTWalker'));
 		$query->setMaxResults(NULL)->setFirstResult(NULL);
