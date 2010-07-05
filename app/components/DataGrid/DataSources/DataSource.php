@@ -2,6 +2,8 @@
 
 namespace DataGrid\DataSources;
 
+use Nette;
+
 /**
  * Base class for all data sources
  */

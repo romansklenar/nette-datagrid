@@ -35,12 +35,23 @@ abstract class Mapped extends DataSource
 
 
 	/**
-	 * Is column with given name valid?
+	 * Does datasource have column of given name?
 	 *
 	 * @return boolean
 	 */
-	public function isValid($column)
+	public function hasColumn($name)
 	{
-		return \in_array($column, $this->mapping);
+		return \array_key_exists($name, $this->mapping);
+	}
+
+
+	/**
+	 * Get aliased column name list
+	 *
+	 * @return array
+	 */
+	public function getColumns()
+	{
+		return array_keys($this->mapping);
 	}
 }

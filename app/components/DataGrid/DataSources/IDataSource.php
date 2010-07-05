@@ -43,11 +43,11 @@ interface IDataSource extends \Countable, \IteratorAggregate
 
 
 	/**
-	 * Is column with given name valid?
+	 * Does datasource have column of given name?
 	 *
 	 * @return boolean
 	 */
-	function isValidColumn($name);
+	function hasColumn($name);
 
 
 	/**
@@ -56,7 +56,7 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * @param string Column name
 	 * @return array
 	 */
-	function getFilterValues($column);
+	function getFilterItems($column);
 	
 
 	/**

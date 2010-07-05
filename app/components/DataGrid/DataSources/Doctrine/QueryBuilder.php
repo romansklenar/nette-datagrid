@@ -2,7 +2,7 @@
 
 namespace DataGrid\DataSources\Doctrine;
 
-use Doctrine\ORM\QueryBuilder;
+use Doctrine;
 
 /**
  * Query Builder based data source
@@ -22,7 +22,7 @@ class QueryBuilder extends Mapped
 	/**
 	 * @param QueryBuilder $qb
 	 */
-	public function __construct(QueryBuilder $qb)
+	public function __construct(Doctrine\ORM\QueryBuilder $qb)
 	{
 		$this->qb = $qb;
 	}
@@ -93,6 +93,13 @@ class QueryBuilder extends Mapped
 		$query->setMaxResults(NULL)->setFirstResult(NULL);
 
 		return (int) $query->getSingleScalarResult();
+	}
+
+	public function getFilterItems($column)
+	{
+		//	Pekelník: mušeli bysme nějak implementovat tu funkci z $fluent->distinct()... což namená removeSelect() a setSelect('Distinct <column>') 
+		//	Majkl: v ní se to může naklonovat, resetnout select, aplikovat distinct a selectnout
+		throw new \NotImplementedException();
 	}
 
 }
