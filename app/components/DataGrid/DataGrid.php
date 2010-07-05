@@ -660,7 +660,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 		$i = 1;
 		parse_str($this->order, $list);
 		foreach ($list as $field => $dir) {
-			$this->dataSource->sort($field, $dir === 'a' ? IDataSource::ASCENDING : IDataSource::DESCENDING);
+			$this->dataSource->sort($field, $dir === 'a' ? DataSources\IDataSource::ASCENDING : DataSources\IDataSource::DESCENDING);
 			$list[$field] = array($dir, $i++);
 		}
 		return $list;
