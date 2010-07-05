@@ -432,16 +432,6 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	}
 
 
-	/**
-	 * Returns array of classes persistent parameters.
-	 * @param  string  class name
-	 * @return array
-	 */
-	public static function getPersistentParams()
-	{
-		return array('page', 'order', 'filters', 'itemsPerPage');
-	}
-
 
 
 	/********************* signal handlers ********************/
