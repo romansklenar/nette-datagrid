@@ -149,7 +149,7 @@ class ActionColumn extends Column implements \ArrayAccess
 	final public function offsetSet($name, $component)
 	{
 		if (!$component instanceof Nette\IComponent) {
-			throw new \InvalidArgumentException("DataGrid\Columns\ActionColumn accepts only IComponent objects.");
+			throw new \InvalidArgumentException("DataGrid\Columns\ActionColumn accepts only Nette\IComponent objects.");
 		}
 		$this->getComponent('actions')->addComponent($component, $name == NULL ? count($this->getActions()) : $name);
 	}

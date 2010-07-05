@@ -118,7 +118,7 @@ class Renderer extends Nette\Object implements IRenderer
 	 */
 	public function __construct()
 	{
-		$this->file = dirname(__FILE__) . '/grid.phtml';
+		$this->file = __DIR__ . '/grid.phtml';
 	}
 
 
@@ -135,7 +135,7 @@ class Renderer extends Nette\Object implements IRenderer
 		}
 
 		if (!$dataGrid->dataSource instanceof \DibiDataSource) {
-			throw new \InvalidArgumentException("Data source was not setted. You must set data source to data grid before rendering.");
+			throw new \InvalidArgumentException('Data source was not set. You must set data source to DataGrid before rendering.');
 		}
 
 		if ($mode !== NULL) {
