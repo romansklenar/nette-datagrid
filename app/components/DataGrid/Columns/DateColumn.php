@@ -58,8 +58,10 @@ class DateColumn extends TextColumn
 	{
 		if (!$this->hasFilter()) return;
 
-		//$cond[] = array("[$column] = %t", $value);
-		//$datagrid->dataSource->where('%and', $cond);
-		$this->dataGrid->getDataSource()->filter($this->name, $value, '=');
+		$datagrid = $this->dataGrid;
+		$column = $this->name;
+		$cond = array();
+		$cond[] = array("[$column] = %t", $value);
+		$datagrid->dataSource->where('%and', $cond);
 	}
 }

@@ -28,15 +28,9 @@ class DataSource extends Nette\Object implements DataGrid\IDataSource
 		}
 	}
 
-	public function select($columns, $mode = self::NORMAL)
+	public function select($columns)
 	{
-		if ($mode === self::NORMAL) {
-			$this->_qb->addSelect($columns);
-		} elseif ($mode === self::DISTINCT) {
-			$this->_qb->add('select', "DISTINCT $columns", FALSE);
-		} else {
-			throw new \InvalidArgumentException;
-		}
+		$this->_qb->addSelect($columns);
 	}
 
 	protected function validateFilterOperation($operation)
@@ -59,14 +53,8 @@ class DataSource extends Nette\Object implements DataGrid\IDataSource
 		}
 	}
 
-	public function filter($column, $value = NULL, $type = self::EQUAL, $chainType = NULL)
+	public function filter($column, $value, $type = self::EQUAL, $chainType = NULL)
 	{
-		if ($column === NULL) {
-			$this->_qb->add('where', NULL);
-			$this->_qb->setParameters(array());
-			return;
-		}
-		
 		$nextParamId = count($this->_qb->getParameters()) + 1;
 		
 		if (is_array($type)) {
@@ -112,7 +100,7 @@ class DataSource extends Nette\Object implements DataGrid\IDataSource
 
 	public function reduce($count, $start = 0)
 	{
-		if (($count !== NULL && $count < 1) || ($start !== NULL && ($start < 0 || $start >= count($this)))) {
+		if ($count < 1 || $start < 0 || $start >= count($this)) {
 			throw new \OutOfRangeException;
 		}
 		$this->_qb->setMaxResults($count)->setFirstResult($start);

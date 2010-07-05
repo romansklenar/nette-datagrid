@@ -239,7 +239,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	 */
 	public function getRows()
 	{
-		if (!$this->dataSource instanceof IDataSource) {
+		if (!$this->dataSource instanceof \DibiDataSource) {
 			throw new \InvalidStateException("Data source has not been set or has invalid data type. You must set data source before you want get rows.");
 		}
 		return $this->dataSource->getIterator();
@@ -685,7 +685,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 				'type' => 'info',
 			);
 		}
-		$this->dataSource->reduce($this->paginator->length, $this->paginator->offset);
+		$this->dataSource->applyLimit($this->paginator->length, $this->paginator->offset);
 	}
 
 
@@ -698,7 +698,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 		$i = 1;
 		parse_str($this->order, $list);
 		foreach ($list as $field => $dir) {
-			$this->dataSource->sort($field, $dir === 'a' ? IDataSource::ASCENDING : IDataSource::DESCENDING);
+			$this->dataSource->orderBy($field, $dir === 'a' ? \dibi::ASC : \dibi::DESC);
 			$list[$field] = array($dir, $i++);
 		}
 		return $list;
