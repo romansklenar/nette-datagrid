@@ -1,89 +1,41 @@
 <?php
 
 namespace DataGrid\DataSources\Doctrine;
-use Nette, Doctrine, DataGrid,
-	Doctrine\ORM\Query\Expr;
+
+use Doctrine\ORM\QueryBuilder;
 
 /**
- * Base class for Doctrine2 based data sources
+ * Query Builder based data source
  * 
  * @author Michael Moravec
  * @author Štěpán Svoboda
  */
-abstract class MappedDataSource extends Nette\Object implements DataGrid\IDataSource
+class QueryBuilder extends Mapped
 {
-	/** @var Doctrine\ORM\QueryBuilder */
-	private $_qb;
-
-	public function __construct($query, array $mapping = array())
-	{
-		if ($query instanceof Doctrine\ORM\QueryBuilder) {
-			if (!$query->getDQLPart('from')) {
-				throw new \InvalidStateException('Doctrine\ORM\QueryBuilder instance does not contain any "from" part');
-			}
-			$this->_qb = $query;
-		} elseif (is_string($query)) {
-			$this->_qb = Nette\Environment::getEntityManager()->createQueryBuilder()->from($query); /** @todo */
-		} else {
-			throw new \InvalidArgumentException;
-		}
-
-		$this->setMapping($mapping);
-
-	}
-
 
 	/**
-	 * Set columns mapping
-	 *
-	 * @param $mapping array
+	 * @var QueryBuilder 
 	 */
-	public function setMapping(array $mapping)
-	{
-		$this->mapping = $mapping;
-	}
+	private $qb;
 
-
+	
 	/**
-	 * Is column with given name valid?
-	 *
-	 * @return boolean
+	 * @param QueryBuilder $qb
 	 */
-	public function isColumnValid($name)
+	public function __construct(QueryBuilder $qb)
 	{
-		return \in_array($name, $this->mapping);
+		$this->qb = $qb;
 	}
-
 
 	public function select($columns)
 	{
 		$this->_qb->addSelect($columns);
 	}
 
-	protected function validateFilterOperation($operation)
-	{
-		static $types = array(
-			self::EQUAL,
-			self::NOT_EQUAL,
-			self::GREATER,
-			self::GREATER_OR_EQUAL,
-			self::SMALLER,
-			self::SMALLER_OR_EQUAL,
-			self::LIKE,
-			self::NOT_LIKE,
-			self::IS_NULL,
-			self::IS_NOT_NULL,
-		);
-
-		if (!in_array($operation, $types)) {
-			throw new \InvalidArgumentException('Invalid filter operation type.');
-		}
-	}
-
 	public function filter($column, $value, $type = self::EQUAL, $chainType = NULL)
 	{
 		$nextParamId = count($this->_qb->getParameters()) + 1;
-		
+
 		if (is_array($type)) {
 			if ($chainType !== self::CHAIN_AND && $chainType !== self::CHAIN_OR) {
 				throw new \InvalidArgumentException('Invalid chain operation type.');
@@ -101,7 +53,7 @@ abstract class MappedDataSource extends Nette\Object implements DataGrid\IDataSo
 			}
 
 			if ($chainType === self::CHAIN_AND) {
-				foreach ($conds as $cond)  {
+				foreach ($conds as $cond) {
 					$this->_qb->andWhere($cond);
 				}
 			} elseif ($chainType === self::CHAIN_OR) {
@@ -142,9 +94,10 @@ abstract class MappedDataSource extends Nette\Object implements DataGrid\IDataSo
 	{
 		$query = clone $this->_qb->getQuery();
 
-		$query->setHint(Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array(__NAMESPACE__ . '\CountingASTWalker'));
+		$query->setHint(Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array(__NAMESPACE__ . '\Utils\CountingASTWalker'));
 		$query->setMaxResults(NULL)->setFirstResult(NULL);
 
-        return (int) $query->getSingleScalarResult();
+		return (int) $query->getSingleScalarResult();
 	}
+
 }

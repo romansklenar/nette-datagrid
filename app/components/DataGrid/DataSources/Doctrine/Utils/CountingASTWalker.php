@@ -1,6 +1,6 @@
 <?php
 
-namespace DataGrid\DataSources\Doctrine;
+namespace DataGrid\DataSources\Doctrine\Utils;
 use Doctrine, Doctrine\ORM\Query\AST;
 
 class CountingASTWalker extends Doctrine\ORM\Query\TreeWalkerAdapter

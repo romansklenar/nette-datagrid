@@ -1,9 +1,10 @@
 <?php
 
-namespace DataGrid;
+namespace DataGrid\DataSources;
 
 /**
  * An interface which provides main data logic for DataGrid
+ * 
  * @author Michael Moravec
  * @author Štěpán Svoboda
  */
