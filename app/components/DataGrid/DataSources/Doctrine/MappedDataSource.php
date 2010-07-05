@@ -5,16 +5,17 @@ use Nette, Doctrine, DataGrid,
 	Doctrine\ORM\Query\Expr;
 
 /**
- * Doctrine 2 data source for DataGrid
+ * Base class for Doctrine2 based data sources
+ * 
  * @author Michael Moravec
  * @author Štěpán Svoboda
  */
-class DataSource extends Nette\Object implements DataGrid\IDataSource
+abstract class MappedDataSource extends Nette\Object implements DataGrid\IDataSource
 {
 	/** @var Doctrine\ORM\QueryBuilder */
 	private $_qb;
 
-	public function __construct($query)
+	public function __construct($query, array $mapping = array())
 	{
 		if ($query instanceof Doctrine\ORM\QueryBuilder) {
 			if (!$query->getDQLPart('from')) {
@@ -26,7 +27,33 @@ class DataSource extends Nette\Object implements DataGrid\IDataSource
 		} else {
 			throw new \InvalidArgumentException;
 		}
+
+		$this->setMapping($mapping);
+
 	}
+
+
+	/**
+	 * Set columns mapping
+	 *
+	 * @param $mapping array
+	 */
+	public function setMapping(array $mapping)
+	{
+		$this->mapping = $mapping;
+	}
+
+
+	/**
+	 * Is column with given name valid?
+	 *
+	 * @return boolean
+	 */
+	public function isColumnValid($name)
+	{
+		return \in_array($name, $this->mapping);
+	}
+
 
 	public function select($columns)
 	{

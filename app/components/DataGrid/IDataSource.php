@@ -32,6 +32,23 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	const CHAIN_OR		= 'OR';
 	/**#@-*/
 
+
+	/**
+	 * Get list of columns available in datasource
+	 *
+	 * @return array
+	 */
+	function getColumns();
+
+
+	/**
+	 * Is column with given name valid?
+	 *
+	 * @return boolean
+	 */
+	function isValidColumn($name);
+
+
 	/**
 	 * Select columns
 	 * @param string|array columns to be selected
