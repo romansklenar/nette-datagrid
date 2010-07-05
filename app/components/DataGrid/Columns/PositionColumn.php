@@ -38,10 +38,9 @@ class PositionColumn extends NumericColumn
 	 * @param  bool    use ajax? (add class self::$ajaxClass into generated link)
 	 * @return void
 	 */
-	//public function __construct($caption = NULL, $destination = NULL, array $moves = NULL, $useAjax = TRUE)
-	public function __construct(DataGrid\DataGrid $dataGrid, $name, $caption = NULL, $destination = NULL, array $moves = NULL, $useAjax = TRUE)
+	public function __construct($caption = NULL, $destination = NULL, array $moves = NULL, $useAjax = TRUE)
 	{
-		parent::__construct($dataGrid, $name, $caption, 0);
+		parent::__construct($caption, 0);
 
 		$this->useAjax = $useAjax;
 
@@ -54,17 +53,12 @@ class PositionColumn extends NumericColumn
 
 		// try set handler if is not set
 		if ($destination === NULL) {
-			$this->destination = $this->name . 'Move!';
+			$this->destination = $this->getName . 'Move!';
 		} else {
 			$this->destination = $destination;
 		}
 
-		$dataSource = clone $dataGrid->dataSource;
-		$dataSource->orderBy(array());
-		$this->min = (int) $dataSource->select($this->name)->orderBy($this->name, 'ASC')->fetchSingle();
-		$this->max = (int) $dataSource->select($this->name)->orderBy($this->name, 'DESC')->fetchSingle();
-
-		//$this->monitor('Datagrid\DataGrid');
+		$this->monitor('Datagrid\DataGrid');
 	}
 
 
@@ -74,17 +68,17 @@ class PositionColumn extends NumericColumn
 	 * @param  Nette\IComponent
 	 * @return void
 	 */
-	/*protected function attached($dataGrid)
+	protected function attached($dataGrid)
 	{
 		if ($dataGrid instanceof DataGrid\DataGrid) {
 			$dataSource = clone $dataGrid->dataSource;
 			$dataSource->orderBy(array());
-			$this->min = (int) $dataSource->select($this->name)->orderBy($this->name, 'ASC')->fetchSingle();
-			$this->max = (int) $dataSource->select($this->name)->orderBy($this->name, 'DESC')->fetchSingle();
+			$this->min = (int) $dataSource->select($this->getName())->orderBy($this->getName(), 'ASC')->fetchSingle();
+			$this->max = (int) $dataSource->select($this->getName())->orderBy($this->getName(), 'DESC')->fetchSingle();
 		}
 
 		parent::attached($dataGrid);
-	}*/
+	}
 
 
 	/**
@@ -95,7 +89,7 @@ class PositionColumn extends NumericColumn
 	 */
 	public function formatContent($value, $data = NULL)
 	{
-		$control = $this->dataGrid->lookup('Nette\Application\Control', TRUE); //@todo necessary?
+		$control = $this->getDataGrid(TRUE)->lookup('Nette\Application\Control', TRUE);
 		$uplink = $control->link($this->destination, array('key' => $value, 'dir' => 'up'));
 		$downlink = $control->link($this->destination, array('key' => $value, 'dir' => 'down'));
 

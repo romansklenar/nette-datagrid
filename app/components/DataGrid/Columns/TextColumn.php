@@ -64,8 +64,8 @@ class TextColumn extends Column
 	{
 		if (!$this->hasFilter()) return;
 
-		$datagrid = $this->dataGrid;
-		$column = $this->name;
+		$datagrid = $this->getDataGrid(TRUE);
+		$column = $this->getName();
 		$cond = array();
 
 		if (strstr($value, '*')) {

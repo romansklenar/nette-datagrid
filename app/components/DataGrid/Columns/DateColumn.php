@@ -1,7 +1,6 @@
 <?php
 
 namespace DataGrid\Columns;
-use DataGrid;
 
 /**
  * Representation of date data grid column.
@@ -24,10 +23,9 @@ class DateColumn extends TextColumn
 	 * @param  string  date format supported by PHP strftime()
 	 * @return void
 	 */
-	//public function __construct($caption = NULL, $format = '%x')
-	public function __construct(DataGrid\DataGrid $dataGrid, $name, $caption = NULL, $format = '%x')
+	public function __construct($caption = NULL, $format = '%x')
 	{
-		parent::__construct($dataGrid, $name, $caption);
+		parent::__construct($caption);
 		$this->format = $format;
 		$this->getHeaderPrototype()->style('width: 80px');
 	}
@@ -58,8 +56,8 @@ class DateColumn extends TextColumn
 	{
 		if (!$this->hasFilter()) return;
 
-		$datagrid = $this->dataGrid;
-		$column = $this->name;
+		$datagrid = $this->getDataGrid(TRUE);
+		$column = $this->getName();
 		$cond = array();
 		$cond[] = array("[$column] = %t", $value);
 		$datagrid->dataSource->where('%and', $cond);

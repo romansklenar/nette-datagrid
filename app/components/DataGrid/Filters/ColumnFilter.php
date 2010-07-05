@@ -12,7 +12,7 @@ use Nette, DataGrid;
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-abstract class ColumnFilter extends Nette\Object implements IColumnFilter
+abstract class ColumnFilter extends Nette\Component implements IColumnFilter
 {
 	/** @var Nette\Forms\FormControl  form element */
 	protected $element;
@@ -20,15 +20,10 @@ abstract class ColumnFilter extends Nette\Object implements IColumnFilter
 	/** @var string  value of filter (if was filtered) */
 	protected $value;
 
-	/** @var DataGrid\DataGrid */
-	protected $dataGrid;
 
-	protected $name;
-
-	public function __construct(DataGrid\DataGrid $dataGrid, $name)
+	public function __construct()
 	{
-		$this->dataGrid = $dataGrid;
-		$this->name = $name;
+		parent::__construct();
 	}
 
 
@@ -52,8 +47,10 @@ abstract class ColumnFilter extends Nette\Object implements IColumnFilter
 	 */
 	public function getValue()
 	{
+		$dataGrid = $this->lookup('DataGrid\DataGrid', TRUE);
+
 		// set value if was data grid filtered yet
-		parse_str($this->dataGrid->filters, $list);
+		parse_str($dataGrid->filters, $list);
 		foreach ($list as $key => $value) {
 			if ($key == $this->getName()) {
 				$this->setValue($value);
@@ -73,10 +70,5 @@ abstract class ColumnFilter extends Nette\Object implements IColumnFilter
 	{
 		$this->getFormControl()->setDefaultValue($value);
 		$this->value = $value;
-	}
-
-	public function getName()
-	{
-		return $this->name;
 	}
 }

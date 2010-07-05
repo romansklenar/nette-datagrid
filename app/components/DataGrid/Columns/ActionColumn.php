@@ -15,19 +15,17 @@ use Nette, DataGrid;
  */
 class ActionColumn extends Column implements \ArrayAccess
 {
-	private $actions = array();
 
 	/**
 	 * Action column constructor.
 	 * @param  string  column's textual caption
 	 * @return void
 	 */
-	//public function __construct($caption = 'Actions')
-	public function __construct(DataGrid\DataGrid $dataGrid, $name, $caption = 'Actions')
+	public function __construct($caption = 'Actions')
 	{
-		parent::__construct($dataGrid, $name, $caption);
-		//$this->addComponent(new Nette\ComponentContainer, 'actions');
-		//$this->removeComponent($this->getComponent('filters'));
+		parent::__construct($caption);
+		$this->addComponent(new Nette\ComponentContainer, 'actions');
+		$this->removeComponent($this->getComponent('filters'));
 		$this->orderable = FALSE;
 	}
 
@@ -68,7 +66,7 @@ class ActionColumn extends Column implements \ArrayAccess
 	 */
 	public function addAction($title, $signal, $icon = NULL, $useAjax = FALSE, $type = DataGrid\Action::WITH_KEY)
 	{
-		$action = new DataGrid\Action($this->dataGrid, $title, $signal, $icon, $useAjax, $type);
+		$action = new DataGrid\Action($title, $signal, $icon, $useAjax, $type);
 		$this[] = $action;
 		return $action;
 	}
@@ -78,7 +76,7 @@ class ActionColumn extends Column implements \ArrayAccess
 	 * Does column has any action?
 	 * @return bool
 	 */
-	public function hasAction($type = 'DataGrid\IAction')
+	public function hasAction($type = NULL)
 	{
 		return count($this->getActions($type)) > 0;
 	}
@@ -88,20 +86,12 @@ class ActionColumn extends Column implements \ArrayAccess
 	 * Returns column's action specified by name.
 	 * @param  string action's name
 	 * @param  bool   throw exception if component doesn't exist?
-	 * @return DataGrid\IAction|NULL
+	 * @return Nette\IComponent|NULL
 	 * @todo return type
 	 */
 	public function getAction($name = NULL, $need = TRUE)
 	{
-		//return $this->getComponent('actions')->getComponent($name, $need);
-		if (array_key_exists($name, $this->actions)) {
-			return $this->actions[$name];
-		} else {
-			if ($need) {
-				throw new \InvalidStateException("Action $name not found");
-			}
-			return NULL;
-		}
+		return $this->getComponent('actions')->getComponent($name, $need);
 	}
 
 
@@ -113,15 +103,9 @@ class ActionColumn extends Column implements \ArrayAccess
 	public function getActions($type = 'DataGrid\IAction')
 	{
 		$actions = new \ArrayObject();
-		
-		/*foreach ($this->getComponent('actions')->getComponents(FALSE, $type) as $action) {
-			$actions->append($action);
-		}*/
-
-		foreach (new Nette\InstanceFilterIterator(new \ArrayIterator($this->actions), $type) as $action) {
+		foreach ($this->getComponent('actions')->getComponents(FALSE, $type) as $action) {
 			$actions->append($action);
 		}
-		
 		return $actions->getIterator();
 	}
 
@@ -135,7 +119,7 @@ class ActionColumn extends Column implements \ArrayAccess
 	 */
 	public function formatContent($value, $data = NULL)
 	{
-		throw new \InvalidStateException("DataGrid\Columns\ActionColumn cannot be formated.");
+		throw new InvalidStateException("DataGrid\Columns\ActionColumn cannot be formated.");
 	}
 
 
@@ -157,26 +141,24 @@ class ActionColumn extends Column implements \ArrayAccess
 
 
 	/**
-	 * Adds the action to the container.
-	 * @param  string  action name
-	 * @param  DataGrid\IAction
+	 * Adds the component to the container.
+	 * @param  string  component name
+	 * @param  Nette\IComponent
 	 * @return void.
 	 */
-	final public function offsetSet($name, $action)
+	final public function offsetSet($name, $component)
 	{
-		if (!$action instanceof DataGrid\IAction) {
-			throw new \InvalidArgumentException("DataGrid\Columns\ActionColumn accepts only DataGrid\IAction objects.");
+		if (!$component instanceof Nette\IComponent) {
+			throw new \InvalidArgumentException("DataGrid\Columns\ActionColumn accepts only IComponent objects.");
 		}
-		
-		//$this->getComponent('actions')->addComponent($component, $name == NULL ? count($this->getActions()) : $name);
-		$this->actions[$name == NULL ? count($this->getActions()) : $name] = $action;
+		$this->getComponent('actions')->addComponent($component, $name == NULL ? count($this->getActions()) : $name);
 	}
 
 
 	/**
-	 * Returns action specified by name. Throws exception if action doesn't exist.
-	 * @param  string  action name
-	 * @return DataGrid\IAction
+	 * Returns component specified by name. Throws exception if component doesn't exist.
+	 * @param  string  component name
+	 * @return Nette\IComponent
 	 * @throws \InvalidArgumentException
 	 */
 	final public function offsetGet($name)
@@ -186,8 +168,8 @@ class ActionColumn extends Column implements \ArrayAccess
 
 
 	/**
-	 * Does action specified by name exists?
-	 * @param  string  action name
+	 * Does component specified by name exists?
+	 * @param  string  component name
 	 * @return bool
 	 */
 	final public function offsetExists($name)
@@ -197,16 +179,15 @@ class ActionColumn extends Column implements \ArrayAccess
 
 
 	/**
-	 * Removes action from the container. Throws exception if action doesn't exist.
-	 * @param  string  action name
+	 * Removes component from the container. Throws exception if component doesn't exist.
+	 * @param  string  component name
 	 * @return void
 	 */
 	final public function offsetUnset($name)
 	{
-		/*$component = $this->getAction($name, FALSE);
+		$component = $this->getAction($name, FALSE);
 		if ($component !== NULL) {
 			$this->getComponent('actions')->removeComponent($component);
-		}*/
-		unset($this->actions[$name]);
+		}
 	}
 }

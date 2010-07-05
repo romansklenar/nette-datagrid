@@ -1,7 +1,6 @@
 <?php
 
 namespace DataGrid\Columns;
-use DataGrid;
 
 /**
  * Representation of numeric data grid column.
@@ -24,10 +23,9 @@ class NumericColumn extends Column
 	 * @param  string  number of digits after the decimal point
 	 * @return void
 	 */
-	//public function __construct($caption = NULL, $precision = 2)
-	public function __construct(DataGrid\DataGrid $dataGrid, $name, $caption = NULL, $precision = 2)
+	public function __construct($caption = NULL, $precision = 2)
 	{
-		parent::__construct($dataGrid, $name, $caption);
+		parent::__construct($caption);
 		$this->precision = $precision;
 	}
 
@@ -64,7 +62,7 @@ class NumericColumn extends Column
 	{
 		if (!$this->hasFilter()) return;
 
-		$column = $this->name;
+		$column = $this->getName();
 		$cond = array();
 
 		if ($value === 'NULL' || $value === 'NOT NULL') {
@@ -84,7 +82,7 @@ class NumericColumn extends Column
 			$cond[] = array("[$column] $operator %f", $value);
 		}
 
-		$datagrid = $this->dataGrid;
+		$datagrid = $this->getDataGrid(TRUE);
 		$datagrid->dataSource->where('%and', $cond);
 	}
 }

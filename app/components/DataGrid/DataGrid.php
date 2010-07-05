@@ -103,9 +103,6 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	/** @var Nette\ITranslator */
 	protected $translator;
 
-	/** @var array<DataGrid\Columns\IColumn> */
-	protected $columns = array();
-
 
 	/**
 	 * Data grid constructor.
@@ -144,12 +141,6 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 		$this->dataSource = $dataSource;
 		$this->paginator->itemCount = count($dataSource);
 		return $this;
-	}
-
-	/** @todo remove, for TESTING only */
-	public function bindDataTable($t)
-	{
-		$this->dataSource = $t;
 	}
 
 
@@ -210,22 +201,6 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 		return $this->onOperationSubmit;
 	}
 
-	/**
-	 *
-	 */
-	protected function _addColumn(Columns\IColumn $column, $name)
-	{
-		if (!is_string($name)) {
-			throw new \InvalidArgumentException('Name must be string, ' . gettype($name) . 'given.');
-		}
-
-		if (array_key_exists($name, $this->columns)) {
-			throw new \InvalidStateException("Column $name already exists");
-		}
-
-		return $this->columns[$name] = $column;
-	}
-
 
 
 	/********************* Iterators getters *********************/
@@ -254,13 +229,11 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	 */
 	public function getColumns($type = 'DataGrid\Columns\IColumn')
 	{
-		/*$columns = new \ArrayObject();
+		$columns = new \ArrayObject();
 		foreach ($this->getComponents(FALSE, $type) as $column) {
 			$columns->append($column);
 		}
-		return $columns->getIterator();*/
-
-		return new \ArrayIterator(iterator_to_array(new Nette\InstanceFilterIterator(new \ArrayIterator($this->columns), $type)));
+		return $columns->getIterator();
 	}
 
 
@@ -297,13 +270,10 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 		$actions = new \ArrayObject();
 		foreach ($this->getColumns('DataGrid\Columns\ActionColumn') as $column) {
 			if ($column->hasAction()) {
-				/*foreach ($column->getActions() as $action) {
+				foreach ($column->getActions() as $action) {
 					if ($action instanceof $type) {
 						$actions->append($action);
 					}
-				}*/
-				foreach (new Nette\InstanceFilterIterator($column->getActions(), $type) as $action) {
-					$actions->append($action);
 				}
 			}
 		}
@@ -716,7 +686,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 		parse_str($this->filters, $list);
 		foreach ($list as $column => $value) {
 			if ($value !== '') {
-				$this->columns[$column]->applyFilter($value);
+				$this[$column]->applyFilter($value);
 			}
 		}
 	}
@@ -1021,7 +991,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	 */
 	public function addColumn($name, $caption = NULL, $maxLength = NULL)
 	{
-		return $this->_addColumn(new Columns\TextColumn($this, $name, $caption, $maxLength), $name);
+		return $this[$name] = new Columns\TextColumn($caption, $maxLength);
 	}
 
 
@@ -1034,7 +1004,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	 */
 	public function addNumericColumn($name, $caption = NULL, $precision = 2)
 	{
-		return $this->_addColumn(new Columns\NumericColumn($this, $name, $caption, $precision), $name);
+		return $this[$name] = new Columns\NumericColumn($caption, $precision);
 	}
 
 
@@ -1047,7 +1017,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	 */
 	public function addDateColumn($name, $caption = NULL, $format = '%x')
 	{
-		return $this->_addColumn(new Columns\DateColumn($this, $name, $caption, $format), $name);
+		return $this[$name] = new Columns\DateColumn($caption, $format);
 	}
 
 
@@ -1059,7 +1029,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	 */
 	public function addCheckboxColumn($name, $caption = NULL)
 	{
-		return $this->_addColumn(new Columns\CheckboxColumn($this, $name, $caption), $name);
+		return $this[$name] = new Columns\CheckboxColumn($caption);
 	}
 
 
@@ -1071,7 +1041,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	 */
 	public function addImageColumn($name, $caption = NULL)
 	{
-		return $this->_addColumn(new Columns\ImageColumn($this, $name, $caption), $name);
+		return $this[$name] = new Columns\ImageColumn($caption);
 	}
 
 
@@ -1086,7 +1056,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	 */
 	public function addPositionColumn($name, $caption = NULL, $destination = NULL, array $moves = NULL, $useAjax = TRUE)
 	{
-		return $this->_addColumn(new Columns\PositionColumn($this, $name, $caption, $destination, $moves), $name);
+		return $this[$name] = new Columns\PositionColumn($caption, $destination, $moves);
 	}
 
 
@@ -1099,12 +1069,12 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	 */
 	public function addActionColumn($name, $caption = NULL, $setAsCurrent = TRUE)
 	{
-		$column = new Columns\ActionColumn($this, $name, $caption);
+		$column = new Columns\ActionColumn($caption);
 
 		if ($setAsCurrent) {
 			$this->setCurrentActionColumn($column);
 		}
-		return $this->_addColumn($column, $name);
+		return $this[$name] = $column;
 	}
 
 
