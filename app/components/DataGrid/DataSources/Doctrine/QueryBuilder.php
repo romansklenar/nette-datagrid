@@ -27,11 +27,6 @@ class QueryBuilder extends Mapped
 		$this->qb = $qb;
 	}
 
-	public function select($columns)
-	{
-		$this->_qb->addSelect($columns);
-	}
-
 	public function filter($column, $value, $type = self::EQUAL, $chainType = NULL)
 	{
 		$nextParamId = count($this->_qb->getParameters()) + 1;

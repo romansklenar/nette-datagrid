@@ -51,11 +51,13 @@ interface IDataSource extends \Countable, \IteratorAggregate
 
 
 	/**
-	 * Select columns
-	 * @param string|array columns to be selected
-	 * @throws \InvalidArgumentException
+	 * Return distinct values for a selectbox filter
+	 *
+	 * @param string Column name
+	 * @return array
 	 */
-	function select($columns);
+	function getFilterValues($column);
+	
 
 	/**
 	 * Add filtering onto specified column
@@ -82,8 +84,4 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * @throws \OutOfRangeException
 	 */
 	function reduce($count, $start = 0);
-
-	//function getIterator()
-
-	//function count()
 }
