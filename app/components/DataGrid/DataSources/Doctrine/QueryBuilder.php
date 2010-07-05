@@ -2,7 +2,7 @@
 
 namespace DataGrid\DataSources\Doctrine;
 
-use Doctrine;
+use Doctrine, Doctrine\ORM\Query\Expr;
 
 /**
  * Query Builder based data source
@@ -15,9 +15,7 @@ class QueryBuilder extends Mapped
 	/** @var Doctrine\ORM\QueryBuilder */
 	private $qb;
 
-	/**
-	 * @param QueryBuilder $qb
-	 */
+	/** @param QueryBuilder $qb */
 	public function __construct(Doctrine\ORM\QueryBuilder $qb)
 	{
 		$this->qb = $qb;
@@ -31,19 +29,18 @@ class QueryBuilder extends Mapped
 
 		$nextParamId = count($this->qb->getParameters()) + 1;
 
-		if (is_array($type)) {
+		if (is_array($operation)) {
 			if ($chainType !== self::CHAIN_AND && $chainType !== self::CHAIN_OR) {
 				throw new \InvalidArgumentException('Invalid chain operation type.');
 			}
 			$conds = array();
-			$paramUsed = FALSE;
-			foreach ($type as $t) {
+			foreach ($operation as $t) {
 				$this->validateFilterOperation($t);
 				if ($t === self::IS_NULL || $t === self::IS_NOT_NULL) {
-					$conds[] = "$column $t";
+					$conds[] = "{$this->mapping[$column]} $t";
 				} else {
-					$conds[] = "$column $t ?$nextParamId";
-					$paramUsed = TRUE;
+					$conds[] = "{$this->mapping[$column]} $t ?$nextParamId";
+					$this->qb->setParameter($nextParamId++, $value);
 				}
 			}
 
@@ -54,22 +51,24 @@ class QueryBuilder extends Mapped
 			} elseif ($chainType === self::CHAIN_OR) {
 				$this->qb->andWhere(new Expr\Orx($conds));
 			}
-
-			$paramUsed && $this->qb->setParameter($nextParamId++, $value);
 		} else {
-			$this->validateFilterOperation($type);
+			$this->validateFilterOperation($operation);
 
-			if ($type === self::IS_NULL || $type === self::IS_NOT_NULL) {
-				$this->qb->andWhere("$column $type");
+			if ($operation === self::IS_NULL || $operation === self::IS_NOT_NULL) {
+				$this->qb->andWhere("{$this->mapping[$column]} $operation");
 			} else {
-				$this->qb->andWhere("$column $type ?$nextParamId")->setParameter($nextParamId, $value);
+				$this->qb->andWhere("{$this->mapping[$column]} $operation ?$nextParamId")->setParameter($nextParamId, $value);
 			}
 		}
 	}
 
 	public function sort($column, $order = self::ASCENDING)
 	{
-		$this->qb->addOrderBy($column, $order === self::ASCENDING ? 'ASC' : 'DESC');
+		if (!$this->hasColumn($column)) {
+			throw new \InvalidArgumentException('Trying to sort data source by unknown column.');
+		}
+		
+		$this->qb->addOrderBy($this->mapping[$column], $order === self::ASCENDING ? 'ASC' : 'DESC');
 	}
 
 	public function reduce($count, $start = 0)
