@@ -432,16 +432,6 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	}
 
 
-	/**
-	 * Returns array of classes persistent parameters.
-	 * @param  string  class name
-	 * @return array
-	 */
-	public static function getPersistentParams()
-	{
-		return array('page', 'order', 'filters', 'itemsPerPage');
-	}
-
 
 
 	/********************* signal handlers ********************/
@@ -1101,7 +1091,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	public function addAction($title, $signal, $icon = NULL, $useAjax = FALSE, $key = Action::WITH_KEY)
 	{
 		if (!$this->hasColumns('DataGrid\Columns\ActionColumn')) {
-			throw new InvalidStateException('No DataGrid\Columns\ActionColumn defined. Use DataGrid\DataGrid::addActionColumn before you add actions.');
+			throw new \InvalidStateException('No DataGrid\Columns\ActionColumn defined. Use DataGrid\DataGrid::addActionColumn before you add actions.');
 		}
 
 		return $this->currentActionColumn->addAction($title, $signal, $icon, $useAjax, $key);
@@ -1147,7 +1137,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 
 
 
-	/********************* interface \ISignalReceiver *********************/
+	/********************* interface Nette\Application\ISignalReceiver *********************/
 
 
 
