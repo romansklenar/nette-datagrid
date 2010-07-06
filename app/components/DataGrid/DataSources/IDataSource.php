@@ -14,6 +14,7 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	const DESCENDING = 'DESC';
 	/**#@-*/
 
+
 	/**#@+ filter operations */
 	const EQUAL	= '=';
 	const NOT_EQUAL = '!=';
@@ -27,10 +28,12 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	const IS_NOT_NULL = 'IS NOT NULL';
 	/**#@-*/
 
+
 	/**#@+ filter chain types */
 	const CHAIN_AND = 'AND';
 	const CHAIN_OR	= 'OR';
 	/**#@-*/
+
 
 	/**
 	 * Get list of columns available in datasource
@@ -45,13 +48,15 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 */
 	function hasColumn($name);
 
+
 	/**
 	 * Return distinct values for a selectbox filter
 	 * @param string Column name
 	 * @return array
 	 */
 	function getFilterItems($column);
-	
+
+
 	/**
 	 * Add filtering onto specified column
 	 * @param string column name
@@ -62,6 +67,7 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 */
 	function filter($column, $operation = IDataSource::EQUAL, $value = NULL, $chainType = NULL);
 
+
 	/**
 	 * Adds ordering to specified column
 	 * @param string column name
@@ -70,6 +76,7 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 */
 	function sort($column, $order = IDataSource::ASCENDING);
 
+
 	/**
 	 * Reduce the result starting from $start to have $count rows
 	 * @param int the number of results to obtain
@@ -77,4 +84,12 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * @throws \OutOfRangeException
 	 */
 	function reduce($count, $start = 0);
+
+
+	/**
+	 * Get the first item from data source
+	 *
+	 * @return array
+	 */
+	function first();
 }

@@ -14,6 +14,7 @@ class QueryBuilder extends Mapped
 
 	/** @var Doctrine\ORM\QueryBuilder */
 	private $qb;
+	private $data;
 
 	/** @param QueryBuilder $qb */
 	public function __construct(Doctrine\ORM\QueryBuilder $qb)
@@ -69,13 +70,13 @@ class QueryBuilder extends Mapped
 		}
 	}
 
-	private function _formatValueForLikeExpr($value)
-	{
-		$value = str_replace('%', '\\%', $value); //escape wildcard character used in PDO
-		$value = \Nette\String::replace($value, '~(?!\\\\)(.?)\\*~', '\\1%'); //replace asterisks
-		return str_replace('\\*', '*', $value); //replace escaped asterisks
-	}
 
+	/**
+	 * Sort data source
+	 * 
+	 * @param string $column
+	 * @param string $order
+	 */
 	public function sort($column, $order = self::ASCENDING)
 	{
 		if (!$this->hasColumn($column)) {
@@ -85,6 +86,13 @@ class QueryBuilder extends Mapped
 		$this->qb->addOrderBy($this->mapping[$column], $order === self::ASCENDING ? 'ASC' : 'DESC');
 	}
 
+
+	/**
+	 * Reduce data source to given $count starting from $start
+	 * 
+	 * @param integer $count
+	 * @param integer $start
+	 */
 	public function reduce($count, $start = 0)
 	{
 		if ($count == NULL || $count > 0) { //intentionally ==
@@ -96,12 +104,38 @@ class QueryBuilder extends Mapped
 		} else throw new \OutOfRangeException;
 	}
 
+
+	/**
+	 * Get iterator over data source items
+	 *
+	 * @return \ArrayIterator
+	 */
 	public function getIterator()
 	{
-		echo $this->qb->getDQL();dump($this->qb->getParameters());
-		return new \ArrayIterator($this->qb->getQuery()->getScalarResult());
+		echo $this->qb->getDQL();
+		return new \ArrayIterator($this->fetch());
 	}
 
+
+	/**
+	 * Fetch if needed and return the result data
+	 * 
+	 * @return array
+	 */
+	protected function fetch()
+	{
+		if ($this->data === NULL) {
+			$this->data = $this->qb->getQuery()->getScalarResult();
+		}
+		return $this->data;
+	}
+
+
+	/**
+	 * Count items in data source
+	 *
+	 * @return integer
+	 */
 	public function count()
 	{
 		$query = clone $this->qb->getQuery();
@@ -114,21 +148,18 @@ class QueryBuilder extends Mapped
 
 	public function getFilterItems($column)
 	{
-		//	Pekelník: mušeli bysme nějak implementovat tu funkci z $fluent->distinct()... což namená removeSelect() a setSelect('Distinct <column>') 
-		//	Majkl: v ní se to může naklonovat, resetnout select, aplikovat distinct a selectnout
 		throw new \NotImplementedException();
-
-		//
-		// Tohle je z toho původního commitu (třeba se to bude hodit...)
-		// 
-		//		$items = $fluent->fetchPairs($columnName, $columnName);
-		//		$dataSource = $this->dataGrid->getDataSource();
-		//		$dataSource->select($this->name, $dataSource::DISTINCT);
-		//		$dataSource->filter(NULL);
-		//		$dataSource->reduce(NULL, NULL);
-		//		$iterator = $dataSource->getIterator();
-		//		$items = iterator_to_array($iterator);
-		//		$items = array_combine($items, $items);
 	}
 
+
+	/**
+	 * Get the first item from data source
+	 *
+	 * @return array
+	 */
+	public function first()
+	{
+		$data = $this->fetch();
+		return \reset($data);
+	}
 }

@@ -943,7 +943,8 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 
 
 	/**
-	 * Generates columns from datasource.
+	 * Generate columns from datasource
+	 * 
 	 * @return void
 	 */
 	protected function generateColumns()
@@ -955,10 +956,13 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 			}
 		}
 
+		// Clone data source
 		$ds = clone $this->dataSource;
-		$row = $ds->select('*')->applyLimit(1)->fetch();
-		$keys = array_keys((array)$row);
-		foreach ($keys as $key) $this->addColumn($key);
+		$row = $ds->reduce(1);
+		$keys = \array_keys((array) $row);
+		foreach ($keys as $key) {
+			$this->addColumn($key);
+		}
 
 		if (isset($columns)) {
 			foreach ($columns as $column) {
