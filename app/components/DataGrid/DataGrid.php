@@ -79,7 +79,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	/** @var int|string  session timeout (default: until is browser closed) */
 	public $timeout = 0;
 
-	/** @var DataGrid\IRenderer */
+	/** @var DataGrid\Renderers\IRenderer */
 	protected $renderer;
 
 	/** @var DataGrid\DataSources\IDataSource */
@@ -707,10 +707,10 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 
 	/**
 	 * Sets data grid renderer.
-	 * @param  DataGrid\IRenderer
+	 * @param  DataGrid\Renderers\IRenderer
 	 * @return void
 	 */
-	public function setRenderer(IRenderer $renderer)
+	public function setRenderer(Renderers\IRenderer $renderer)
 	{
 		$this->renderer = $renderer;
 	}
@@ -718,12 +718,12 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 
 	/**
 	 * Returns data grid renderer.
-	 * @return DataGrid\IRenderer|NULL
+	 * @return DataGrid\Renderers\IRenderer
 	 */
 	public function getRenderer()
 	{
 		if ($this->renderer === NULL) {
-			$this->renderer = new Renderer;
+			$this->renderer = new Renderers\Conventional;
 		}
 		return $this->renderer;
 	}

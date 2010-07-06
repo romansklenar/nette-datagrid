@@ -1,6 +1,6 @@
 <?php
 
-namespace DataGrid;
+namespace DataGrid\Renderers;
 
 /**
  * Defines method that must implement data grid rendered.
@@ -17,6 +17,6 @@ interface IRenderer
 	 * @param  DataGrid\Datagrid
 	 * @return string
 	 */
-	function render(DataGrid $dataGrid);
+	function render(\DataGrid\DataGrid $dataGrid);
 
 }

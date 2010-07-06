@@ -1,7 +1,10 @@
 <?php
 
-namespace DataGrid;
-use Nette, Nette\Web\Html;
+namespace DataGrid\Renderers;
+use Nette, DataGrid,
+	Nette\Web\Html,
+	DataGrid\Columns,
+	DataGrid\Action;
 
 /**
  * Converts a data grid into the HTML output.
@@ -12,7 +15,7 @@ use Nette, Nette\Web\Html;
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class Renderer extends Nette\Object implements IRenderer
+class Conventional extends Nette\Object implements IRenderer
 {
 	/** @var array  of HTML tags */
 	public $wrappers = array(
@@ -128,13 +131,13 @@ class Renderer extends Nette\Object implements IRenderer
 	 * @param  string
 	 * @return string
 	 */
-	public function render(DataGrid $dataGrid, $mode = NULL)
+	public function render(DataGrid\DataGrid $dataGrid, $mode = NULL)
 	{
 		if ($this->dataGrid !== $dataGrid) {
 			$this->dataGrid = $dataGrid;
 		}
 
-		if (! $dataGrid->dataSource instanceof DataSources\IDataSource) {
+		if (! $dataGrid->dataSource instanceof DataGrid\DataSources\IDataSource) {
 			throw new \InvalidStateException('Data source is not instance of IDataSource. ' . \gettype($this->dataSource) . ' given.');
 		}
 
