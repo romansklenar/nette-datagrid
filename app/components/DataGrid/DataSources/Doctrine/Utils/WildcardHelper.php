@@ -1,6 +1,6 @@
 <?php
 
-namespace DataGrid\DataSources\Doctrine;
+namespace DataGrid\DataSources\Doctrine\Utils;
 
 class WildcardHelper
 {
