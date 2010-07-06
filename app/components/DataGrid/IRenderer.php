@@ -1,5 +1,7 @@
 <?php
 
+namespace DataGrid;
+
 /**
  * Defines method that must implement data grid rendered.
  *
@@ -8,11 +10,11 @@
  * @license    New BSD License
  * @package    Nette\Extras\DataGrid
  */
-interface IDataGridRenderer
+interface IRenderer
 {
 	/**
 	 * Provides complete data grid rendering.
-	 * @param  DataGrid
+	 * @param  DataGrid\Datagrid
 	 * @return string
 	 */
 	function render(DataGrid $dataGrid);

@@ -7,6 +7,10 @@
  * @package    DataGrid\Example
  */
 
+use Nette\Environment,
+	Nette\Debug,
+	Nette\Application\Presenter,
+	Nette\Application\Route;
 
 // Step 1: Load Nette Framework
 if (!is_dir(LIBS_DIR . '/Nette')) {
@@ -42,7 +46,7 @@ Debug::$showLocation = TRUE;
 
 
 /** 2d) enable RobotLoader - this allows load all classes automatically */
-$loader = new RobotLoader();
+$loader = new Nette\Loaders\RobotLoader();
 $loader->addDirectory(explode(';', $config->scanDirs));
 $loader->autoRebuild = Environment::isProduction() ? FALSE : TRUE; // rebuild if class is not found?
 $loader->register();
@@ -98,7 +102,7 @@ $router[] = new Route('<presenter>/<action>/', array(
 	'action' => 'default',
 ));
 
-$router[] = new SimpleRouter('Example:default');
+$router[] = new Nette\Application\SimpleRouter('Example:default');
 
 
 

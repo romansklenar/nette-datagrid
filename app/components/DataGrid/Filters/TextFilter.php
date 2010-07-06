@@ -1,8 +1,7 @@
 <?php
 
-require_once dirname(__FILE__) . '/../DataGridColumnFilter.php';
-
-
+namespace DataGrid\Filters;
+use Nette;
 
 /**
  * Representation of data grid column textual filter.
@@ -13,17 +12,17 @@ require_once dirname(__FILE__) . '/../DataGridColumnFilter.php';
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class TextFilter extends DataGridColumnFilter
+class TextFilter extends ColumnFilter
 {
 	/**
 	 * Returns filter's form element.
-	 * @return FormControl
+	 * @return Nette\Forms\FormControl
 	 */
 	public function getFormControl()
 	{
-		if ($this->element instanceof FormControl) return $this->element;
+		if ($this->element instanceof Nette\Forms\FormControl) return $this->element;
 
-		$this->element = new TextInput($this->getName(), 5);
+		$this->element = new Nette\Forms\TextInput($this->getName(), 5);
 		return $this->element;
 	}
 }

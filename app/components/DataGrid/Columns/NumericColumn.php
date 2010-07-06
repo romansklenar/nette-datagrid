@@ -1,8 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../DataGridColumn.php';
-
-
+namespace DataGrid\Columns;
 
 /**
  * Representation of numeric data grid column.
@@ -13,7 +11,7 @@ require_once dirname(__FILE__) . '/../DataGridColumn.php';
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class NumericColumn extends DataGridColumn
+class NumericColumn extends Column
 {
 	/** @var int */
 	public $precision;
@@ -35,7 +33,7 @@ class NumericColumn extends DataGridColumn
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
-	 * @param  DibiRow|array
+	 * @param  \DibiRow|array
 	 * @return string
 	 */
 	public function formatContent($value, $data = NULL)
@@ -56,7 +54,8 @@ class NumericColumn extends DataGridColumn
 	}
 
 	/**
-	 * Filters data source.
+	 * Filter data source
+	 * 
 	 * @param  mixed
 	 * @return void
 	 */
@@ -64,11 +63,11 @@ class NumericColumn extends DataGridColumn
 	{
 		if (!$this->hasFilter()) return;
 
-		$column = $this->getName();
-		$cond = array();
+		$dataGrid = $this->getDataGrid(TRUE);
 
 		if ($value === 'NULL' || $value === 'NOT NULL') {
-			$cond[] = array("[$column] IS $value");
+			
+			$dataGrid->getDataSource()->filter($this->name, "IS $value");
 
 		} else {
 			$operator = '=';
@@ -81,10 +80,7 @@ class NumericColumn extends DataGridColumn
 				$value = $matches['value'];
 			}
 
-			$cond[] = array("[$column] $operator %f", $value);
+			$dataGrid->getDataSource()->filter($this->name, $operator, (float) $value); //or skip converting?
 		}
-
-		$datagrid = $this->getDataGrid(TRUE);
-		$datagrid->dataSource->where('%and', $cond);
 	}
 }

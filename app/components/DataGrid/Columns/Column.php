@@ -1,8 +1,7 @@
 <?php
 
-require_once dirname(__FILE__) . '/IDataGridColumn.php';
-
-
+namespace DataGrid\Columns;
+use Nette, Nette\Web\Html, Datagrid, DataGrid\Filters;
 
 /**
  * Base class that implements the basic common functionality to data grid columns.
@@ -13,12 +12,12 @@ require_once dirname(__FILE__) . '/IDataGridColumn.php';
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-abstract class DataGridColumn extends ComponentContainer implements IDataGridColumn
+abstract class Column extends Nette\ComponentContainer implements IColumn
 {
-	/** @var Html  table header element template */
+	/** @var Nette\Web\Html  table header element template */
 	protected $header;
 
-	/** @var Html  table cell element template */
+	/** @var Nette\Web\Html  table cell element template */
 	protected $cell;
 
 	/** @var string */
@@ -48,24 +47,24 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 	public function __construct($caption = NULL, $maxLength = NULL)
 	{
 		parent::__construct();
-		$this->addComponent(new ComponentContainer, 'filters');
+		$this->addComponent(new Nette\ComponentContainer, 'filters');
 		$this->header = Html::el();
 		$this->cell = Html::el();
 		$this->caption = $caption;
 		if ($maxLength !== NULL) $this->maxLength = $maxLength;
-		$this->monitor('DataGrid');
+		$this->monitor('DataGrid\DataGrid');
 	}
 
 
 	/**
 	 * This method will be called when the component (or component's parent)
 	 * becomes attached to a monitored object. Do not call this method yourself.
-	 * @param  IComponent
+	 * @param  Nette\IComponent
 	 * @return void
 	 */
 	protected function attached($component)
 	{
-		if ($component instanceof DataGrid) {
+		if ($component instanceof DataGrid\DataGrid) {
 			$this->setParent($component);
 
 			if ($this->caption === NULL) {
@@ -78,11 +77,11 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 	/**
 	 * Returns DataGrid.
 	 * @param  bool   throw exception if form doesn't exist?
-	 * @return DataGrid
+	 * @return DataGrid\DataGrid
 	 */
 	public function getDataGrid($need = TRUE)
 	{
-		return $this->lookup('DataGrid', $need);
+		return $this->lookup('DataGrid\DataGrid', $need);
 	}
 
 
@@ -93,7 +92,7 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 
 	/**
 	 * Returns headers's HTML element template.
-	 * @return Html
+	 * @return Nette\Web\Html
 	 */
 	public function getHeaderPrototype()
 	{
@@ -103,7 +102,7 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 
 	/**
 	 * Returns table's cell HTML element template.
-	 * @return Html
+	 * @return Nette\Web\Html
 	 */
 	public function getCellPrototype()
 	{
@@ -126,7 +125,7 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 
 
 
-	/********************* interface \IDataGridColumn *********************/
+	/********************* interface DataGrid\Columns\IColumn *********************/
 
 
 
@@ -157,14 +156,14 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 	 */
 	public function hasFilter()
 	{
-		return $this->getFilter(FALSE) instanceof IDataGridColumnFilter;
+		return $this->getFilter(FALSE) instanceof DataGrid\Filters\IColumnFilter;
 	}
 
 
 	/**
 	 * Returns column's filter.
 	 * @param  bool   throw exception if component doesn't exist?
-	 * @return IDataGridColumnFilter|NULL
+	 * @return DataGrid\Filters\IColumnFilter|NULL
 	 */
 	public function getFilter($need = TRUE)
 	{
@@ -203,13 +202,13 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 	/**
 	 * Adds default sorting to data grid.
 	 * @param string
-	 * @return DataGridColumn  provides a fluent interface
+	 * @return DataGrid\Columns\Column  provides a fluent interface
 	 */
 	public function addDefaultSorting($order = 'ASC')
 	{
 		$orders = array('ASC', 'DESC', 'asc', 'desc', 'A', 'D', 'a', 'd');
 		if (!in_array($order, $orders)) {
-			throw new InvalidArgumentException("Order must be in '" . implode(', ', $orders) . "', '$order' given.");
+			throw new \InvalidArgumentException("Order must be in '" . implode(', ', $orders) . "', '$order' given.");
 		}
 
 		parse_str($this->getDataGrid()->defaultOrder, $list);
@@ -223,7 +222,7 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 	/**
 	 * Adds default filtering to data grid.
 	 * @param string
-	 * @return DataGridColumn  provides a fluent interface
+	 * @return DataGrid\Columns\Column  provides a fluent interface
 	 */
 	public function addDefaultFiltering($value)
 	{
@@ -237,7 +236,7 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 
 	/**
 	 * Removes data grid's default sorting.
-	 * @return DataGridColumn  provides a fluent interface
+	 * @return DataGrid\Columns\Column  provides a fluent interface
 	 */
 	public function removeDefaultSorting()
 	{
@@ -251,7 +250,7 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 
 	/**
 	 * Removes data grid's default filtering.
-	 * @return DataGridColumn  provides a fluent interface
+	 * @return DataGrid\Columns\Column  provides a fluent interface
 	 */
 	public function removeDefaultFiltering()
 	{
@@ -271,7 +270,7 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 
 	/**
 	 * Alias for method addTextFilter().
-	 * @return IDataGridColumnFilter
+	 * @return DataGrid\Filters\IColumnFilter
 	 */
 	public function addFilter()
 	{
@@ -281,12 +280,12 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 
 	/**
 	 * Adds single-line text filter input to data grid.
-	 * @return IDataGridColumnFilter
-	 * @throws InvalidArgumentException
+	 * @return DataGrid\Filters\IColumnFilter
+	 * @throws \InvalidArgumentException
 	 */
 	public function addTextFilter()
 	{
-		$this->_addFilter(new TextFilter);
+		$this->_addFilter(new Filters\TextFilter);
 		return $this->getFilter();
 	}
 
@@ -294,24 +293,24 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 	/**
 	 * Adds single-line text date filter input to data grid.
 	 * Optional dependency on DatePicker class (@link http://nettephp.com/extras/datepicker)
-	 * @return IDataGridColumnFilter
-	 * @throws InvalidArgumentException
+	 * @return DataGrid\Filters\IColumnFilter
+	 * @throws \InvalidArgumentException
 	 */
 	public function addDateFilter()
 	{
-		$this->_addFilter(new DateFilter);
+		$this->_addFilter(new Filters\DateFilter);
 		return $this->getFilter();
 	}
 
 
 	/**
 	 * Adds check box filter input to data grid.
-	 * @return IDataGridColumnFilter
-	 * @throws InvalidArgumentException
+	 * @return DataGrid\Filters\IColumnFilter
+	 * @throws \InvalidArgumentException
 	 */
 	public function addCheckboxFilter()
 	{
-		$this->_addFilter(new CheckboxFilter);
+		$this->_addFilter(new Filters\CheckboxFilter);
 		return $this->getFilter();
 	}
 
@@ -321,22 +320,22 @@ abstract class DataGridColumn extends ComponentContainer implements IDataGridCol
 	 * @param  array   items from which to choose
 	 * @param  bool    add empty first item to selectbox?
 	 * @param  bool    translate all items in selectbox?
-	 * @return IDataGridColumnFilter
-	 * @throws InvalidArgumentException
+	 * @return DataGrid\Filters\IColumnFilter
+	 * @throws \InvalidArgumentException
 	 */
 	public function addSelectboxFilter($items = NULL, $firstEmpty = TRUE, $translateItems = TRUE)
 	{
-		$this->_addFilter(new SelectboxFilter($items, $firstEmpty));
+		$this->_addFilter(new Filters\SelectboxFilter($items, $firstEmpty));
 		return $this->getFilter()->translateItems($translateItems);
 	}
 
 
 	/**
 	 * Internal filter adding routine.
-	 * @param  IDataGridColumnFilter $filter
+	 * @param  DataGrid\Filters\IColumnFilter $filter
 	 * @return void
 	 */
-	private function _addFilter(IDataGridColumnFilter $filter)
+	private function _addFilter(DataGrid\Filters\IColumnFilter $filter)
 	{
 		if ($this->hasFilter()) {
 			$this->getComponent('filters')->removeComponent($this->getFilter());

@@ -29,7 +29,7 @@ class DatagridModel extends BaseModel
 		}
 
 		if ($this->connection->profiler) {
-			$this->connection->getProfiler()->setFile(Environment::expand('%logDir%') . '/sql.log');
+			$this->connection->getProfiler()->setFile(Nette\Environment::expand('%logDir%') . '/sql.log');
 		}
 	}
 

@@ -1,8 +1,8 @@
 <?php
 
-require_once dirname(__FILE__) . '/NumericColumn.php';
+namespace DataGrid\Columns;
 
-
+use Nette;
 
 /**
  * Representation of checkbox data grid column.
@@ -15,6 +15,7 @@ require_once dirname(__FILE__) . '/NumericColumn.php';
  */
 class CheckboxColumn extends NumericColumn
 {
+
 	/**
 	 * Checkbox column constructor.
 	 * @param  string  column's textual caption
@@ -26,36 +27,37 @@ class CheckboxColumn extends NumericColumn
 		$this->getCellPrototype()->style('text-align: center');
 	}
 
-
 	/**
 	 * Formats cell's content.
 	 * @param  mixed
-	 * @param  DibiRow|array
+	 * @param  \DibiRow|array
 	 * @return string
 	 */
 	public function formatContent($value, $data = NULL)
 	{
-		$checkbox = Html::el('input')->type('checkbox')->disabled('disabled');
-		if ($value) $checkbox->checked = TRUE;
+		$checkbox = Nette\Web\Html::el('input')->type('checkbox')->disabled('disabled');
+		if ($value)
+			$checkbox->checked = TRUE;
 		return (string) $checkbox;
 	}
 
-
 	/**
-	 * Filters data source.
+	 * Filter data source
+	 * 
 	 * @param  mixed
 	 * @return void
 	 */
 	public function applyFilter($value)
 	{
-		if (!$this->hasFilter()) return;
+		if (! $this->hasFilter()) return;
 
 		$datagrid = $this->getDataGrid(TRUE);
-		$column = $this->getName();
-		$value = (int)(bool)$value;
-		$cond = array();
-		if ($value) $cond[] = array("[$column] >= %b", TRUE);
-		else $cond[] = array("[$column] = %b", FALSE, " OR [$column] IS NULL");
-		$datagrid->dataSource->where('%and', $cond);
+		$value = (boolean) $value;
+		if ($value) {
+			$dataGrid->getDataSource()->filter($this->name, '>=', $value);
+		} else {
+			$dataGrid->getDataSource()->filter($this->name, array('=', 'IS NULL'), $value, 'OR');
+		}
 	}
+
 }

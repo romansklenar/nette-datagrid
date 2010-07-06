@@ -1,5 +1,7 @@
 <?php
 
+namespace DataGrid\Filters;
+
 /**
  * Defines method that must be implemented to allow a component act like a data grid column's filter.
  *
@@ -8,11 +10,11 @@
  * @license    New BSD License
  * @package    Nette\Extras\DataGrid
  */
-interface IDataGridColumnFilter
+interface IColumnFilter
 {
 	/**
 	 * Returns filter's form element.
-	 * @return FormControl
+	 * @return Nette\Forms\FormControl
 	 */
 	function getFormControl();
 

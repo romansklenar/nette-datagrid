@@ -1,12 +1,14 @@
 <?php
 
+use Nette\Environment;
+
 /**
  * Base abstract model class.
  *
  * @author     Roman Sklenář
  * @package    DataGrid\Example
  */
-abstract class BaseModel extends Object implements IModel
+abstract class BaseModel extends Nette\Object implements IModel
 {
 	/** @var DibiConnection */
 	protected $connection;

@@ -1,5 +1,8 @@
 <?php
 
+use Nette\Web\Html,
+	Nette\Environment;
+
 /**
  * DataGrid demo presenter.
  *
@@ -14,7 +17,7 @@ class ExamplePresenter extends BasePresenter
 		$model = new DatagridModel;
 
 		// if no columns are defined, takes all cols from given data source
-		$grid = new DataGrid;
+		$grid = new DataGrid\DataGrid;
 		$grid->bindDataTable($model->getOrdersInfo());
 
 		return $grid;
@@ -24,7 +27,7 @@ class ExamplePresenter extends BasePresenter
 	{
 		$model = new DatagridModel;
 
-		$grid = new DataGrid;
+		$grid = new DataGrid\DataGrid;
 		$grid->bindDataTable($model->getOfficesInfo()->orderBy('position')); // binds DibiDataSource
 		$grid->keyName = 'officeCode'; // for actions or operations
 		$grid->disableOrder = TRUE;
@@ -43,7 +46,7 @@ class ExamplePresenter extends BasePresenter
 
 		$grid->addActionColumn('Actions');
 		$icon = Html::el('span');
-		$grid->addAction('New entry', 'Office:new', clone $icon->class('icon icon-add'), FALSE, DataGridAction::WITHOUT_KEY);
+		$grid->addAction('New entry', 'Office:new', clone $icon->class('icon icon-add'), FALSE, DataGrid\Action::WITHOUT_KEY);
 		$grid->addAction('Edit', 'Office:edit', clone $icon->class('icon icon-edit'));
 		$grid->addAction('Delete', 'Office:delete', clone $icon->class('icon icon-del'));
 
@@ -53,12 +56,12 @@ class ExamplePresenter extends BasePresenter
 	protected function createComponentOrdersGrid()
 	{
 		$model = new DatagridModel;
-		$grid = new DataGrid;
+		$grid = new DataGrid\DataGrid;
 
 		$translator = new GettextTranslator(Environment::expand('%templatesDir%/customersGrid.cs.mo'));
 		$grid->setTranslator($translator);
 
-		$renderer = new DataGridRenderer;
+		$renderer = new DataGrid\Renderer;
 		$renderer->paginatorFormat = '%input%'; // customize format of paginator
 		$renderer->onCellRender[] = array($this, 'ordersGridOnCellRendered');
 		$grid->setRenderer($renderer);
@@ -148,7 +151,7 @@ class ExamplePresenter extends BasePresenter
 	 * @param  SubmitButton
 	 * @return void
 	 */
-	public function gridOperationHandler(SubmitButton $button)
+	public function gridOperationHandler(Nette\Forms\SubmitButton $button)
 	{
 		// how to findout which checkboxes in checker was checked?  $values['checker']['ID'] => bool(TRUE)
 		$form = $button->getParent();
@@ -192,7 +195,7 @@ class ExamplePresenter extends BasePresenter
 	 * @param  mixed
 	 * @return Html
 	 */
-	public function ordersGridOnCellRendered(Html $cell, $column, $value)
+	public function ordersGridOnCellRendered(Nette\Web\Html $cell, $column, $value)
 	{
 		if ($column === 'creditLimit') {
 			if ($value < 30000) $cell->addClass('money-low');

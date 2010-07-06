@@ -11,6 +11,8 @@
  * @link       http://addons.nette.org/datagrid
  */
 
+namespace DataGrid;
+use Nette;
 
 
 /**
@@ -36,7 +38,7 @@
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class DataGrid extends Control implements ArrayAccess, INamingContainer
+class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\Forms\INamingContainer
 {
 	/** @persistent int */
 	public $page = 1;
@@ -77,13 +79,13 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/** @var int|string  session timeout (default: until is browser closed) */
 	public $timeout = 0;
 
-	/** @var IDataGridRenderer */
+	/** @var DataGrid\IRenderer */
 	protected $renderer;
 
-	/** @var DibiDataSource */
+	/** @var DataGrid\DataSources\IDataSource */
 	protected $dataSource;
 
-	/** @var Paginator */
+	/** @var Nette\Paginator */
 	protected $paginator;
 
 	/** @var string */
@@ -92,13 +94,13 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/** @var string */
 	protected $receivedSignal;
 
-	/** @var ActionColumn */
+	/** @var DataGrid\Columns\ActionColumn */
 	protected $currentActionColumn;
 
 	/** @var bool  was method render() called? */
 	protected $wasRendered = FALSE;
 
-	/** @var ITranslator */
+	/** @var Nette\ITranslator */
 	protected $translator;
 
 
@@ -109,7 +111,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public function __construct()
 	{
 		parent::__construct(); // intentionally without any arguments (because of session loadState)
-		$this->paginator = new Paginator;
+		$this->paginator = new Nette\Paginator;
 
 		$session = $this->getSession();
 		if (!$session->isStarted()) {
@@ -119,25 +121,26 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * Binds data source to data grid.
-	 * @param  DibiDataSource
-	 * @throws DibiException
-	 * @return void
-	 */
-	public function bindDataTable(DibiDataSource $dataSource)
-	{
-		$this->dataSource = $dataSource;
-		$this->paginator->itemCount = count($dataSource);
-	}
-
-
-	/**
 	 * Getter / property method.
-	 * @return DibiDataSource
+	 * @return DataGrid\DataSources\IDataSource
 	 */
 	public function getDataSource()
 	{
 		return $this->dataSource;
+	}
+
+
+	/**
+	 * Setter / property method.
+	 * Binds data source to data grid.
+	 * @param  DataGrid\DataSources\IDataSource
+	 * @return DataGrid\DataGrid
+	 */
+	public function setDataSource(DataSources\IDataSource $dataSource)
+	{
+		$this->dataSource = $dataSource;
+		$this->paginator->itemCount = count($dataSource);
+		return $this;
 	}
 
 
@@ -167,7 +170,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Getter / property method.
-	 * @return Paginator
+	 * @return Nette\Paginator
 	 */
 	public function getPaginator()
 	{
@@ -206,13 +209,14 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Iterates over datagrid rows.
-	 * @throws InvalidStateException
-	 * @return DibiResultIterator
+	 * 
+	 * @throws \InvalidStateException
+	 * @return \Iterator
 	 */
 	public function getRows()
 	{
-		if (!$this->dataSource instanceof DibiDataSource) {
-			throw new InvalidStateException("Data source has not been set or has invalid data type. You must set data source before you want get rows.");
+		if (! $this->dataSource instanceof DataSources\IDataSource) {
+				throw new \InvalidStateException('Data source is not instance of IDataSource. ' . \gettype($this->dataSource) . ' given.');
 		}
 		return $this->dataSource->getIterator();
 	}
@@ -220,13 +224,14 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Iterates over datagrid columns.
-	 * @param  string
-	 * @throws InvalidArgumentException
-	 * @return ArrayIterator
+	 * 
+	 * @param string $type
+	 * @throws \InvalidArgumentException
+	 * @return \ArrayIterator
 	 */
-	public function getColumns($type = 'IDataGridColumn')
+	public function getColumns($type = 'DataGrid\Columns\IColumn')
 	{
-		$columns = new ArrayObject();
+		$columns = new \ArrayObject();
 		foreach ($this->getComponents(FALSE, $type) as $column) {
 			$columns->append($column);
 		}
@@ -237,12 +242,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/**
 	 * Iterates over datagrid filters.
 	 * @param  string
-	 * @throws InvalidArgumentException
-	 * @return ArrayIterator
+	 * @throws \InvalidArgumentException
+	 * @return \ArrayIterator
 	 */
-	public function getFilters($type = 'IDataGridColumnFilter')
+	public function getFilters($type = 'DataGrid\Filters\IColumnFilter')
 	{
-		$filters = new ArrayObject();
+		$filters = new \ArrayObject();
 		foreach ($this->getColumns() as $column) {
 			if ($column->hasFilter()) {
 				$filter = $column->getFilter();
@@ -259,13 +264,13 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * TODO: throw new DeprecatedException
 	 * Iterates over all datagrid actions.
 	 * @param  string
-	 * @throws InvalidArgumentException
-	 * @return ArrayIterator
+	 * @throws \InvalidArgumentException
+	 * @return \ArrayIterator
 	 */
-	public function getActions($type = 'IDataGridAction')
+	public function getActions($type = 'DataGrid\IAction')
 	{
-		$actions = new ArrayObject();
-		foreach ($this->getColumns('ActionColumn') as $column) {
+		$actions = new \ArrayObject();
+		foreach ($this->getColumns('DataGrid\Columns\ActionColumn') as $column) {
 			if ($column->hasAction()) {
 				foreach ($column->getActions() as $action) {
 					if ($action instanceof $type) {
@@ -429,16 +434,6 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	}
 
 
-	/**
-	 * Returns array of classes persistent parameters.
-	 * @param  string  class name
-	 * @return array
-	 */
-	public static function getPersistentParams()
-	{
-		return array('page', 'order', 'filters', 'itemsPerPage');
-	}
-
 
 
 	/********************* signal handlers ********************/
@@ -525,7 +520,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public function handleItems($value)
 	{
 		if ($value < 0) {
-			throw new InvalidArgumentException("Parametr must be non-negative number, '$value' given.");
+			throw new \InvalidArgumentException("Parametr must be non-negative number, '$value' given.");
 		}
 		$this->itemsPerPage = $value;
 
@@ -555,10 +550,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Data grid form submit handler.
-	 * @param  AppForm
+	 * @param  Nette\Application\AppForm
 	 * @return void
 	 */
-	public function formSubmitHandler(AppForm $form)
+	public function formSubmitHandler(Nette\Application\AppForm $form)
 	{
 		$this->receivedSignal = 'submit';
 
@@ -580,11 +575,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 			} elseif ($form['operationSubmit']->isSubmittedBy()) {
 				if (!is_array($this->onOperationSubmit)) {
-					throw new InvalidStateException('No user defined handler for operations; assign valid callback to operations handler into DataGrid::$operationsHandler variable.');
+					throw new \InvalidStateException('No user defined handler for operations; assign valid callback to operations handler into DataGrid\DataGrid::$operationsHandler variable.');
 				}
 
 			} else {
-				throw new InvalidStateException("Unknown submit button.");
+				throw new \InvalidStateException("Unknown submit button.");
 			}
 
 		}
@@ -652,7 +647,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				'type' => 'info',
 			);
 		}
-		$this->dataSource->applyLimit($this->paginator->length, $this->paginator->offset);
+		$this->dataSource->reduce($this->paginator->length, $this->paginator->offset);
 	}
 
 
@@ -665,7 +660,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		$i = 1;
 		parse_str($this->order, $list);
 		foreach ($list as $field => $dir) {
-			$this->dataSource->orderBy($field, $dir === 'a' ? dibi::ASC : dibi::DESC);
+			$this->dataSource->sort($field, $dir === 'a' ? DataSources\IDataSource::ASCENDING : DataSources\IDataSource::DESCENDING);
 			$list[$field] = array($dir, $i++);
 		}
 		return $list;
@@ -712,10 +707,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Sets data grid renderer.
-	 * @param  IDataGridRenderer
+	 * @param  DataGrid\IRenderer
 	 * @return void
 	 */
-	public function setRenderer(IDataGridRenderer $renderer)
+	public function setRenderer(IRenderer $renderer)
 	{
 		$this->renderer = $renderer;
 	}
@@ -723,12 +718,12 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Returns data grid renderer.
-	 * @return IDataGridRenderer|NULL
+	 * @return DataGrid\IRenderer|NULL
 	 */
 	public function getRenderer()
 	{
 		if ($this->renderer === NULL) {
-			$this->renderer = new DataGridRenderer;
+			$this->renderer = new Renderer;
 		}
 		return $this->renderer;
 	}
@@ -743,7 +738,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 		if (!$this->wasRendered) {
 			$this->wasRendered = TRUE;
 
-			if (!$this->hasColumns() || (count($this->getColumns('ActionColumn')) == count($this->getColumns()))) {
+			if (!$this->hasColumns() || (count($this->getColumns('DataGrid\Columns\ActionColumn')) == count($this->getColumns()))) {
 				$this->generateColumns();
 			}
 
@@ -755,7 +750,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 			if ($this->hasActions() || $this->hasOperations()) {
 				if ($this->keyName == NULL) {
-					throw new InvalidStateException("Name of key for operations or actions was not set for DataGrid '" . $this->getName() . "'.");
+					throw new \InvalidStateException("Name of key for operations or actions was not set for DataGrid '" . $this->getName() . "'.");
 				}
 			}
 
@@ -782,7 +777,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Template factory.
-	 * @return ITemplate
+	 * @return Nette\Templates\ITemplate
 	 */
 	protected function createTemplate()
 	{
@@ -812,9 +807,9 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			$this->receivedSignal = 'submit';
 		}
 
-		$form = new AppForm($this, $name);
+		$form = new Nette\Application\AppForm($this, $name);
 		$form->setTranslator($this->getTranslator());
-		FormControl::$idMask = 'frm-datagrid-' . $this->getUniqueId() . '-%s-%s';
+		Nette\Forms\FormControl::$idMask = 'frm-datagrid-' . $this->getUniqueId() . '-%s-%s';
 		$form->onSubmit[] = array($this, 'formSubmitHandler');
 
 		$form->addSubmit('resetSubmit', 'Reset state');
@@ -874,7 +869,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	/**
 	 * Returns data grid's form component.
 	 * @param  bool   throw exception if form doesn't exist?
-	 * @return AppForm
+	 * @return Nette\Application\AppForm
 	 */
 	public function getForm($need = TRUE)
 	{
@@ -884,7 +879,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Generates filter controls and checker's checkbox controls
-	 * @param  AppForm
+	 * @param  Nette\Application\AppForm
 	 * @return void
 	 */
 	protected function regenerateFormControls()
@@ -911,7 +906,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 			parse_str($this->filters, $list);
 
 			foreach ($this->getFilters() as $filter) {
-				if ($filter instanceof SelectboxFilter) {
+				if ($filter instanceof Filters\SelectboxFilter) {
 					$filter->generateItems();
 				}
 
@@ -948,22 +943,26 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * Generates columns from datasource.
+	 * Generate columns from datasource
+	 * 
 	 * @return void
 	 */
 	protected function generateColumns()
 	{
-		if ($this->hasColumns('ActionColumn')) {
-			$columns = $this->getColumns('ActionColumn');
+		if ($this->hasColumns('DataGrid\Columns\ActionColumn')) {
+			$columns = $this->getColumns('DataGrid\Columns\ActionColumn');
 			foreach ($columns as $column) {
 				unset($this[$column->getName()]);
 			}
 		}
 
 		$ds = clone $this->dataSource;
-		$row = $ds->select('*')->applyLimit(1)->fetch();
-		$keys = array_keys((array)$row);
-		foreach ($keys as $key) $this->addColumn($key);
+		$row = $ds->reduce(1)->first();
+		
+		$keys = \array_keys((array) $row);
+		foreach ($keys as $key) {
+			$this->addColumn($key);
+		}
 
 		if (isset($columns)) {
 			foreach ($columns as $column) {
@@ -984,11 +983,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  string  control name
 	 * @param  string  column label
 	 * @param  int     maximum number of dislayed characters
-	 * @return TextColumn
+	 * @return DataGrid\Columns\TextColumn
 	 */
 	public function addColumn($name, $caption = NULL, $maxLength = NULL)
 	{
-		return $this[$name] = new TextColumn($caption, $maxLength);
+		return $this[$name] = new Columns\TextColumn($caption, $maxLength);
 	}
 
 
@@ -997,11 +996,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  string  control name
 	 * @param  string  column label
 	 * @param  int     number of digits after the decimal point
-	 * @return NumericColumn
+	 * @return DataGrid\Columns\NumericColumn
 	 */
 	public function addNumericColumn($name, $caption = NULL, $precision = 2)
 	{
-		return $this[$name] = new NumericColumn($caption, $precision);
+		return $this[$name] = new Columns\NumericColumn($caption, $precision);
 	}
 
 
@@ -1010,11 +1009,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  string  control name
 	 * @param  string  column label
 	 * @param  string  date format
-	 * @return DateColumn
+	 * @return DataGrid\Columns\DateColumn
 	 */
 	public function addDateColumn($name, $caption = NULL, $format = '%x')
 	{
-		return $this[$name] = new DateColumn($caption, $format);
+		return $this[$name] = new Columns\DateColumn($caption, $format);
 	}
 
 
@@ -1022,11 +1021,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * Adds column of boolean values (represented by checkboxes).
 	 * @param  string  control name
 	 * @param  string  column label
-	 * @return CheckboxColumn
+	 * @return DataGrid\Columns\CheckboxColumn
 	 */
 	public function addCheckboxColumn($name, $caption = NULL)
 	{
-		return $this[$name] = new CheckboxColumn($caption);
+		return $this[$name] = new Columns\CheckboxColumn($caption);
 	}
 
 
@@ -1034,11 +1033,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * Adds column of graphical images.
 	 * @param  string  control name
 	 * @param  string  column label
-	 * @return ImageColumn
+	 * @return DataGrid\Columns\ImageColumn
 	 */
 	public function addImageColumn($name, $caption = NULL)
 	{
-		return $this[$name] = new ImageColumn($caption);
+		return $this[$name] = new Columns\ImageColumn($caption);
 	}
 
 
@@ -1049,11 +1048,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  string  destination or signal to handler which do the move rutine
 	 * @param  array   textual labels for generated links
 	 * @param  bool    use ajax? (add class DataGridColumn::$ajaxClass into generated link)
-	 * @return PositionColumn
+	 * @return DataGrid\Columns\PositionColumn
 	 */
 	public function addPositionColumn($name, $caption = NULL, $destination = NULL, array $moves = NULL, $useAjax = TRUE)
 	{
-		return $this[$name] = new PositionColumn($caption, $destination, $moves);
+		return $this[$name] = new Columns\PositionColumn($caption, $destination, $moves);
 	}
 
 
@@ -1062,11 +1061,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  string  control name
 	 * @param  string  column label
 	 * @param  bool
-	 * @return ActionColumn
+	 * @return DataGrid\Columns\ActionColumn
 	 */
 	public function addActionColumn($name, $caption = NULL, $setAsCurrent = TRUE)
 	{
-		$column = new ActionColumn($caption);
+		$column = new Columns\ActionColumn($caption);
 
 		if ($setAsCurrent) {
 			$this->setCurrentActionColumn($column);
@@ -1076,10 +1075,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * @param  ActionColumn
+	 * @param  DataGrid\Columns\ActionColumn
 	 * @return void
 	 */
-	public function setCurrentActionColumn(ActionColumn $column)
+	public function setCurrentActionColumn(Columns\ActionColumn $column)
 	{
 		$this->currentActionColumn = $column;
 	}
@@ -1092,13 +1091,13 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	 * @param  Html    element which is added to a generated link
 	 * @param  bool    use ajax? (add class self::$ajaxClass into generated link)
 	 * @param  mixed   generate link with argument? (if yes you can specify name of parameter
-	 * 				   otherwise variable DataGrid::$keyName will be used and must be defined)
-	 * @return DataGridAction
+	 * 				   otherwise variable DataGrid\DataGrid::$keyName will be used and must be defined)
+	 * @return DataGrid\Action
 	 */
-	public function addAction($title, $signal, $icon = NULL, $useAjax = FALSE, $key = DataGridAction::WITH_KEY)
+	public function addAction($title, $signal, $icon = NULL, $useAjax = FALSE, $key = Action::WITH_KEY)
 	{
-		if (!$this->hasColumns('ActionColumn')) {
-			throw new InvalidStateException('No ActionColumn defined. Use DataGrid::addActionColumn before you add actions.');
+		if (!$this->hasColumns('DataGrid\Columns\ActionColumn')) {
+			throw new \InvalidStateException('No DataGrid\Columns\ActionColumn defined. Use DataGrid\DataGrid::addActionColumn before you add actions.');
 		}
 
 		return $this->currentActionColumn->addAction($title, $signal, $icon, $useAjax, $key);
@@ -1112,10 +1111,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Sets translate adapter.
-	 * @param  ITranslator
+	 * @param  Nette\ITranslator
 	 * @return void
 	 */
-	public function setTranslator(ITranslator $translator = NULL)
+	public function setTranslator(Nette\ITranslator $translator = NULL)
 	{
 		$this->translator = $translator;
 	}
@@ -1123,7 +1122,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 	/**
 	 * Returns translate adapter.
-	 * @return ITranslator|NULL
+	 * @return Nette\ITranslator|NULL
 	 */
 	final public function getTranslator()
 	{
@@ -1144,7 +1143,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 
-	/********************* interface \ISignalReceiver *********************/
+	/********************* interface Nette\Application\ISignalReceiver *********************/
 
 
 
@@ -1174,7 +1173,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * @return SessionNamespace
+	 * @return Nette\Web\SessionNamespace
 	 */
 	protected function getStateSession()
 	{
@@ -1183,11 +1182,11 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 
 
 	/**
-	 * @return Session
+	 * @return Nette\Web\Session
 	 */
 	protected function getSession()
 	{
-		return Environment::getSession();
+		return Nette\Environment::getSession();
 	}
 
 
