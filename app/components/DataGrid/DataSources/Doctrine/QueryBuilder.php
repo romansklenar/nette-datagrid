@@ -90,7 +90,7 @@ class QueryBuilder extends Mapped
 				$this->qb->andWhere("{$this->mapping[$column]} $operation ?$nextParamId");
 				$this->qb->setParameter(
 					$nextParamId,
-					$operation === self::LIKE || $operation === self::NOT_LIKE ? $this->_formatValueForLikeExpr($value) : $value
+					$operation === self::LIKE || $operation === self::NOT_LIKE ? WildcardHelper::formatLikeStatementWildcards($value) : $value
 				);
 			}
 		}
