@@ -27,5 +27,7 @@ class CountingASTWalker extends Doctrine\ORM\Query\TreeWalkerAdapter
 					new AST\AggregateExpression('count', $pathExpression, FALSE), NULL
 				)
 			);
+			
+			$ast->orderByClause = array(); //reset ORDER BY clause, it is not necessary
 	}
 }
