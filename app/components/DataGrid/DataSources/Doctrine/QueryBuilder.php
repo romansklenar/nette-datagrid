@@ -146,7 +146,6 @@ class QueryBuilder extends Mapped
 	 */
 	public function getIterator()
 	{
-		echo $this->qb->getDQL();
 		return new \ArrayIterator($this->fetch());
 	}
 
