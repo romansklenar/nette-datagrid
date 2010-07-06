@@ -1,5 +1,7 @@
 <?php
 
+namespace DataGrid\DataSources\Doctrine;
+
 class WildcardHelper
 {
 	/**

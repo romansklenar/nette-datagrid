@@ -43,7 +43,7 @@ class QueryBuilder extends Mapped
 					$conds[] = "{$this->mapping[$column]} $t ?$nextParamId";
 					$this->qb->setParameter(
 						$nextParamId++,
-						$t === self::LIKE || $t === self::NOT_LIKE ? $this->_formatValueForLikeExpr($value) : $value
+						$t === self::LIKE || $t === self::NOT_LIKE ? WildcardHelper::formatLikeStatementWildcards($value) : $value
 					);
 				}
 			}
