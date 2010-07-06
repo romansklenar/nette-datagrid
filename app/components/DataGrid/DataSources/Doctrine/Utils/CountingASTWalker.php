@@ -24,7 +24,7 @@ class CountingASTWalker extends Doctrine\ORM\Query\TreeWalkerAdapter
 
 			$ast->selectClause->selectExpressions = array(
 				new AST\SelectExpression(
-					new AST\AggregateExpression('count', $pathExpression, TRUE), NULL
+					new AST\AggregateExpression('count', $pathExpression, FALSE), NULL
 				)
 			);
 	}
