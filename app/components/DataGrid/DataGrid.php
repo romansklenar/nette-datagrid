@@ -956,9 +956,10 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 			}
 		}
 
-		$row = $this->getDataSource()->first();
-		$keys = \array_keys($row);
+		$ds = clone $this->dataSource;
+		$row = $ds->reduce(1)->first();
 		
+		$keys = \array_keys((array) $row);
 		foreach ($keys as $key) {
 			$this->addColumn($key);
 		}
