@@ -64,6 +64,7 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * @param string|array operation mode
 	 * @param string chain type (if third argument is array)
 	 * @throws \InvalidArgumentException
+	 * @return IDataSource
 	 */
 	function filter($column, $operation = IDataSource::EQUAL, $value = NULL, $chainType = NULL);
 
@@ -73,6 +74,7 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * @param string column name
 	 * @param string one of ordering types
 	 * @throws \InvalidArgumentException
+	 * @return IDataSource
 	 */
 	function sort($column, $order = IDataSource::ASCENDING);
 
@@ -82,6 +84,7 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * @param int the number of results to obtain
 	 * @param int the offset
 	 * @throws \OutOfRangeException
+	 * @return IDataSource
 	 */
 	function reduce($count, $start = 0);
 

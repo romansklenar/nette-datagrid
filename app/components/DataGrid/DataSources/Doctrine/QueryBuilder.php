@@ -11,17 +11,43 @@ use Doctrine, Doctrine\ORM\Query\Expr;
  */
 class QueryBuilder extends Mapped
 {
-
-	/** @var Doctrine\ORM\QueryBuilder */
+	/**
+	 * Query builder instance
+	 * 
+	 * @var Doctrine\ORM\QueryBuilder 
+	 */
 	private $qb;
+
+
+	/**
+	 * Fetched data
+	 * 
+	 * @var array
+	 */
 	private $data;
 
-	/** @param QueryBuilder $qb */
+
+	/**
+	 * Store given query builder instance
+	 * 
+	 * @param QueryBuilder $qb
+	 * @return QueryBuilder
+	 */
 	public function __construct(Doctrine\ORM\QueryBuilder $qb)
 	{
 		$this->qb = $qb;
 	}
 
+	
+	/**
+	 * Filter items in data source
+	 *
+	 * @param string $column
+	 * @param string $operation
+	 * @param string $value
+	 * @param string $chainType
+	 * @return QueryBuilder
+	 */
 	public function filter($column, $operation = self::EQUAL, $value = NULL, $chainType = NULL)
 	{
 		if (!$this->hasColumn($column)) {
@@ -68,6 +94,8 @@ class QueryBuilder extends Mapped
 				);
 			}
 		}
+
+		return $this;
 	}
 
 
@@ -76,6 +104,7 @@ class QueryBuilder extends Mapped
 	 * 
 	 * @param string $column
 	 * @param string $order
+	 * @return QueryBuilder
 	 */
 	public function sort($column, $order = self::ASCENDING)
 	{
@@ -84,6 +113,8 @@ class QueryBuilder extends Mapped
 		}
 		
 		$this->qb->addOrderBy($this->mapping[$column], $order === self::ASCENDING ? 'ASC' : 'DESC');
+
+		return $this;
 	}
 
 
@@ -92,6 +123,7 @@ class QueryBuilder extends Mapped
 	 * 
 	 * @param integer $count
 	 * @param integer $start
+	 * @return QueryBuilder
 	 */
 	public function reduce($count, $start = 0)
 	{
@@ -102,6 +134,8 @@ class QueryBuilder extends Mapped
 		if ($start == NULL || ($start > 0 && $start < count($this))) {
 			$this->qb->setFirstResult($start == NULL ? NULL : $start);
 		} else throw new \OutOfRangeException;
+
+		return $this;
 	}
 
 
