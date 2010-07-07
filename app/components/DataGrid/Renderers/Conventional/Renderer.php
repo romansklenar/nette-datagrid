@@ -138,7 +138,7 @@ class Conventional extends Nette\Object implements IRenderer
 		}
 
 		if (! $dataGrid->dataSource instanceof DataGrid\DataSources\IDataSource) {
-			throw new \InvalidStateException('Data source is not instance of IDataSource. ' . gettype($this->dataSource) . ' given.');
+			throw new \InvalidStateException('Data source is not instance of IDataSource. ' . \gettype($this->dataSource) . ' given.');
 		}
 
 		if ($mode !== NULL) {
@@ -147,7 +147,7 @@ class Conventional extends Nette\Object implements IRenderer
 
 		$template = $this->dataGrid->getTemplate();
 		$template->setFile($this->file);
-		return $template->__toString();
+		return $template->__toString(TRUE);
 	}
 
 
