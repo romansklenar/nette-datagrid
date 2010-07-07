@@ -138,7 +138,7 @@ class Conventional extends Nette\Object implements IRenderer
 		}
 
 		if (! $dataGrid->dataSource instanceof DataGrid\DataSources\IDataSource) {
-			throw new \InvalidStateException('Data source is not instance of IDataSource. ' . \gettype($this->dataSource) . ' given.');
+			throw new \InvalidStateException('Data source is not instance of IDataSource. ' . gettype($this->dataSource) . ' given.');
 		}
 
 		if ($mode !== NULL) {
@@ -513,7 +513,7 @@ class Conventional extends Nette\Object implements IRenderer
 
 	/**
 	 * Generates datagrid row content.
-	 * @param  DibiRow data
+	 * @param  \Traversable|array data
 	 * @return Nette\Web\Html
 	 */
 	protected function generateContentRow($data)

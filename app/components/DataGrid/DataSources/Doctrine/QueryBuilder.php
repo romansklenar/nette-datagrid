@@ -181,7 +181,7 @@ class QueryBuilder extends Mapped
 
 	public function getFilterItems($column)
 	{
-		throw new \NotImplementedException();
+		throw new \NotImplementedException;
 	}
 
 
@@ -193,6 +193,6 @@ class QueryBuilder extends Mapped
 	public function first()
 	{
 		$data = $this->fetch();
-		return \reset($data);
+		return reset($data);
 	}
 }
