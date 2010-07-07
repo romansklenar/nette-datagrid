@@ -15,12 +15,29 @@ use Nette, Doctrine, DataGrid,
  */
 abstract class Mapped extends DataSource
 {
-	/** @var array Column aliases to raw resultset columns mapping */
+	/**
+	 * Alias to column mapping
+	 *
+	 * @var array
+	 */
 	protected $mapping = array();
 
 
 	/**
+	 * Get columns mapping
+	 * 
+	 * @param array
+	 * @return void
+	 */
+	public function getMapping()
+	{
+		return $this->mapping;
+	}
+
+	
+	/**
 	 * Set columns mapping
+	 *
 	 * @param array
 	 * @return void
 	 */
@@ -37,49 +54,17 @@ abstract class Mapped extends DataSource
 	 */
 	public function hasColumn($name)
 	{
-		return \array_key_exists($name, $this->mapping);
+		return array_key_exists($name, $this->mapping);
 	}
 
 	
 	/**
-	 * Get aliased column name list
+	 * Get list of column aliases
 	 *
 	 * @return array
 	 */
 	public function getColumns()
 	{
 		return array_keys($this->mapping);
-	}
-
-
-	/**
-	 * Get sample record from data source
-	 *
-	 * @return array
-	 */
-	protected function getDataSample()
-	{
-		static $cache = NULL;
-		if ($cache === NULL) {
-			$ds = clone $this;
-			$cache = $ds->reduce(1)->first();
-		}
-		return $cache;
-	}
-
-	
-	/**
-	 * Generate simple mapping with column name uniqueness in mind
-	 *
-	 * @return void
-	 */
-	protected function generateMapping()
-	{
-		foreach ($this->getDataSample() as $column => $value) {
-			if (isset($this->mapping[$column])) {
-				throw new \InvalidStateException('Unable to generate the mapping because of ambiguous column names.');
-			}
-			$this->mapping[$column] = strtr($column, '_', '.');
-		}
 	}
 }

@@ -87,12 +87,4 @@ interface IDataSource extends \Countable, \IteratorAggregate
 	 * @return IDataSource
 	 */
 	function reduce($count, $start = 0);
-
-
-	/**
-	 * Get the first item from data source
-	 *
-	 * @return array
-	 */
-	function first();
 }

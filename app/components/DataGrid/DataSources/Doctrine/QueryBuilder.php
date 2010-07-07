@@ -183,16 +183,4 @@ class QueryBuilder extends Mapped
 	{
 		throw new \NotImplementedException;
 	}
-
-
-	/**
-	 * Get the first item from data source
-	 *
-	 * @return array
-	 */
-	public function first()
-	{
-		$data = $this->fetch();
-		return reset($data);
-	}
 }
