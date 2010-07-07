@@ -147,7 +147,7 @@ class Conventional extends Nette\Object implements IRenderer
 
 		$template = $this->dataGrid->getTemplate();
 		$template->setFile($this->file);
-		return $template->__toString();
+		return $template->__toString(TRUE);
 	}
 
 
@@ -513,7 +513,7 @@ class Conventional extends Nette\Object implements IRenderer
 
 	/**
 	 * Generates datagrid row content.
-	 * @param  DibiRow data
+	 * @param  \Traversable|array data
 	 * @return Nette\Web\Html
 	 */
 	protected function generateContentRow($data)
