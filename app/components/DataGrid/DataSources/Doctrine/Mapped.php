@@ -9,6 +9,7 @@ use Nette, Doctrine, DataGrid,
 
 /**
  * Base class for Doctrine2 based data sources
+ * 
  * @author Michael Moravec
  * @author Štěpán Svoboda
  */
@@ -16,6 +17,7 @@ abstract class Mapped extends DataSource
 {
 	/** @var array Column aliases to raw resultset columns mapping */
 	protected $mapping = array();
+
 
 	/**
 	 * Set columns mapping
@@ -27,6 +29,7 @@ abstract class Mapped extends DataSource
 		$this->mapping = $mapping;
 	}
 
+
 	/**
 	 * Does datasource have column of given name?
 	 *
@@ -37,7 +40,7 @@ abstract class Mapped extends DataSource
 		return \array_key_exists($name, $this->mapping);
 	}
 
-
+	
 	/**
 	 * Get aliased column name list
 	 *
@@ -46,5 +49,37 @@ abstract class Mapped extends DataSource
 	public function getColumns()
 	{
 		return array_keys($this->mapping);
+	}
+
+
+	/**
+	 * Get sample record from data source
+	 *
+	 * @return array
+	 */
+	protected function getDataSample()
+	{
+		static $cache = NULL;
+		if ($cache === NULL) {
+			$ds = clone $this;
+			$cache = $ds->reduce(1)->first();
+		}
+		return $cache;
+	}
+
+	
+	/**
+	 * Generate simple mapping with column name uniqueness in mind
+	 *
+	 * @return void
+	 */
+	protected function generateMapping()
+	{
+		foreach ($this->getDataSample() as $column => $value) {
+			if (isset($this->mapping[$column])) {
+				throw new \InvalidStateException('Unable to generate the mapping because of ambiguous column names.');
+			}
+			$this->mapping[$column] = strtr($column, '_', '.');
+		}
 	}
 }
