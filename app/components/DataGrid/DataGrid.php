@@ -439,6 +439,37 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	/********************* signal handlers ********************/
 
 
+	/**
+	 * Do the final work after signal handling
+	 *
+	 * @return void
+	 */
+	protected function finalize()
+	{
+		if ($this->presenter->isAjax()) {
+
+			$presenter = $this->getPresenter();
+			$presenter->payload->snippets = array();
+
+			$html = $this->__toString();
+
+			// Remove snippet-div to emulate native snippets... No extra support on client side is needed...
+			$snippet = 'snippet-' . $this->getName() . '-grid';
+			$start = strlen('<div id="' . $snippet . '">');
+			$stop = - strlen('</div>');
+			$html = trim(mb_substr($html, $start, $stop));
+
+			// Send snippet 
+			$presenter->payload->snippets[$snippet] = $html;
+			$presenter->sendPayload();
+			$presenter->terminate();
+
+		} else {
+			
+			$presenter->redirect('this');
+		}
+	}
+
 
 	/**
 	 * Changes page number.
@@ -448,8 +479,8 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	public function handlePage($goto)
 	{
 		$this->page = ($goto > 0 ? $goto : 1);
-		$this->invalidateControl();
-		if (!$this->presenter->isAjax()) $this->redirect('this');
+
+		$this->finalize();
 	}
 
 
@@ -489,8 +520,8 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 		}
 
 		$this->order = http_build_query($list, '', '&');
-		$this->invalidateControl();
-		if (!$this->presenter->isAjax()) $this->redirect('this');
+
+		$this->finalize();
 	}
 
 
@@ -507,8 +538,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 		}
 		$this->filters = http_build_query($filters, '', '&');
 
-		$this->invalidateControl();
-		if (!$this->presenter->isAjax()) $this->redirect('this');
+		$this->finalize();
 	}
 
 
@@ -524,8 +554,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 		}
 		$this->itemsPerPage = $value;
 
-		$this->invalidateControl();
-		if (!$this->presenter->isAjax()) $this->redirect('this');
+		$this->finalize();
 	}
 
 
@@ -538,8 +567,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	{
 		$this->restoreState();
 
-		$this->invalidateControl();
-		if (!$this->presenter->isAjax()) $this->redirect('this');
+		$this->finalize();
 	}
 
 
@@ -583,7 +611,8 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 			}
 
 		}
-		if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
+
+		$this->finalize();
 	}
 
 
@@ -955,7 +984,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	}
 
 
-	/******************** Factories ********************/
+	/******************** Column Factories ********************/
 	
 
 	/**
