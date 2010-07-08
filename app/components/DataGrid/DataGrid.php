@@ -943,6 +943,22 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 
 
 	/**
+	 * Generate columns from data source
+	 *
+	 * @return void
+	 */
+	protected function generateColumns()
+	{
+		foreach ($this->dataSource->getColumns() as $name) {
+			$this->addColumn($name);
+		}
+	}
+
+
+	/******************** Factories ********************/
+	
+
+	/**
 	 * Adds column of textual values.
 	 * @param  string  control name
 	 * @param  string  column label
