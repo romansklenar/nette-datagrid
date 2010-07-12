@@ -11,6 +11,9 @@ use Doctrine, Doctrine\ORM\Query\Expr;
  */
 class QueryBuilder extends Mapped
 {
+	const MAP_PROPERTIES = 1;
+	const MAP_OBJECTS = 2;
+
 	/**
 	 * Query builder instance
 	 * 
@@ -19,6 +22,20 @@ class QueryBuilder extends Mapped
 	private $qb;
 
 
+	/**
+	 * The mapping type
+	 *
+	 * This is automaticaly detected from the SELECT statement.
+	 * Supported are:
+	 * 
+	 *		1. Mapping properties via "SELECT a.id FROM Entities\Article a"
+	 *		2. Mapping objects via "SELECT a FROM Entities\Article a"
+	 * 
+	 * @var integer
+	 */
+	private $mappingType;
+
+	
 	/**
 	 * Fetched data
 	 * 
@@ -151,16 +168,60 @@ class QueryBuilder extends Mapped
 
 
 	/**
-	 * Fetch if needed and return the result data
+	 * Fetches and returns the result data.
 	 * 
 	 * @return array
 	 */
 	protected function fetch()
 	{
-		if ($this->data === NULL) {
-			$this->data = $this->qb->getQuery()->getScalarResult();
+		$this->data = $this->qb->getQuery()->getScalarResult();
+
+		// Detect mapping type. It will affect the hydrated column names.
+		$this->detectMappingType(); 
+
+		// Create mapping index
+		foreach ($this->data as & $row) {
+			foreach ($this->mapping as $alias => $column) {
+				$row[$alias] = & $row[$this->getHydratedColumnName($column)];
+			}
 		}
+
 		return $this->data;
+	}
+
+	/**
+	 * Returns hydrated column name based on the mapping type.
+	 * 
+	 * @param string $column
+	 * @return string
+	 */
+	private function getHydratedColumnName($column)
+	{
+		if ($this->mappingType === self::MAP_PROPERTIES) {
+			return substr($column, strpos($column, '.') + 1);
+		}
+		
+		if ($this->mappingType === self::MAP_OBJECTS) {
+			return strtr($column, '.', '_');
+		}
+	}
+
+
+	/**
+	 * Detect the mapping type.
+	 * It is detected from type of SELECT expressions.
+	 *
+	 * @return integer
+	 */
+	protected function detectMappingType()
+	{
+		$expressions = $this->qb->getQuery()->getAST()->selectClause->selectExpressions;
+		foreach ($expressions as $expr) {
+			if (is_string($expr->expression)) {
+				$this->mappingType = self::MAP_OBJECTS;
+			}
+		}
+		$this->mappingType = self::MAP_PROPERTIES;
 	}
 
 
