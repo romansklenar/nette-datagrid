@@ -446,9 +446,10 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 	 */
 	protected function finalize()
 	{
+		$presenter = $this->getPresenter();
+		
 		if ($this->presenter->isAjax()) {
 
-			$presenter = $this->getPresenter();
 			$presenter->payload->snippets = array();
 
 			$html = $this->__toString();
