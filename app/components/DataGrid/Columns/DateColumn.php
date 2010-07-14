@@ -27,7 +27,6 @@ class DateColumn extends TextColumn
 	{
 		parent::__construct($caption);
 		$this->format = $format;
-		$this->getHeaderPrototype()->style('width: 80px');
 	}
 
 
