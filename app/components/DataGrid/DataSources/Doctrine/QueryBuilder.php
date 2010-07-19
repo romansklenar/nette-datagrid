@@ -43,6 +43,13 @@ class QueryBuilder extends Mapped
 	 */
 	private $data;
 
+	/**
+	 * Total data count
+	 *
+	 * @var int
+	 */
+	private $count;
+
 
 	/**
 	 * Store given query builder instance
@@ -232,10 +239,15 @@ class QueryBuilder extends Mapped
 	 */
 	public function count()
 	{
+		//\Nette\Debug::barDump(debug_backtrace());
 		$query = clone $this->qb->getQuery();
 
 		$query->setHint(Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array(__NAMESPACE__ . '\Utils\CountingASTWalker'));
 		$query->setMaxResults(NULL)->setFirstResult(NULL);
+
+		$parts = $this->qb->getDQLParts();
+		if (array_key_exists('groupBy', $parts) && count($parts['groupBy']) > 0)
+			return count($query->getScalarResult());
 
 		return (int) $query->getSingleScalarResult();
 	}
