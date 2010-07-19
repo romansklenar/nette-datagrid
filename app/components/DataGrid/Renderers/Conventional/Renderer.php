@@ -544,11 +544,14 @@ class Conventional extends Nette\Object implements IRenderer
 			if ($column instanceof Columns\ActionColumn) {
 				$value = '';
 				foreach ($this->dataGrid->getActions() as $action) {
-					$html = $action->getHtml();
-					$html->title($this->dataGrid->translate($html->title));
-					$action->generateLink(array($primary => $data[$primary]));
-					$this->onActionRender($html, $data);
-					$value .= $html->render() . ' ';
+					if (!is_callable($action->ifDisableCallback) || !callback($action->ifDisableCallback)->invokeArgs(array($data))) {
+						$html = $action->getHtml();
+						$html->title($this->dataGrid->translate($html->title));
+						$action->generateLink(array($primary => $data[$primary]));
+						$this->onActionRender($html, $data);
+						$value .= $html->render() . ' ';
+					} else
+						$value .= Html::el('span')->setText($this->dataGrid->translate($action->getHtml()->title))->render() . ' ';
 				}
 				$cell->addClass('actions');
 

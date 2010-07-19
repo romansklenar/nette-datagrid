@@ -31,6 +31,9 @@ class Action extends Nette\Component implements IAction
 	/** @var bool|string */
 	public $key;
 
+	/** @var Nette\Callback|Closure */
+	public $ifDisableCallback;
+
 
 	/**
 	 * Data grid action constructor.
