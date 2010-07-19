@@ -198,7 +198,7 @@ class QueryBuilder extends Mapped
 	private function getHydratedColumnName($column)
 	{
 		if ($this->mappingType === self::MAP_PROPERTIES) {
-			return substr($column, strpos($column, '.') + 1);
+			return substr($column, strpos($column, '.') !== FALSE ? strpos($column, '.') + 1 : 0);
 		}
 		
 		if ($this->mappingType === self::MAP_OBJECTS) {
