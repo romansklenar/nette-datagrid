@@ -179,7 +179,7 @@ class QueryBuilder extends Mapped
 	 * 
 	 * @return array
 	 */
-	protected function fetch()
+	public function fetch()
 	{
 		$this->data = $this->qb->getQuery()->getScalarResult();
 
@@ -187,13 +187,17 @@ class QueryBuilder extends Mapped
 		$this->detectMappingType(); 
 
 		// Create mapping index
+		$data = array();
+		$i = 0;
 		foreach ($this->data as & $row) {
+			$data[$i] = array();
 			foreach ($this->mapping as $alias => $column) {
-				$row[$alias] = & $row[$this->getHydratedColumnName($column)];
+				$data[$i][$alias] = & $row[$this->getHydratedColumnName($column)];
 			}
+			$i++;
 		}
 
-		return $this->data;
+		return $this->data = $data;
 	}
 
 	/**
