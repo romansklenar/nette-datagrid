@@ -1,7 +1,7 @@
 <?php
 
 namespace DataGrid\Columns;
-use DataGrid, Nette\Web\Html;
+use DataGrid, Nette\Web\Html, DataGrid\DataSources\IDataSource;
 
 /**
  * Representation of positioning data grid column, that provides moving entries up or down.
@@ -72,9 +72,13 @@ class PositionColumn extends NumericColumn
 	{
 		if ($dataGrid instanceof DataGrid\DataGrid) {
 			$dataSource = clone $dataGrid->dataSource;
-			$dataSource->orderBy(array());
-			$this->min = (int) $dataSource->select($this->getName())->orderBy($this->getName(), 'ASC')->fetchSingle();
-			$this->max = (int) $dataSource->select($this->getName())->orderBy($this->getName(), 'DESC')->fetchSingle();
+			$this->min = $this->max = 0;
+			$first = $dataSource->sort($this->getName(), IDataSource::ASCENDING)->reduce(1)->fetch();
+			if (count($first) > 0)
+				$this->min = (int) $first[0][$this->getName()];
+			$last = $dataSource->sort($this->getName(), IDataSource::DESCENDING)->reduce(1)->fetch();
+			if (count($last) > 0)
+				$this->max = (int) $first[0][$this->getName()];
 		}
 
 		parent::attached($dataGrid);
