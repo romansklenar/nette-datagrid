@@ -69,7 +69,7 @@ class SelectboxFilter extends DataGridColumnFilter
 		$fluent->where('%and', $cond)->orderBy($columnName);
 		$items = $fluent->fetchPairs($columnName, $columnName);
 
-		$this->generatedItems = $this->firstEmpty ? array_merge(array('' => '?'), $items) : $items;
+		$this->generatedItems = $this->firstEmpty ? array("" => '?') + $items : $items;
 
 		// if was data grid already filtered by this filter don't update with filtred items (keep full list)
 		if (empty($this->element->value)) {
