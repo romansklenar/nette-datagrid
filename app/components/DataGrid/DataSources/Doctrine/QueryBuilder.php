@@ -227,12 +227,12 @@ class QueryBuilder extends Mapped
 	protected function detectMappingType()
 	{
 		$expressions = $this->qb->getQuery()->getAST()->selectClause->selectExpressions;
+		$this->mappingType = self::MAP_PROPERTIES;
 		foreach ($expressions as $expr) {
 			if (is_string($expr->expression)) {
 				$this->mappingType = self::MAP_OBJECTS;
 			}
 		}
-		$this->mappingType = self::MAP_PROPERTIES;
 	}
 
 
