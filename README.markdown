@@ -1,15 +1,17 @@
-What is DataGrid
-================
+#What is DataGrid
+
 DataGrid control is a data bound list control that displays the items from datasource in a table. The DataGrid control allows you to select, sort, and manage these items.
 
 **This is development version, it probably contains bugs and therefore it is NOT intended for production use.**
-Keep in mind that things are still in development.
+
+Keep in mind that things are **still in development**.
+
 Feel free to suggest improvements.
 
 ##Basic usage:
 It is required to provide mapping between DataGrid's column names and entity columns. This allows internal components (eg. sorting filtering) to work properly.
 
-Doctrine 2:
+####Doctrine 2:
 
     $grid = new \DataGrid\DataGrid;
 
@@ -35,27 +37,29 @@ Doctrine 2:
     $grid->setDataSource($dataSource);
 
     //now we're working with mapped fields
-    $dg->addNumericColumn('id', 'ID')->addFilter();
-    $dg->addColumn('name', 'Jméno')->addFilter();
-    $dg->addColumn('email', 'Email')->addFilter();
-    $dg->addColumn('city', 'Město')->addFilter();
-    $dg->addColumn('street', 'Ulice')->addFilter();
-    $dg->addDateColumn('time', 'Datum registrace')->addDateFilter();
+    $grid->addNumericColumn('id', 'ID')->addFilter();
+    $grid->addColumn('name', 'Jméno')->addFilter();
+    $grid->addColumn('email', 'Email')->addFilter();
+    $grid->addColumn('city', 'Město')->addFilter();
+    $grid->addColumn('street', 'Ulice')->addFilter();
+    $grid->addDateColumn('time', 'Datum registrace')->addDateFilter();
 
-Dibi:
-
-    TODO
-
-PHP Array:
+####Dibi:
 
     TODO
 
-Todo
-----
-High priority:
+####PHP Array:
+
+    TODO
+
+##Todo
+
+####High priority:
+
  - Dibi wrapper (datasource)
  - Latte renderer
 
-Low priority:
- - PHP Array wrapper (datasource)
- - SelectBox formatting
+####Low priority:
+
+- PHP Array wrapper (datasource)
+- SelectBox formatting
