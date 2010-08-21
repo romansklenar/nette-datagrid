@@ -226,10 +226,22 @@ class Conventional extends Nette\Object implements IRenderer
 
 		// body
 		$body = Html::el($container->getName() == 'table' ? 'tbody' : NULL);
-		$iterator = new Nette\SmartCachingIterator($this->dataGrid->getRows());
-		foreach ($iterator as $data) {
-			$row = $this->generateContentRow($data);
-			$row->addClass($iterator->isEven() ? $this->getValue('row.content .even') : NULL);
+
+		if ($this->dataGrid->paginator->itemCount) {
+			$iterator = new Nette\SmartCachingIterator($this->dataGrid->getRows());
+			foreach ($iterator as $data) {
+				$row = $this->generateContentRow($data);
+				$row->addClass($iterator->isEven() ? $this->getValue('row.content .even') : NULL);
+				$body->add($row);
+			}
+		} else {
+			$size = count($this->dataGrid->getColumns());
+			$row = $this->getWrapper('row.content container');
+			$cell = $this->getWrapper('row.content cell container');
+			$cell->colspan = $size;
+			$cell->style = 'text-align:center';
+			$cell->add(Html::el('div')->setText($this->dataGrid->translate('No data were found')));
+			$row->add($cell);
 			$body->add($row);
 		}
 

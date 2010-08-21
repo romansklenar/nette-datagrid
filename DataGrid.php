@@ -784,10 +784,6 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\
 				}
 			}
 
-			if (!$this->paginator->itemCount) {
-				$this->flashMessage($this->translate("Empty datasource given."), 'info');
-			}
-
 			// NOTE: important!
 			$this->filterItems();
 
