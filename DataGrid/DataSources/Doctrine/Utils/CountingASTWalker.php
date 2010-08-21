@@ -9,7 +9,7 @@ class CountingASTWalker extends Doctrine\ORM\Query\TreeWalkerAdapter
 	{
 			$parent = $parentName = NULL;
 			foreach ($this->_getQueryComponents() AS $dqlAlias => $qComp) {
-				if ($qComp['parent'] === NULL && $qComp['nestingLevel'] == 0) {
+				if (array_key_exists('parent', $qComp) && $qComp['parent'] === NULL && $qComp['nestingLevel'] == 0) {
 					$parent = $qComp;
 					$parentName = $dqlAlias;
 					break;

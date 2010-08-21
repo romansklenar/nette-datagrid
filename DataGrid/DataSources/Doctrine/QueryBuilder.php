@@ -43,6 +43,13 @@ class QueryBuilder extends Mapped
 	 */
 	private $data;
 
+	/**
+	 * Total data count
+	 *
+	 * @var int
+	 */
+	private $count;
+
 
 	/**
 	 * Store given query builder instance
@@ -172,7 +179,7 @@ class QueryBuilder extends Mapped
 	 * 
 	 * @return array
 	 */
-	protected function fetch()
+	public function fetch()
 	{
 		$this->data = $this->qb->getQuery()->getScalarResult();
 
@@ -180,13 +187,17 @@ class QueryBuilder extends Mapped
 		$this->detectMappingType(); 
 
 		// Create mapping index
+		$data = array();
+		$i = 0;
 		foreach ($this->data as & $row) {
+			$data[$i] = array();
 			foreach ($this->mapping as $alias => $column) {
-				$row[$alias] = & $row[$this->getHydratedColumnName($column)];
+				$data[$i][$alias] = & $row[$this->getHydratedColumnName($column)];
 			}
+			$i++;
 		}
 
-		return $this->data;
+		return $this->data = $data;
 	}
 
 	/**
@@ -198,7 +209,7 @@ class QueryBuilder extends Mapped
 	private function getHydratedColumnName($column)
 	{
 		if ($this->mappingType === self::MAP_PROPERTIES) {
-			return substr($column, strpos($column, '.') + 1);
+			return substr($column, strpos($column, '.') !== FALSE ? strpos($column, '.') + 1 : 0);
 		}
 		
 		if ($this->mappingType === self::MAP_OBJECTS) {
@@ -216,12 +227,12 @@ class QueryBuilder extends Mapped
 	protected function detectMappingType()
 	{
 		$expressions = $this->qb->getQuery()->getAST()->selectClause->selectExpressions;
+		$this->mappingType = self::MAP_PROPERTIES;
 		foreach ($expressions as $expr) {
 			if (is_string($expr->expression)) {
 				$this->mappingType = self::MAP_OBJECTS;
 			}
 		}
-		$this->mappingType = self::MAP_PROPERTIES;
 	}
 
 
@@ -232,10 +243,15 @@ class QueryBuilder extends Mapped
 	 */
 	public function count()
 	{
+		//\Nette\Debug::barDump(debug_backtrace());
 		$query = clone $this->qb->getQuery();
 
 		$query->setHint(Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array(__NAMESPACE__ . '\Utils\CountingASTWalker'));
 		$query->setMaxResults(NULL)->setFirstResult(NULL);
+
+		$parts = $this->qb->getDQLParts();
+		if (array_key_exists('groupBy', $parts) && count($parts['groupBy']) > 0)
+			return count($query->getScalarResult());
 
 		return (int) $query->getSingleScalarResult();
 	}
