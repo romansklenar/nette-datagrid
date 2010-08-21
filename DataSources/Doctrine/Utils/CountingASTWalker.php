@@ -17,8 +17,7 @@ class CountingASTWalker extends Doctrine\ORM\Query\TreeWalkerAdapter
 			}
 
 			$pathExpression = new AST\PathExpression(
-				AST\PathExpression::TYPE_STATE_FIELD | AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION, $parentName, array(
-				$parent['metadata']->getSingleIdentifierFieldName())
+				AST\PathExpression::TYPE_STATE_FIELD | AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION, $parentName, $parent['metadata']->getSingleIdentifierFieldName()
 			);
 			$pathExpression->type = AST\PathExpression::TYPE_STATE_FIELD;
 
