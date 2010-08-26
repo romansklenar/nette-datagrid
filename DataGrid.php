@@ -38,7 +38,7 @@ use Nette;
  * @example    http://addons.nette.org/datagrid
  * @package    Nette\Extras\DataGrid
  */
-class DataGrid extends Nette\Application\Control implements \ArrayAccess, Nette\Forms\INamingContainer
+class DataGrid extends Nette\Application\Control implements \ArrayAccess
 {
 	/** @persistent int */
 	public $page = 1;
