@@ -117,9 +117,9 @@ abstract class Column extends Nette\ComponentContainer implements IColumn
 	public function getCaption()
 	{
 		if ($this->caption instanceof Html && $this->caption->title) {
-			return $this->caption->title($this->getDataGrid(TRUE)->translate($this->caption->title));
+			return $this->caption->title($this->getDataGrid()->translate($this->caption->title));
 		} else {
-			return $this->getDataGrid(TRUE)->translate($this->caption);
+			return $this->getDataGrid()->translate($this->caption);
 		}
 	}
 
@@ -146,7 +146,7 @@ abstract class Column extends Nette\ComponentContainer implements IColumn
 	 */
 	public function getOrderLink($dir = NULL)
 	{
-		return $this->getDataGrid(TRUE)->link('order', array('by' => $this->getName(), 'dir' => $dir));
+		return $this->getDataGrid()->link('order', array('by' => $this->getName(), 'dir' => $dir));
 	}
 
 

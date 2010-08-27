@@ -63,7 +63,7 @@ class NumericColumn extends Column
 	{
 		if (!$this->hasFilter()) return;
 
-		$dataGrid = $this->getDataGrid(TRUE);
+		$dataGrid = $this->getDataGrid();
 
 		if ($value === 'NULL' || $value === 'NOT NULL') {
 			

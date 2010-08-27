@@ -650,7 +650,7 @@ class Conventional extends Nette\Object implements IRenderer
 
 	/**
 	 * Returns DataGrid.
-	 * @return DataGrid\Datagrid
+	 * @return DataGrid\DataGrid
 	 */
 	public function getDataGrid()
 	{

@@ -93,7 +93,7 @@ class PositionColumn extends NumericColumn
 	 */
 	public function formatContent($value, $data = NULL)
 	{
-		$control = $this->getDataGrid(TRUE)->lookup('Nette\Application\Control', TRUE);
+		$control = $this->getDataGrid()->lookup('Nette\Application\Control', TRUE);
 		$uplink = $control->link($this->destination, array('key' => $value, 'dir' => 'up'));
 		$downlink = $control->link($this->destination, array('key' => $value, 'dir' => 'down'));
 

@@ -64,7 +64,7 @@ class TextColumn extends Column
 	{
 		if (!$this->hasFilter()) return;
 
-		$dataSource = $this->getDataGrid(TRUE)->getDataSource();
+		$dataSource = $this->getDataGrid()->getDataSource();
 
 		if (strpos($value, '*') !== FALSE) {
 			$dataSource->filter($this->name, 'LIKE', $value); //asterisks are converted internally

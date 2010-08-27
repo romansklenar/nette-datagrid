@@ -51,7 +51,7 @@ class CheckboxColumn extends NumericColumn
 	{
 		if (! $this->hasFilter()) return;
 
-		$dataSource = $this->getDataGrid(TRUE)->getDataSource();
+		$dataSource = $this->getDataGrid()->getDataSource();
 		$value = (boolean) $value;
 		if ($value) {
 			$dataSource->filter($this->name, '>=', $value);
