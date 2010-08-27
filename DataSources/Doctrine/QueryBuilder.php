@@ -2,7 +2,9 @@
 
 namespace DataGrid\DataSources\Doctrine;
 
-use Doctrine, Doctrine\ORM\Query\Expr;
+use Doctrine,
+	Doctrine\ORM\Query\Expr,
+	DataGrid\DataSources\Utils\WildcardHelper;
 
 /**
  * Query Builder based data source
@@ -93,7 +95,7 @@ class QueryBuilder extends Mapped
 					$conds[] = "{$this->mapping[$column]} $t ?$nextParamId";
 					$this->qb->setParameter(
 						$nextParamId++,
-						$t === self::LIKE || $t === self::NOT_LIKE ? Utils\WildcardHelper::formatLikeStatementWildcards($value) : $value
+						$t === self::LIKE || $t === self::NOT_LIKE ? WildcardHelper::formatLikeStatementWildcards($value) : $value
 					);
 				}
 			}
@@ -114,7 +116,7 @@ class QueryBuilder extends Mapped
 				$this->qb->andWhere("{$this->mapping[$column]} $operation ?$nextParamId");
 				$this->qb->setParameter(
 					$nextParamId,
-					$operation === self::LIKE || $operation === self::NOT_LIKE ? Utils\WildcardHelper::formatLikeStatementWildcards($value) : $value
+					$operation === self::LIKE || $operation === self::NOT_LIKE ? WildcardHelper::formatLikeStatementWildcards($value) : $value
 				);
 			}
 		}
