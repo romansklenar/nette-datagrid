@@ -11,7 +11,8 @@ Feel free to suggest improvements.
 ##Basic usage:
 It is required to provide mapping between DataGrid's column names and entity columns. This allows internal components (eg. sorting filtering) to work properly.
 
-####Doctrine 2:
+####Doctrine 2
+######Doctrine 2 ORM - QueryBuilder:
 
     $grid = new \DataGrid\DataGrid;
 
@@ -44,9 +45,56 @@ It is required to provide mapping between DataGrid's column names and entity col
     $grid->addColumn('street', 'Ulice')->addFilter();
     $grid->addDateColumn('time', 'Datum registrace')->addDateFilter();
 
-####Dibi:
+####Dibi
+#####DibiFluent:
 
-    TODO
+	// Create a query
+	$df = new \DibiFluent(\dibi::getConnection());
+	$df->select('p.*')
+	->select('c.name')->as('city')
+	->from('%n', 'people', 'p')
+	->leftJoin('%n', 'cities', 'c')
+	->on('(p.[city_id] = c.[id])');
+
+	// Configure data source
+	$dataSource = new \DataGrid\DataSources\Dibi\Fluent($df);
+	$dataSource->setMapping(array(
+	'id' => 'p.ID',
+	'name' => 'p.name',
+	'mail' => 'p.mail',
+	'city' => 'c.name',
+	'registered' => 'p.registered',
+	));
+
+
+	// Configure data grid
+	$grid = new \DataGrid\DataGrid;
+	$grid->setDataSource($dataSource);
+
+	// Configure columns
+	$grid->addNumericColumn('id', 'ID')->addFilter();
+	$grid->addColumn('name', 'Jméno')->addFilter();
+	$grid->addColumn('mail', 'E-mail')->addFilter();
+	$grid->addColumn('city', 'Město')->addFilter();
+	$grid->addDateColumn('date', 'Registrován')->addFilter();
+
+#####DibiDataSource:
+
+	// Create a query
+	$ds = \dibi::dataSource('SELECT p.*, c.[name] as city FROM [people] p LEFT JOIN [cities] c ON p.[city_id] = c.[id]');
+	// Create a data source
+	$dataSource = new \DataGrid\DataSources\Dibi\DataSource($ds);
+
+	// Configure data grid
+	$grid = new DataGrid;
+	$grid->setDataSource($dataSource);
+
+	// Configure columns
+	$grid->addNumericColumn('id', 'ID')->addFilter();
+	$grid->addColumn('name', 'Jméno')->addFilter();
+	$grid->addColumn('mail', 'E-mail')->addFilter();
+	$grid->addColumn('city', 'Město')->addFilter();
+	$grid->addDateColumn('registered', 'Registrován')->addFilter();
 
 ####PHP Array:
 
@@ -56,7 +104,6 @@ It is required to provide mapping between DataGrid's column names and entity col
 
 ####High priority:
 
- - Dibi wrapper (datasource)
  - Latte renderer
 
 ####Low priority:
