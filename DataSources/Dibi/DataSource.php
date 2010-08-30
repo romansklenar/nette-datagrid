@@ -3,8 +3,7 @@ namespace DataGrid\DataSources\Dibi;
 
 use DataGrid\DataSources\IDataSource,
 	DataGrid\DataSources,
-	dibi,
-	DibiDataSource;
+	dibi;
 
 /**
  * Dibi data source based data source
@@ -15,29 +14,24 @@ use DataGrid\DataSources\IDataSource,
 class DataSource extends DataSources\DataSource
 {
 	/**
-	 * Dibi data source instance
-	 *
-	 * @var DibiDataSource
+	 * @var \DibiDataSource Dibi data source instance
 	 */
 	private $ds;
 
 	/**
-	 * Fetched data
-	 *
-	 * @var array
+	 * @var array Fetched data
 	 */
 	private $data;
 
 	/**
 	 * Store given dibi data source instance
-	 * @param DibiDataSource $qb
-	 * @return DibiDataSource
+	 * @param \DibiDataSource
+	 * @return IDataSource
 	 */
-	public function __construct(DibiDataSource $ds)
+	public function __construct(\DibiDataSource $ds)
 	{
 		$this->ds = $ds;
 	}
-
 
 	/**
 	 * Get list of columns available in datasource
@@ -57,7 +51,6 @@ class DataSource extends DataSources\DataSource
 		throw new \NotSupportedException;
 	}
 
-
 	/**
 	 * Return distinct values for a selectbox filter
 	 * @param string Column name
@@ -67,7 +60,6 @@ class DataSource extends DataSources\DataSource
 	{
 		throw new \NotImplementedException;
 	}
-
 
 	/**
 	 * Add filtering onto specified column
@@ -120,7 +112,6 @@ class DataSource extends DataSources\DataSource
 		}
 	}
 
-
 	/**
 	 * Adds ordering to specified column
 	 * @param string column name
@@ -134,7 +125,6 @@ class DataSource extends DataSources\DataSource
 
 		return $this;
 	}
-
 
 	/**
 	 * Reduce the result starting from $start to have $count rows
