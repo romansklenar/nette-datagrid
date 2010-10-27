@@ -11,6 +11,7 @@ use DataGrid\DataSources\IDataSource,
  * @author Pavel Kučera
  * @author Michael Moravec
  * @author Štěpán Svoboda
+ * @author Petr Morávek
  */
 class Fluent extends DataSources\Mapped
 {
@@ -178,5 +179,14 @@ class Fluent extends DataSources\Mapped
 	public function getFilterItems($column)
 	{
 		throw new \NotImplementedException;
+	}
+
+	/**
+	 * Clone dibi fluent instance
+	 * @return void
+	 */
+	public function __clone()
+	{
+		$this->df = clone $this->df;
 	}
 }

@@ -10,6 +10,7 @@ use DataGrid\DataSources\IDataSource,
  * @author Pavel Kučera
  * @author Michael Moravec
  * @author Štěpán Svoboda
+ * @author Petr Morávek
  */
 class DataSource extends DataSources\DataSource
 {
@@ -171,5 +172,14 @@ class DataSource extends DataSources\DataSource
 	public function count()
 	{
 		return (int) $this->ds->count();
+	}
+
+	/**
+	 * Clone dibi datasource instance
+	 * @return void
+	 */
+	public function __clone()
+	{
+		$this->ds = clone $this->ds;
 	}
 }
