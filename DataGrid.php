@@ -442,7 +442,7 @@ class DataGrid extends Nette\Application\Control implements \ArrayAccess
 			$html = $this->__toString();
 
 			// Remove snippet-div to emulate native snippets... No extra support on client side is needed...
-			$snippet = 'snippet-' . $this->getName() . '-grid';
+			$snippet = 'snippet-' . $this->getUniqueId() . '-grid';
 			$start = strlen('<div id="' . $snippet . '">');
 			$stop = - strlen('</div>');
 			$html = trim(mb_substr($html, $start, $stop));
