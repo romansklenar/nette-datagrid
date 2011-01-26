@@ -127,7 +127,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public function bindDataTable(DibiDataSource $dataSource)
 	{
 		$this->dataSource = $dataSource;
-		$this->paginator->itemCount = count($dataSource);
+		$this->paginator->itemCount = null;
 	}
 
 
@@ -737,6 +737,10 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 	public function render()
 	{
 		if (!$this->wasRendered) {
+			if(is_null($this->paginator->itemCount))
+			{
+				$this->paginator->itemCount = count($this->dataSource);
+			}
 			$this->wasRendered = TRUE;
 
 			if (!$this->hasColumns() || (count($this->getColumns('ActionColumn')) == count($this->getColumns()))) {
@@ -755,7 +759,7 @@ class DataGrid extends Control implements ArrayAccess, INamingContainer
 				}
 			}
 
-			if (!count($this->dataSource)) {
+			if (!$this->paginator->itemCount && !count($this->dataSource)) {
 				$this->flashMessage($this->translate("Empty datasource given."), 'info');
 			}
 
