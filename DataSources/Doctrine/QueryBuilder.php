@@ -11,6 +11,7 @@ use Doctrine,
  * Query Builder based data source
  * @author Michael Moravec
  * @author Štěpán Svoboda
+ * @author Milan Lempera
  */
 class QueryBuilder extends DataSources\Mapped
 {
@@ -221,6 +222,7 @@ class QueryBuilder extends DataSources\Mapped
 	{
 		//\Nette\Debug::barDump(debug_backtrace());
 		$query = clone $this->qb->getQuery();
+		$query->setParameters($this->qb->getQuery()->getParameters());
 
 		$query->setHint(Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array(__NAMESPACE__ . '\Utils\CountingASTWalker'));
 		$query->setMaxResults(NULL)->setFirstResult(NULL);
