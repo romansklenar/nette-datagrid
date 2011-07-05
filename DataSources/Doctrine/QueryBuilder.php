@@ -53,6 +53,11 @@ class QueryBuilder extends DataSources\Mapped
 		$this->qb = $qb;
 	}
 
+	public function __clone()
+	{
+		$this->qb=clone $this->qb;
+	}
+
 	/**
 	 * Filter items in data source
 	 * @param string $column
