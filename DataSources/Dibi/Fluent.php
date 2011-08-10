@@ -78,7 +78,7 @@ class Fluent extends DataSources\Mapped
 					$this->df->where($cond);
 				}
 			} elseif ($chainType === self::CHAIN_OR) {
-				$this->df->where('%or', $conds);
+				$this->df->where('( %or )', $conds);
 			}
 		} else {
 			$this->validateFilterOperation($operation);
@@ -125,7 +125,7 @@ class Fluent extends DataSources\Mapped
 	public function reduce($count, $start = 0)
 	{
 		if ($count == NULL || $count > 0) { //intentionally ==
-			$this->df->limit($count == NULL ? NULL : $count);
+			$this->df->limit($count == NULL ? 0 : $count);
 		} else throw new \OutOfRangeException;
 
 		if ($start == NULL || ($start > 0 && $start < count($this))) {
